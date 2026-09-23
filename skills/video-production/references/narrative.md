@@ -46,6 +46,20 @@ them**, it is a brochure, not a story. Cut.
 
 **This distinction cost a full chapter rewrite in the source production.**
 
+### The mechanism is not the claim `#40`
+
+A tool's behaviour and a viewer's benefit are different sentences, and only one of them sells.
+
+| Sentence | Subject | What it is |
+|---|---|---|
+| "It fails the build when a check does not pass" | the product | mechanism |
+| "You don't hear about the mistake from your client" | the viewer | **the claim** |
+
+Write the mechanism, then ask **"so what?"** until the answer is something that happens to a person.
+Stop there. That is the film.
+
+**Test:** if the grammatical subject of the claim is the product, it is still a feature.
+
 ### Every feature must answer a real objection `#12`
 
 If nobody is asking about it, cut it. A defensive claim plants a doubt that was not there.
@@ -59,6 +73,38 @@ If nobody is asking about it, cut it. A defensive claim plants a doubt that was 
 
 **The claim is always about the product, never about the viewer.** "You use 22 tools" makes the
 viewer say *I don't*, and you lose their belief in everything else.
+
+---
+
+## 2b. The cold-read gate — run this before anything is built `#41`
+
+The verifier measures whether text **can** be read: dwell, contrast, stillness, coverage. It has
+nothing whatever to say about whether a stranger **understands** it. That gap is where the two worst
+demos this skill has produced went out — fifteen checks green, incomprehensible to the first human
+who watched.
+
+So the script passes a mechanical gate of its own, before a line of composition code exists.
+
+**Write a ledger. One row per chapter, in order:**
+
+| Chapter | What this chapter needs the viewer to already know | Where that was established |
+|---|---|---|
+
+Fill the third column with a **specific earlier chapter**. If any cell reads "obvious", "from the
+title", "they'd figure it out", or is empty — **the script fails.** Move the missing fact earlier or
+cut the chapter that depends on it.
+
+Every term, number, name and abbreviation is a row. `18 renders · same` needs: what was rendered,
+what it was compared with, and why sameness is the good outcome. Three facts, none of them
+established, in one card that was on screen for four seconds.
+
+**Why it has to be mechanical.** The author has just finished the work, so every reference feels
+self-evident — from the inside, recency is indistinguishable from clarity. A feeling that "it reads
+fine" is exactly the signal that cannot be trusted here, because it is the same feeling whether the
+script is clear or whether you simply already know the answer.
+
+> **The hardest version of this test:** the one person who could not follow the second demo was the
+> person who commissioned the work it described.
 
 ---
 
