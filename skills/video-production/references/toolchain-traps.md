@@ -1,58 +1,59 @@
-# مصايد سلسلة الأدوات — الأخطاء اللي بتعدّي كل فحص وتطلّع ملف غلط
+# Toolchain traps — the failures that pass every check and ship a broken file
 
-> مُضاف بعد إنتاج سلسلة كاملة بتلات نسب عرض (2026-09).
-> `failure-log.md` بيغطي أخطاء **الحكم**: هوية، رسالة، سرد، تخطيط.
-> الملف ده بيغطي أخطاء **التنفيذ**: كود بيبان سليم، معاينة سليمة، lint ساكت — وفيديو مكسور.
+> Added after producing a full series in three aspect ratios (2026-09).
+> `failure-log.md` covers mistakes of **judgement**: brand, message, narrative, layout.
+> This file covers mistakes of **execution**: code that looks right, a preview that looks right, a
+> silent lint — and a broken video.
 >
-> الفرق مهم: أخطاء الحكم بتتمسك بالعين. دي لأ.
+> The distinction matters. Judgement errors are caught by looking. These are not.
 
 ---
 
-## 1. الفئة الأخطر — فشل صامت في الرندر
+## 1. The most dangerous class — silent render failure
 
-الرندر بيبني كل إطار بـ **seek** مستقل. أي كود بيفترض تشغيل متسلسل بيسقط من غير
-رسالة خطأ.
+The renderer builds each frame with an independent **seek**. Any code that assumes sequential
+playback fails without an error message.
 
-| # | المصيدة | العَرَض | الإصلاح |
+| # | Trap | Symptom | Fix |
 |---|---|---|---|
-| T1 | `<html dir="rtl">` | **فيديو أسود بالكامل** · المعاينة والـsnapshot سليمين | متحطّش أي attribute على `<html>`؛ اعمل scope للـ RTL على العناصر |
-| T2 | `tl.set(x, 0)` | الإطار 0 بيطلع وكل العناصر المخفية ظاهرة | الحالة الابتدائية بـ `gsap.set()` **بره** الـtimeline |
-| T3 | `fromTo` | الـ"from" بيتطبّق وقت بناء الـtimeline فبيفضل ظاهر في كل المشاهد | `immediateRender: false` على كل `fromTo` |
-| T4 | `tl.call()` | الـcallbacks بتتكتم مع الـseek → العدّادات **مش بتتحدّث في الرندر** وشغالة في المعاينة | ممنوع `tl.call`؛ سوق الـDOM من `onUpdate` على tween على object |
-| T5 | `tl.seek(t)` | نفس المشكلة في أي أداة بتعمل seek بنفسها — `suppressEvents` افتراضيه `true` | `tl.seek(t, false)` |
-| T6 | tween على `text` | no-op صامت من غير TextPlugin | `el.textContent = …` |
-| T7 | ids مكرّرة | builder بيتندَه أكتر من مرة → الـselector بيمسك الأول بس | prefix إجباري لكل نسخة |
+| T1 | `<html dir="rtl">` | **a fully black video** · preview and snapshots both fine | no attribute on `<html>` at all; scope direction to the elements inside |
+| T2 | `tl.set(x, 0)` | frame 0 shows every element that should be hidden | initial state with `gsap.set()` **outside** the timeline |
+| T3 | `fromTo` | the "from" applies at authoring time, so it stays visible in every scene | `immediateRender: false` on every `fromTo` |
+| T4 | `tl.call()` | callbacks are suppressed on seek → counters **never update in the render** while working in the preview | no `tl.call`; drive the DOM from `onUpdate` on a tween over an object |
+| T5 | `tl.seek(t)` | the same problem in any tool that seeks for itself — `suppressEvents` defaults to `true` | `tl.seek(t, false)` |
+| T6 | tweening `text` | a silent no-op without TextPlugin | `el.textContent = …` |
+| T7 | duplicate ids | a builder called more than once → the selector only ever finds the first | a mandatory prefix per instance |
 
-> **القاعدة الجامعة:** أي حاجة «بتشتغل مرة واحدة» هي شبهة. اسأل: لو الإطار ده
-> اتبنى لوحده من غير اللي قبله، هيطلع صح؟
+> **The general rule:** anything that "runs once" is a suspect. Ask: if this frame were built alone,
+> with nothing before it, would it come out right?
 
 ---
 
-## 2. أدوات القياس بتكذب — والكذب المريح أخطر
+## 2. Measuring tools lie — and the comfortable lie is the dangerous one
 
-في إنتاج واحد، **تلات فاحصات من اللي كتبتهم أدّوا أرقام غلط، ومرتين في الاتجاه
-اللي بيريّح**.
+In one production, **three of the checkers I wrote returned wrong numbers, twice in the direction
+that let a failure pass.**
 
-| # | السبب | العَرَض |
+| # | Cause | Symptom |
 |---|---|---|
-| T8 | الحاويات الشفافة بتتحسب «محتوى» | أرقام مختلفة بتطلع متطابقة بالظبط |
-| T9 | القياس على إطار **انتقالي** | التعديل الحقيقي مابيغيّرش الرقم |
-| T10 | عدم القص على `overflow:hidden` | صورة مقصوصة بتتحسب بحجمها الكامل |
-| T11 | تجاهل نافذة `data-start`/`data-duration` | عنصر بيتحسب ظاهر في كل المشاهد |
-| T12 | صندوق شفاف بعرض الشاشة حوالين نص صغير | تغطية 49% وهمية والحقيقة 36% |
-| T13 | عتبة مكتوبة بأرقام مقاس واحد | **100% لكل مشهد** على مقاس تاني |
+| T8 | transparent layout containers counted as "content" | different numbers come out exactly identical |
+| T9 | measuring on a **transitional** frame | a real change moves no number |
+| T10 | not clipping to `overflow:hidden` | a cropped image measures at its full off-frame size |
+| T11 | ignoring the `data-start` / `data-duration` window | an element counts as visible in every scene |
+| T12 | a transparent full-width box around small text | 49% coverage reported, 36% true |
+| T13 | a threshold written in one format's pixels | **100% for every chapter** in another format |
 
-**الفحص لازم:** يقيس اللي **بيرسم** بس (خلفية · حد · نص خاص · img · svg) ·
-يقص على كل `overflow:hidden` فوقه · يحترم نافذة الزمن · ياخد مقاس الإطار
-كـ **argument** مش ثابت · ويتسمّى على إطارات **ساكنة**.
+**A checker must:** measure only what **paints** (background · border · own text · img · svg) · clip
+to every `overflow:hidden` ancestor · respect the time window · take the frame size as an
+**argument**, never a constant · and sample **still** frames.
 
-> **علامة تحذير:** أي نجاح مريح — دوّر على ليه هو مريح. وأي رقم مااتحركش بعد
-> تعديل حقيقي — شك في الفاحص قبل ما تشك في التعديل.
+> **Warning sign:** any comfortable pass — go and find out why it is comfortable. And any number
+> that does not move after a real change — suspect the checker before you suspect the change.
 
-### 2.1 الـseek لوحده مابيغيّرش المشهد الظاهر
+### 2.1 Seeking alone does not change which scene is visible
 
-الـruntime هو اللي بيقرر أي `clip` ظاهر من `data-start`. أي فاحص أو أداة لقطات
-لازم تطبّق دي بنفسها، وإلا هتصوّر المشهد الغلط:
+The runtime decides which `clip` is on screen from `data-start`. Any checker or screenshot tool has
+to apply that itself, or it photographs the wrong scene:
 
 ```js
 document.querySelectorAll("section[data-start]").forEach((el) => {
@@ -62,103 +63,103 @@ document.querySelectorAll("section[data-start]").forEach((el) => {
 });
 ```
 
-### 2.2 Playwright بيعلّق من غير رسالة
+### 2.2 Playwright hangs with no message
 
-`seek()` بترجّع الـtimeline. arrow function من غير أقواس بترجّعه ضمنياً، فالـ
-serializer بيحاول يفكّ كائن GSAP حي — **والاستدعاء بيعلّق للأبد**.
+`seek()` returns the timeline. An arrow function without braces returns it implicitly, so the
+serializer tries to unpack a live GSAP object — **and the call hangs forever.**
 
 ```js
-await p.evaluate((n) => tl.seek(n / 30, false), f);      // ✗ بيعلّق
+await p.evaluate((n) => tl.seek(n / 30, false), f);      // ✗ hangs
 await p.evaluate((n) => { tl.seek(n / 30, false); }, f); // ✓
 ```
 
-ومتغيّرات Node مش موجودة جوه `page.evaluate` — لازم تتمرّر كـ argument.
+And Node variables do not exist inside `page.evaluate` — they must be passed as an argument.
 
 ---
 
-## 3. الصوت — التطبيع لوحده بيعمل clipping
+## 3. Audio — normalising alone produces clipping
 
-`loudnorm` وصل −14.0 LUFS و**true peak +3.5 dBFS**. ترميز AAC بيضيف intersample
-peaks فوق قمة الـPCM.
+`loudnorm` reached −14.0 LUFS and a **true peak of +3.5 dBFS**. AAC encoding adds intersample peaks
+above the PCM peak.
 
 ```bash
-# مرحلة 1: قِس  →  مرحلة 2: طبّق بالقيم المقاسة + limiter بهامش كافي
+# pass 1: measure  →  pass 2: apply the measured values + a limiter with real headroom
 ... ,alimiter=limit=0.794:attack=5:release=50:level=disabled,aresample=48000
 ```
 
-وتضييق الـlimiter مش دايماً بيحسّن: `0.84` طلّع peak **أسوأ** من `0.891`.
-**قِس كل احتمال، متستنتجش.**
+And tightening the limiter does not monotonically help: `0.84` produced a **worse** peak than
+`0.891`. **Measure every candidate; do not reason about it.**
 
----
+### 3.1 A script that resolves its dependencies next to itself breaks the moment it moves
 
-### 3.1 سكربت بيدوّر على اعتماديّاته جنب نفسه بيتكسر أول ما يتنقل
-
-`import { chromium } from "@playwright/test"` بيتحل **نسبةً لمكان الملف**. فطول
-ما السكربت جوه المشروع شغال، وأول ما يتثبّت في `~/.claude/skills/` بيموت —
-ومفيش `node_modules` هناك. ده بيحصل لأي حد بيثبّت من repo أو حزمة.
+`import { chromium } from "@playwright/test"` resolves **relative to the file**. So it works as long
+as the script lives inside the project, and dies the moment it is installed in `~/.claude/skills/` —
+there is no `node_modules` there. This happens to everyone who installs from a repo or a package.
 
 ```js
-// الحل: حل الاعتمادية من مجلد العمل، مش من مجلد السكربت
+// resolve from the working directory, not from the script's directory
 const req = createRequire(pathToFileURL(join(process.cwd(), "noop.js")).href);
 const mod = await import(pathToFileURL(req.resolve(name)).href);
 ```
 
-**ومصيدة جواها:** الحزم دي CommonJS. `import()` لملف CJS بيحط `module.exports`
-في `default`، والـnamed exports بتتكشف بالـlexer وساعات بيفوته. فلازم:
+**And a trap inside the trap:** these packages are CommonJS. `import()` of a CJS file puts
+`module.exports` on `default`, and named exports are detected by a lexer that sometimes misses. So:
 
 ```js
 const pick = (mod) => mod?.chromium || mod?.default?.chromium;
 ```
 
-من غير السطر ده الاستيراد بينجح والقيمة بتطلع `undefined`، والكود بيعدّي للمحاولة
-اللي بعدها ويرمي في الآخر «مش متثبّت» — وهي متثبّتة.
-
-## 4. البيئة
-
-| العَرَض | السبب | الحل |
-|---|---|---|
-| `audio_processing_failed: spawn EPERM` | shim بتاع ffmpeg مش قابل للتشغيل | حط مجلد الملف الحقيقي على PATH |
-| **نفس الخطأ في مشروع واحد بس من تلاتة** | الملف الناتج بياخد **اسم المجلد**، ومجلد اسمه `9x16` بيفشل | سمّي المجلدات بكلمات: `main` · `vertical` · `square` |
-| الرندر بيفشل محتاج مساحة | `TEMP` على قرص ضيّق | وجّه `TEMP`/`TMP` لقرص فيه ≥6GB |
-| `missing_timeline_registry` | الـlint بيقرا `index.html` **نصاً** فـ`<script src>` بيقرا كأن مفيش timeline | ادمج الـJS جوه الملف؛ سيب المصدر في `_src/` **جوه** مجلد المشروع |
-| `root_dimensions_mismatch` | الـlint بيقرا **أول** قاعدة `html, body` | **استبدل** القاعدة، ماتضفش عليها |
+Without that line the import succeeds, the value is `undefined`, the code moves to the next
+candidate, and eventually throws "not installed" — about a package that is installed.
 
 ---
 
-## 5. تخطيط بيتكسر عند تغيير المقاس
+## 4. Environment
 
-| # | العَرَض | السبب |
+| Symptom | Cause | Fix |
 |---|---|---|
-| T14 | سطر بيطلع بره الكادر | `width:max-content` مش بيلفّ — محتاج `white-space:normal` + `max-width` |
-| T15 | النص بيلمس اللي جنبه | نفس السبب: العنصر أوسع من الصندوق المتمركز فيه وبيطلع من الجهتين |
-| T16 | السلوجان نص بره الشاشة | إزاحة ±56px مصمّمة لـ1920 على إطار 1080 |
-| T17 | عنصر بيطلع من منطقته | حجم خط ثابت ومنطقة أضيق · للـmonospace: `العرض ÷ 5` تقريباً |
-| T18 | لوجو مهروس لارتفاع 32px | SVG جوه flex column من غير `flex-shrink:0` |
-| T19 | شريط أسود بيزحف من الجنب | خلفية بعرض الإطار **بالظبط** + حركة انزياح — خلّيها أوسع |
-
-**البنية اللي اشتغلت لتلات مقاسات:** الـtimeline مشترك **حرفياً** (هو اللي كلّف
-كل التحقق) · الهندسة في ملف تعريف لكل مقاس · مولّد بيدمج الاتنين.
-والـ**inline styles بتغلب الـCSS المولّد** — محتاجة `!important` وإلا المقاس
-الجديد بيورّث أرقام المقاس القديم بصمت.
+| `audio_processing_failed: spawn EPERM` | a shim for ffmpeg that cannot be spawned | put the real binary's directory on PATH |
+| **the same error in one project out of three** | the output file is named after the **directory**, and a directory named `9x16` fails | name directories with words: `main` · `vertical` · `square` |
+| render fails needing disk space | `TEMP` on a small drive | point `TEMP` / `TMP` at a drive with ≥6 GB |
+| `missing_timeline_registry` | the lint reads `index.html` **as text**, so a `<script src>` reads as having no timeline | inline the JS into the file; keep the source in `_src/` **inside** the project directory |
+| `root_dimensions_mismatch` | the lint reads the **first** `html, body` rule | **replace** the rule; do not add another |
 
 ---
 
-## 6. اللوجوهات والواجهات المُقلَّدة
+## 5. Layout that breaks when the aspect ratio changes
 
-- **لوجو منتج تاني لازم يكون المنتج نفسه.** أيقونة outline بلون واحد مابتتعرفش.
-  الألوان الرسمية + الشكل الحقيقي. ورسمهم SVG كافي — مش لازم تنزّل ملفات.
-- **الحجم جزء من التعرّف:** 20px «موجود»، 26px «واضح».
-- **لون اللوجو الرسمي ممكن يسقط في فحص التباين.** `#4285F4` على أبيض = 3.56:1.
-  تغميق درجة مش باين وبيخلّي البوابة نضيفة من غير استثناء.
-- **لو بتقلّد واجهة تطبيق، قلّدها صح.** رسالة واتس أب واردة **مالهاش ✓✓** —
-  دي بتخص اللي أنت بعته. غلطة بيلاحظها أي مستخدم فوراً.
+| # | Symptom | Cause |
+|---|---|---|
+| T14 | a line runs outside the frame | `width:max-content` does not wrap — needs `white-space:normal` + `max-width` |
+| T15 | text touches its neighbour | the same cause: the element is wider than the box it is centred in and spills both ways |
+| T16 | half the slogan is off screen | a ±56px offset designed for a 1920 frame |
+| T17 | an element escapes its zone | fixed font size, narrower zone · for monospace, roughly `width ÷ 5` |
+| T18 | a logo crushed to 32px tall | an SVG in a flex column without `flex-shrink: 0` |
+| T19 | a black strip creeps in from the edge | a background exactly the frame's width + a drift tween — make it wider |
+
+**The architecture that worked for three ratios:** the timeline is shared **verbatim** (it is what
+cost all the verification) · geometry in one definition file per ratio · a generator that merges
+them. And **inline styles beat generated CSS** — they need `!important`, or the new ratio silently
+inherits the old ratio's numbers.
 
 ---
 
-## 7. الإضافة على «قائمة قف» في `unattended.md`
+## 6. Logos and imitated interfaces
 
-| # | الحالة | ليه |
+- **Another product's logo has to be that product.** A single-colour outline icon is not recognised.
+  Official colours and the real silhouette. Drawing them as SVG is enough — no downloads needed.
+- **Size is part of recognition:** 20px is "present", 26px is "clear".
+- **An official brand colour can fail a contrast check.** `#4285F4` on white is 3.56:1. Darkening it
+  one step is invisible and keeps the gate clean without an exemption.
+- **If you imitate an app's interface, imitate it correctly.** An incoming WhatsApp message has
+  **no ✓✓** — those belong to messages you sent. Every user of the app sees that instantly.
+
+---
+
+## 7. Additions to the stop list in `unattended.md`
+
+| # | Situation | Why |
 |---|---|---|
-| T-S1 | الرندر أسود أو المدة صفر | مصيدة بنيوية (T1) — متحاولش تصلّح بالتخمين |
-| T-S2 | فاحص بيقول **100%** أو رقم مستحيل | الفاحص مكسور مش الفيديو — صلّح الفاحص الأول |
-| T-S3 | `spawn EPERM` بعد تصليح الـPATH | مسار/بيئة — مش محتوى |
+| T-S1 | the render is black, or its duration is zero | a structural trap (T1) — do not guess at a fix |
+| T-S2 | a checker reports **100%** or any impossible number | the checker is broken, not the video — fix the checker first |
+| T-S3 | `spawn EPERM` after the PATH is already fixed | path or environment, not content |

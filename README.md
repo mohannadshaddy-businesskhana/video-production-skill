@@ -109,13 +109,12 @@ clean:
 
 And the ones where the measuring tool itself lied — twice in the direction that let a failure pass.
 
-## Language note
+## Bilingual references
 
-`SKILL.md`, all routes, and the newer references are in **English**. Four inherited references —
-the failure log, production rules, narrative guidance, and the unattended protocol — are in
-**Arabic**, because that is the language the productions they came from were run in. They are the
-most battle-tested files in the repo. Translation is open as
-[issue #1](../../issues/1) if this matters to you.
+Everything is in **English**. Six references also ship as `<name>.ar.md` — the Arabic originals,
+kept because that is the language the productions were actually run in and the wording the
+corrections were given in. The English file is the one to read; the Arabic one is the primary
+source.
 
 ## Licence
 

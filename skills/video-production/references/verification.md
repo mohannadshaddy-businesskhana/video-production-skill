@@ -1,6 +1,6 @@
-# التحقق
+# Verification
 
-## التشغيل
+## Running it
 
 ```bash
 python scripts/verify.py \
@@ -10,131 +10,160 @@ python scripts/verify.py \
 ```
 
 `brand.json`:
+
 ```json
 { "colors": ["#0A0A0A", "#E63946", "#F4C430", "#1D4ED8", "#F2EEE3", "#FFFFFF"],
   "lufs": -14 }
 ```
 
-**خروج 0 = اعرض على المستخدم. خروج 1 = صلّح وأعد.**
-مفيش رندر بيتعرض على حد قبل ما الفاحص يعدّي. ده مش اقتراح.
+**Exit 0 = show it to the user. Exit 1 = fix and re-run.**
+No render is shown to anyone before the verifier passes. That is not a suggestion.
 
-المتطلبات: `ffmpeg` · `ffprobe` · `numpy` · `pillow`.
+Requires `ffmpeg` · `ffprobe` · `numpy` · `pillow`. Without numpy and Pillow, pass `--skip-palette`
+and every other check still runs.
 
 ---
 
-## الفحوصات
+## The checks
 
-| الفحص | بيمسك | المرجع |
+| Check | Catches | Ref |
 |---|---|---|
-| `file integrity` | ملف ناقص أو تالف | #35 |
-| `duration` | المدة ≠ المانيفست | — |
-| `loudness` | خارج −14 LUFS ±1 | #25 |
-| `beat continuity` | التراك وقف ورجع خارج الشبكة | #27 |
-| `palette` | لون سادس | #01 #02 |
-| `chapter continuity` | فجوة بين فصلين | — |
-| `safe zone` | عنصر بره 12%–72% | #18 |
-| `zone containment` | عنصر بره منطقته | #20 |
-| `no overlap` | عنصران متقاطعان في نفس الوقت | #20 |
-| `content coverage` | تغطية < 45% في أي فصل | #21 |
-| `reading dwell` | نص سكونه < 1.5 ثانية | #31 |
-| `single large motion` | حركتان كبيرتان متزامنتان | #28 |
-| `text reads in stillness` | نص جديد أثناء حركة | #29 |
+| `file integrity` | a truncated or corrupt file | #35 |
+| `duration` | duration ≠ the manifest | — |
+| `loudness` | outside the target ±1 LUFS | #25 |
+| `beat continuity` | the track stopped and came back off the grid | #27 |
+| `palette` | a sixth colour | #01 #02 |
+| `chapter continuity` | a gap between two chapters | — |
+| `safe zone` | an element outside 12%–72% of frame height | #18 |
+| `zone containment` | an element outside its own zone | #20 |
+| `no overlap` | two elements intersecting at the same time | #20 |
+| `content coverage` | under 45% coverage in any chapter | #21 |
+| `reading dwell` | text that holds still for under 1.5s | #31 |
+| `single large motion` | two large moves at once | #28 |
+| `text reads in stillness` | new text arriving during motion | #29 |
+
+Narrative routes add: `chapter roles` · `class skeleton` · `hero named early` · `sweep item count` ·
+`sweep accumulates` · `sweep stays shallow` · `relation shapes drawn` · `single language` ·
+`cta stillness`.
 
 ---
 
-## قراءة الفشل
+## Reading a failure
 
 ### `beat continuity`
+
 ```
 FAIL   55 or 110 BPM, phase drift 0.22 beat (TRANSPORT STOPPED)
 ```
-التراك وقف ورجع خارج الشبكة الإيقاعية.
-**الإصلاح: التراك يشتغل من الفريم 0 لآخر فريم بدون توقف — أتوميشن gain بس.**
-مش خفض أعمق ولا أقصر. التراك **مايقفش**.
 
-الـBPM ظاهر باحتمالين لأن الارتباط الذاتي بيلتبس بين النبضة ونصها. ده مايأثرش على قياس الانحراف.
+The track stopped and restarted off the rhythmic grid.
+**Fix: the track runs from frame 0 to the last frame without stopping — gain automation only.**
+Not a deeper duck, not a shorter one. The track **does not stop**.
 
-> ⚠️ **`silencedetect` بيعدّي على الغلطة دي.** متعتمدش عليه.
+The BPM is reported as two possibilities because autocorrelation confuses a pulse with its half.
+That does not affect the drift measurement.
+
+> ⚠️ **`silencedetect` passes straight over this fault.** Do not rely on it.
 
 ### `palette`
+
 ```
 FAIL   worst 3.0% off-palette at 49.1s (limit 2%)
 ```
-**نتيجة 2–4% في فريم مليان نص غالباً تنعيم حواف (antialiasing) مش لون سادس.** افتح التوقيت المذكور وبُص بنفسك قبل ما تصلّح.
 
-**نتيجة فوق 6% دي لون دخيل فعلاً** — غالباً لون من مكتبة خارجية أو ظل أو تدرّج.
+**2–4% on a text-heavy frame is usually antialiasing, not a sixth colour.** Open the timestamp it
+names and look before you fix anything. A soft shadow's penumbra does the same thing.
 
-مناطق الواجهة بتتقنّع تلقائياً من العناصر اللي `type` بتاعها `ui`/`image`/`video` — المنتج له ألوانه. **تأكد إن عناصر الواجهة معلّمة صح في المانيفست** وإلا هتاخد إيجابيات كاذبة.
+**Above 6% is a genuinely foreign colour** — usually something from an external library, a shadow,
+or a gradient.
+
+Interface regions are masked automatically from elements whose `type` is `ui` / `image` / `video` —
+the product is allowed its own colours. **Make sure interface elements are tagged correctly in the
+manifest**, or you will get false positives. A sweep background of real screenshots that is not
+registered will read as off-palette.
 
 ### `content coverage`
+
 ```
 FAIL   worst 20% in ch2 (floor 45%) — redistribute, do not enlarge
 ```
-**الحل التوزيع مش التكبير.** الغلطة المعتادة: عنصرين متكوّمين في المركز.
-حطّ العنوان في جهة والعنصر البصري في الجهة التانية.
 
-### `zone containment` و `no overlap`
-لو دول بيفشلوا يبقى `ZoneGuard` **مش شغّال كما ينبغي**. المفروض يرفض الرسم قبل الرندر، مش يتمسك بعده.
-راجع إن كل كومبوننت بيرندر من خلاله.
+**The fix is distribution, not enlargement.** The usual fault is two elements piled in the centre.
+Put the headline on one side and the visual on the other, both extended.
+
+Note *where* it is measured: **the chapter midpoint**. An element that arrives after the midpoint
+does not count, which is how the same template can pass one duration class and fail another.
+
+### `zone containment` and `no overlap`
+
+If these fail, the zone guard is **not doing its job**. It should refuse to draw before the render,
+not be caught after it. Check that every component renders through it.
+
+A chapter that overrides a zone's box **is** the zone for its children — declare it with `zoneEl`
+so the manifest measures the container that was actually given.
 
 ### `text reads in stillness`
+
 ```
 FAIL   competing motion: narration-2↔typing-cursor
 ```
-الحركة بتغلب الموضع والحجم. **الحل مش تكبير النص — هو الفصل الزمني.**
-النص يستقر في كادر ساكن ≥ 1.5 ثانية، وبعدين الحركة تبدأ.
+
+Motion beats position and size. **The fix is not bigger text — it is temporal separation.**
+The text settles in a still frame for ≥1.5s, and only then does the motion start.
 
 ---
 
-## فحوصات يدوية — الفاحص مش شايفها
+## Manual checks — what the verifier cannot see
 
-بعد ما يعدّي، افحص بنفسك:
+After it passes, look yourself:
 
-| البند | ازاي |
+| Item | How |
 |---|---|
-| **عدد عناصر التنقل** | استخرج فريم واجهة وعُدّ — لازم يطابق كود المنتج `#13` |
-| **شريط onboarding** | افحص كل لقطة واجهة `#14` |
-| **أثر تسجيل شاشة** | نفس اللقطات `#15` |
-| **ملكية فكرية في البيانات** | كل اسم شخص وعميل `#17` |
-| **الشكل يطابق العنوان** | «الشكل ده بيقول إيه لوحده؟» `#24` |
-| **قص 9:16 من 16:9** | لو اختفى نص، التصميم فاشل `#19` |
-| **منحنى العدّاد** | استخرج فريمات النقاط الخمسة واقرا `#32` |
+| **Navigation item count** | pull an interface frame and count — it must match the product's own code `#13` |
+| **Onboarding bar** | check every interface capture `#14` |
+| **Screen-recording artefacts** | the same captures `#15` |
+| **Third-party IP in the data** | every person and client name `#17` |
+| **The shape matches its caption** | ask "what does this shape say on its own?" `#24` |
+| **A 9:16 cropped from 16:9** | if any text vanished, the design failed `#19` |
+| **The counter curve** | pull the five checkpoint frames and read them `#32` |
 
 ```bash
-# فريمات محددة
+# specific frames
 for f in 303 381 459 537; do
   ffmpeg -v error -i out.mp4 -vf "select=eq(n\,$f)" -frames:v 1 f_$f.png
 done
 
-# ورقة تواصل سريعة للمراجعة البصرية
+# a quick contact sheet for a visual pass
 ffmpeg -v error -i out.mp4 -vf "fps=1/2.5,scale=610:-1,tile=6x4" -frames:v 1 sheet.jpg
 ```
 
 ---
 
-## اللي محدش غير المستخدم يقدر يفحصه
+## What only the user can check
 
-الفاحص والفحص اليدوي بيغطوا الصنعة. **دول محتاجين المستخدم:**
+The verifier and the manual pass cover craft. **These need the user:**
 
-1. هل الادعاء صح للسوق ده؟
-2. هل دي الكلمات اللي العميل بيستخدمها؟
-3. هل الاحتكاك ده حقيقي هنا؟
-4. هل الميزة دي فعلاً ميزة؟
-5. هل مفردة الفئة صح؟
+1. Is the claim right for this market?
+2. Are these the words the customer uses?
+3. Is this friction real here?
+4. Is this feature actually a differentiator?
+5. Is the category vocabulary right?
 
-**اعرض الفيديو مع نتيجة الفاحص واسأل عن الخمسة دول بالتحديد.** الفاحص بيشيل الضوضاء علشان المستخدم يشوفهم.
+**Show the video with the verifier output and ask about exactly these five.** The verifier's job is
+to clear the noise so the user can see them.
 
 ---
 
-## إضافة فحص جديد
+## Adding a new check
 
-كل ما المستخدم يصحح حاجة:
+Every time the user corrects something:
 
-1. ضيف الغلطة في `failure-log.md` **بتكلفتها**
-2. اسأل: **دي قابلة للقياس؟**
-   - **أيوة** → ضيف فحص في `verify.py` وسطر في `production-rules.md`
-   - **لأ** → ضيف قاعدة في `narrative.md`
-3. لو القاعدة متعلقة بمكان أو زمن عنصر، **غالباً محتاجة حقل جديد في المانيفست** مش فحص بكسلات
+1. Add the mistake to `failure-log.md` **with its cost**
+2. Ask: **is it measurable?**
+   - **Yes** → add a check to `verify.py` and a line to `production-rules.md`
+   - **No** → add a rule to `narrative.md`
+3. If the rule concerns where or when an element is, it **probably needs a new manifest field**,
+   not a pixel check
 
-> أربع قواعد في الإنتاج المصدر اتكتبت نثراً واتخالفت في الرندر اللي بعدها مباشرةً.
-> **لو القاعدة قابلة للقياس ومش مكتوبة كود، هتتخالف.**
+> Four rules in the source production were written as prose and violated in the very next render.
+> **If a rule is measurable and is not written as code, it will be violated.**

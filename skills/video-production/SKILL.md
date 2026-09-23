@@ -68,6 +68,10 @@ A rule without its scar gets rationalized away.
 | `references/unattended.md` | **Before any batch the user will not watch** |
 | `references/whiteboard.md` | Hand-drawn / draw-on technique, inside any route |
 
+Every reference also exists as `<name>.ar.md` — the Arabic original the productions were run
+in. The English file is the one to read; the Arabic is kept because it is the wording the
+corrections were actually given in.
+
 ### Scripts
 
 | Script | Does |

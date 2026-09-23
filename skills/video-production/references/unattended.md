@@ -1,40 +1,44 @@
-# التشغيل بدون إشراف
+# Unattended runs
 
-> لما المستخدم يسيب الإنتاج شغّال وهو مش موجود.
-> **الهدف مش إنك تخلّص كل حاجة. الهدف إنه يصحى يلاقي شغل صح أو تقرير واضح — مش 18 فيديو غلط.**
-
----
-
-## المبدأ الحاكم
-
-**الخطأ المتكرر أغلى من الخطأ الواحد.**
-
-18 فيديو من قالب واحد معناها إن أي خلل في القالب بيتضاعف 18 مرة. فالحماية مش في الفحص بعد الإنتاج — هي في **بوابة الطيّار**: فيديو واحد بيتبني بالكامل ويعدّي كل الفحوصات **قبل** ما أي فيديو تاني يبدأ.
-
-```
-الطيّار يعدّي  →  الباقي يشتغل
-الطيّار يفشل  →  قف. مفيش فيديو تاني.
-```
+> When the user leaves production running and is not there.
+> **The goal is not to finish everything. The goal is that they wake up to correct work or a clear
+> report — not to eighteen wrong videos.**
 
 ---
 
-## المراحل
+## The governing principle
 
-### المرحلة 0 — قبل أي رندر
+**A repeated mistake costs more than a single mistake.**
 
-| # | الفحص | لو فشل |
+Eighteen videos from one template means any flaw in the template is multiplied eighteen times. So
+the protection is not in checking after production — it is in the **pilot gate**: one video is built
+completely and passes every check **before** any other video starts.
+
+```
+pilot passes  →  the rest run
+pilot fails   →  stop. No second video.
+```
+
+---
+
+## The phases
+
+### Phase 0 — before any render
+
+| # | Gate | If it fails |
 |---|---|---|
-| 1 | الـseed data منظّفة وكل الأسماء المطلوبة موجودة | **قف** |
-| 2 | `brand.json` و`structure.json` موجودين وكاملين | **قف** |
-| 3 | كل التصحيحات المُرحَّلة من الرندر السابق اتعملت في الكومبوننتات المشتركة | **قف** |
-| 4 | `verify.py` بيشتغل على رندر قديم من غير أخطاء تشغيل | **قف** |
-| 5 | `toolchain-traps.md` مقروء وكل مصايده متفادية في الكومبوننتات | **قف** |
+| 1 | Seed data is clean and every required name exists | **stop** |
+| 2 | `brand.json` and `structure.json` exist and are complete | **stop** |
+| 3 | Every correction carried over from the previous run has been made in the shared components | **stop** |
+| 4 | `verify.py` runs on an old render with no runtime errors | **stop** |
+| 5 | `toolchain-traps.md` has been read and its traps avoided in the components | **stop** |
 
-**قف = اكتب السبب في `run-log.md` وما تبدأش.** ساعة انتظار أرخص من 18 فيديو غلط.
+**Stop = write the reason in `run-log.md` and do not start.** An hour of waiting is cheaper than
+eighteen wrong videos.
 
-### المرحلة 1 — الطيّار
+### Phase 1 — the pilot
 
-ابني **فيديو واحد** (الأول في القائمة) · نسبة واحدة · صامت.
+Build **one video** (the first in the list) · one aspect ratio · silent.
 
 ```bash
 python scripts/verify.py \
@@ -43,160 +47,169 @@ python scripts/verify.py \
   --json reports/pilot.json
 ```
 
-ثم **حلقة الإصلاح** (تحت). **ميزانية الطيّار: 8 دورات إصلاح إجمالاً.**
+Then the **fix loop** (below). **Pilot budget: 8 fix cycles in total.**
 
-| النتيجة | الإجراء |
+| Outcome | Action |
 |---|---|
-| عدّى | كمّل للمرحلة 2 |
-| **اتجاوز الـ8 دورات** | **قف.** القالب نفسه غلط — مش الفيديو |
-| فشل في فحص من قائمة «قف» | **قف** |
+| Passed | continue to Phase 2 |
+| **Exceeded 8 cycles** | **stop.** The template is wrong — not the video |
+| Failed a check on the stop list | **stop** |
 
-> ⚠️ **تجاوز ميزانية الطيّار هو أهم إشارة في البروتوكول ده.** لو فيديو واحد محتاج 9 إصلاحات، الهيكل فيه خلل بنيوي، وإنتاج 17 كمان هيضاعف الخلل. **قف واكتب التقرير.**
+> ⚠️ **Exceeding the pilot budget is the most important signal in this protocol.** If one video
+> needs nine fixes, the structure has a fault, and producing seventeen more will multiply it.
+> **Stop and write the report.**
 
-### المرحلة 2 — الدفعة
+### Phase 2 — the batch
 
-لكل فيديو باقي، بالترتيب:
+For every remaining video, in order:
 
-1. ابنيه · نسبة واحدة · صامت
-2. شغّل `verify.py --json reports/NN.json`
-3. حلقة الإصلاح · **ميزانية 4 دورات لكل فيديو**
-4. عدّى → `DONE` · فشل → **`FAILED` وكمّل للفيديو اللي بعده**
+1. Build it · one aspect ratio · silent
+2. Run `verify.py --json reports/NN.json`
+3. Fix loop · **budget 4 cycles per video**
+4. Passed → `DONE` · failed → **`FAILED`, and continue to the next video**
 
-> **فيديو واحد فاشل مابيوقفش الدفعة.** الطيّار بيوقفها، الأفراد لأ.
-> **الاستثناء:** لو **تلات فيديوهات ورا بعض** فشلوا في **نفس الفحص** → قف. ده عيب في القالب اتكشف متأخر.
+> **One failing video does not stop the batch.** The pilot stops it; individuals do not.
+> **The exception:** if **three videos in a row** fail on **the same check** → stop. That is a
+> template defect discovered late.
 
-### المرحلة 3 — النسب الباقية
+### Phase 3 — the remaining aspect ratios
 
-**بعد ما كل الفيديوهات تعدّي في النسبة الأولى فقط.**
-لكل نسبة، شغّل الفحص تاني — **التغطية بتتقاس على كل نسبة بنفسها** (`#40`).
+**Only after every video passes in the first ratio.**
+Run the checks again for each ratio — **coverage is measured against each ratio's own numbers**
+(`#40`). Give each ratio its own pilot; a geometry fault found in ratio one costs one fix, found
+after three batches it costs three.
 
-### المرحلة 4 — التقرير
+### Phase 4 — the report
 
-اكتب `run-log.md` واقفل. **ما تعرضش أي فيديو** — المستخدم هو اللي يقرر.
+Write `run-log.md` and close. **Present no video** — the user decides.
 
 ---
 
-## حلقة الإصلاح
+## The fix loop
 
 ```
-شغّل verify → اقرا reports/NN.json
-   ├─ passed: true  → خلاص
-   └─ passed: false → لكل فحص فاشل:
-        ├─ في جدول الإصلاح؟  → طبّق الإصلاح · دورة+1 · أعد
-        ├─ في قائمة «قف»؟    → قف
-        └─ فشل 3 مرات؟       → علّمه FAILED · كمّل
+run verify → read reports/NN.json
+   ├─ passed: true  → done
+   └─ passed: false → for each failing check:
+        ├─ in the fix table?  → apply it · cycle+1 · repeat
+        ├─ on the stop list?  → stop
+        └─ failed 3 times?    → mark FAILED · continue
 ```
 
-**دورة واحدة = محاولة إصلاح واحدة + رندر + فحص.** حتى لو الدورة صلّحت أكتر من فحص.
+**One cycle = one fix attempt + render + check**, even if that cycle fixed several checks.
 
-## جدول الإصلاح
+## The fix table
 
-| الفحص الفاشل | الإصلاح | آلي؟ |
+| Failing check | Fix | Automatic? |
 |---|---|---|
-| `loudness` | أعد `loudnorm=I=-14:TP=-1.5:LRA=11` | ✅ |
-| `duration` | صحّح عدد الفريمات في التركيب | ✅ |
-| `safe zone` | حرّك العنصر جوّه `y` 130→778 | ✅ |
-| `zone containment` | حرّك أو صغّر العنصر جوّه منطقته | ✅ |
-| `no overlap` | انقل العنصر الأقل أهمية لمنطقة مجاورة فاضية | ✅ |
-| `content coverage` | **وزّع مش تكبّر**: النص لجهة والبصري للجهة المقابلة، الاتنين متمددين | ✅ |
-| `reading dwell` | زوّد السكون — استلف فريمات من الفصل اللي بعده مش من مدة الفيديو | ✅ |
-| `single large motion` | أزح الحركة التانية لبعد ما الأولى تخلص | ✅ |
-| `text reads in stillness` | أخّر النص لحد ما الحركة تخلص · **متكبّرش النص** | ✅ |
-| `sweep item count` | زوّد عناصر من قائمة الاستعراض في السكريبت | ✅ |
-| `sweep accumulates` | خلّي `frames[1]` لكل عنصر = نهاية الفصل | ✅ |
-| `sweep stays shallow` | شيل الزوم/التفاعل من فصل الاستعراض | ✅ |
-| `relation shapes drawn` | ارسم الخطوط · شبكة بـ n عقدة = n(n−1)/2 خط | ✅ |
-| `single language` | ترجم · الاستثناء أسماء العلامات في `brand_names` | ✅ |
-| `cta stillness` | زوّد سكون الـCTA · استلف من فصل الاستعراض | ✅ |
-| `hero named early` | قدّم كتلة التعريف | ✅ |
-| `class skeleton` | أرجع حدود الفصول لهيكل الفئة | ✅ |
-| `beat continuity` | التراك يشتغل متصل · أتوميشن gain بس · ضربة low-pass 12kHz | ⚠️ محاولتان |
-| `palette` | > 6%: دوّر على لون دخيل وشيله · 2–6%: تنعيم حواف غالباً → **علّمه تحذير وكمّل** | ⚠️ |
-| `file integrity` | أعد الرندر مرة واحدة | ⚠️ محاولة واحدة |
-| `chapter roles` | — | ❌ **قف** |
-| `chapter continuity` | — | ❌ **قف** |
+| `loudness` | re-run `loudnorm` at the target with a limiter | ✅ |
+| `duration` | correct the frame count in the composition | ✅ |
+| `safe zone` | move the element inside the safe band | ✅ |
+| `zone containment` | move or shrink the element inside its zone | ✅ |
+| `no overlap` | move the less important element to an empty neighbouring zone | ✅ |
+| `content coverage` | **redistribute, do not enlarge**: text one side, visual the other, both extended | ✅ |
+| `reading dwell` | add stillness — borrow frames from the next chapter, not from the video's duration | ✅ |
+| `single large motion` | move the second motion to after the first finishes | ✅ |
+| `text reads in stillness` | delay the text until the motion ends · **do not enlarge the text** | ✅ |
+| `sweep item count` | add items from the sweep list in the script | ✅ |
+| `sweep accumulates` | set every item's `frames[1]` to the chapter end | ✅ |
+| `sweep stays shallow` | remove the zoom or interaction from the sweep chapter | ✅ |
+| `relation shapes drawn` | draw the lines · a mesh of n nodes needs n(n−1)/2 edges | ✅ |
+| `single language` | translate · the exception is brand names in `brand_names` | ✅ |
+| `cta stillness` | add CTA stillness · borrow from the sweep chapter | ✅ |
+| `hero named early` | bring the identity block forward | ✅ |
+| `class skeleton` | return the chapter boundaries to the class skeleton | ✅ |
+| `beat continuity` | the track runs continuously · gain automation only · a 12 kHz low-passed hit | ⚠️ two attempts |
+| `palette` | > 6%: find the foreign colour and remove it · 2–6%: usually antialiasing → **mark a warning and continue** | ⚠️ |
+| `file integrity` | re-render once | ⚠️ one attempt |
+| `chapter roles` | — | ❌ **stop** |
+| `chapter continuity` | — | ❌ **stop** |
 
 ---
 
-## قائمة «قف» — ممنوع الاجتهاد
+## The stop list — no improvising
 
-قف واكتب التقرير، **متحاولش تصلّح**:
+Stop and write the report; **do not attempt a fix**:
 
-| # | الحالة | ليه |
+| # | Situation | Why |
 |---|---|---|
-| 1 | **ميزانية الطيّار اتجاوزت (8 دورات)** | القالب غلط مش الفيديو |
-| 2 | `chapter roles` أو `chapter continuity` فاشل | خلل بنيوي في السكريبت |
-| 3 | **تلات فيديوهات ورا بعض فشلوا في نفس الفحص** | عيب في القالب |
-| 4 | `file integrity` فشل مرتين | مشكلة في البيئة مش في المحتوى |
-| 5 | `palette` فوق 6% بعد محاولتين | لون خارج الهوية — قرار علامة |
-| 6 | `beat continuity` بهبوط مستوى بعد محاولتين | مشكلة في مصدر الصوت |
-| 7 | الإصلاح يحتاج **تغيير في نص السكريبت** | الكلام قرار المستخدم |
-| 8 | الإصلاح يحتاج **تغيير في الادعاء أو الموقف** | قرار تموضع — انظر `narrative.md` القسم 6 |
-| 9 | البيانات التجريبية فيها اسم مشكوك في ملكيته الفكرية | قانوني `#17` |
-| 10 | فحص فاشل **مش في جدول الإصلاح** | مجهول — متخمّنش |
-| 11 | **الرندر أسود أو مدته صفر** | مصيدة بنيوية — `toolchain-traps.md` T1 |
-| 12 | **فاحص بيقول رقم مستحيل** (100% تغطية مثلاً) | الفاحص مكسور مش الفيديو — صلّح الفاحص الأول ومتحسبهاش دورة |
-| 13 | `spawn EPERM` بعد ما الـPATH اتصلّح | بيئة/مسار مش محتوى — `toolchain-traps.md` §4 |
+| 1 | **Pilot budget exceeded (8 cycles)** | the template is wrong, not the video |
+| 2 | `chapter roles` or `chapter continuity` failed | a structural fault in the script |
+| 3 | **Three videos in a row failed the same check** | a template defect |
+| 4 | `file integrity` failed twice | an environment problem, not a content one |
+| 5 | `palette` above 6% after two attempts | a colour outside the brand — a brand decision |
+| 6 | `beat continuity` with a level dropout after two attempts | a problem in the audio source |
+| 7 | The fix requires **changing the script's words** | the copy is the user's decision |
+| 8 | The fix requires **changing the claim or the situation** | a positioning decision — see `narrative.md` § 6 |
+| 9 | Demo data contains a name whose IP ownership is doubtful | legal `#17` |
+| 10 | A failing check **not in the fix table** | unknown — do not guess |
+| 11 | **The render is black, or its duration is zero** | a structural trap — `toolchain-traps.md` T1 |
+| 12 | **A checker reports an impossible number** (100% coverage, say) | the checker is broken, not the video — fix the checker first and do not count it as a cycle |
+| 13 | `spawn EPERM` after PATH is already fixed | environment or path, not content — `toolchain-traps.md` § 4 |
 
-> **مبدأ:** لو الإصلاح بيغيّر **معنى** حاجة، مش تنفيذها — قف.
-> ترتيب عنصر = تنفيذ. صياغة جملة = معنى.
+> **The principle:** if the fix changes the **meaning** of something rather than its execution —
+> stop. Ordering an element is execution. Rewording a sentence is meaning.
 
 ---
 
-## سجل التشغيل
+## The run log
 
-اكتب `run-log.md` **أثناء** الشغل مش في الآخر — لو حصل انقطاع، اللي اتكتب بيفضل.
+Write `run-log.md` **as you go**, not at the end — if the run is interrupted, what was written
+survives.
 
 ```markdown
-# سجل التشغيل — [التاريخ] [وقت البدء]
+# Run log — [date] [start time]
 
-## الملخص
-جاهز: N/18 · فاشل: N · لم يبدأ: N · الحالة: [مكتمل | متوقف]
+## Summary
+Done: N/18 · Failed: N · Not started: N · Status: [complete | stopped]
 
-## الطيّار
-الفيديو: 01 · دورات الإصلاح: 3/8 · النتيجة: عدّى
-| الدورة | الفحص الفاشل | الإصلاح المطبّق |
+## Pilot
+Video: 01 · fix cycles: 3/8 · result: passed
+| Cycle | Failing check | Fix applied |
 |---|---|---|
-| 1 | content coverage | وزّعت الكتلة والعنصر البصري على الجهتين |
+| 1 | content coverage | redistributed the text block and the visual to opposite sides |
 
-## الدفعة
-| # | الفيديو | الحالة | الدورات | ملاحظات |
+## Batch
+| # | Video | Status | Cycles | Notes |
 |---|---|---|---|---|
-| 01 | بوّابة العميل | ✅ DONE | 3 | — |
-| 02 | المحتوى | ❌ FAILED | 4 | sweep accumulates لسه فاشل |
+| 01 | Client portal | ✅ DONE | 3 | — |
+| 02 | Content | ❌ FAILED | 4 | sweep accumulates still failing |
 
-## ⛔ سبب التوقف (لو حصل)
-الحالة: [رقم من قائمة «قف»]
-التفصيل: ...
-**المطلوب من المستخدم:** ...
+## ⛔ Reason for stopping (if any)
+Case: [number from the stop list]
+Detail: …
+**Needed from the user:** …
 
-## ⚠️ تحذيرات لم تمنع التسليم
-- 05: palette 3.1% عند 14.2ث — تنعيم حواف غالباً، راجعها بعينك
+## ⚠️ Warnings that did not block delivery
+- 05: palette 3.1% at 14.2s — probably antialiasing, look at it yourself
 
-## ❓ قرارات محتاجة المستخدم
-1. ...
+## ❓ Decisions the user has to make
+1. …
 ```
 
 ---
 
-## اللي الفحص الآلي مش بيشوفه
+## What automated checking does not see
 
-**قوله للمستخدم في التقرير صراحةً.** الفحوصات بتغطي الصنعة بس:
+**Tell the user this explicitly in the report.** The checks cover craft only:
 
-- هل الحكاية بتوصل؟
-- هل الاستعراض حاسس إنه استعراض ولا قايمة؟
-- هل الادعاء صح للسوق؟
-- هل اللغة بتتقال ولا مترجمة؟
-- هل الشكل بيقول اللي العنوان بيقوله؟ *(الفحص بيعد الخطوط، مش بيحكم على المعنى)*
+- Does the story land?
+- Does the sweep feel like a sweep, or like a list?
+- Is the claim right for this market?
+- Does the language sound spoken, or translated?
+- Does the shape say what its caption says? *(the check counts edges; it does not judge meaning)*
 
-**فيديو عدّى كل الفحوصات ممكن يكون فيديو ضعيف.** الفحص بيمنع الفشل، مش بيصنع النجاح.
+**A video that passed every check can still be a weak video.** Checking prevents failure. It does
+not create success.
 
 ---
 
-## التجميع الصباحي
+## The morning summary
 
 ```bash
 python scripts/batch_report.py --reports reports/ --out run-log-summary.md
 ```
 
-بيقرا كل `reports/*.json` ويطلّع جدول واحد: إيه اللي عدّى، إيه اللي فشل وفي إيه، وإيه أكتر فحص اتكرر فشله — ده آخر مؤشر بيقول لو المشكلة في القالب.
+Reads every `reports/*.json` and produces one table: what passed, what failed and on what, and which
+check failed most often — that last figure is the strongest indicator of whether the problem is in
+the template.
