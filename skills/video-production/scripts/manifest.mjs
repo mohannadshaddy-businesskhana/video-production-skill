@@ -9,46 +9,67 @@
  * Roles resolve in this order: a section's own data-role attribute, then
  * --roles by index, then omitted. Chapter roles only matter to routes that
  * declare a narrative skeleton.
+ *
+ * No npm dependencies required: it drives whatever Chromium is on the machine over
+ * CDP, and uses Playwright instead when the project already has it.
  */
-import { getChromium } from "./lib/browser.mjs";
 import { createServer } from "node:http";
 import { readFile, writeFile } from "node:fs/promises";
 import { extname, join, resolve } from "node:path";
+import { openPage, sleep } from "./lib/page.mjs";
 
 const argv = process.argv.slice(2);
 const flag = (name, dflt) => {
   const i = argv.indexOf("--" + name);
   return i === -1 ? dflt : argv[i + 1];
 };
-const [dir, W, H, outPath] = argv.filter((a, i) =>
+const positional = argv.filter((a, i) =>
   !a.startsWith("--") && !(i > 0 && argv[i - 1].startsWith("--")));
+const [dir, W, H, outPath] = positional;
 const FPS = Number(flag("fps", 30));
 const ROLES = (flag("roles", "") || "").split(",").map((r) => r.trim()).filter(Boolean);
+
+if (!dir || !W || !H || !outPath) {
+  console.error("usage: manifest.mjs <projectDir> <w> <h> <out.json> [--fps 30] [--roles a,b,c]");
+  process.exit(2);
+}
+
 const ROOT = resolve(dir);
 const T = { ".html": "text/html", ".js": "text/javascript", ".png": "image/png",
-            ".svg": "image/svg+xml", ".woff2": "font/woff2", ".mp3": "audio/mpeg", ".ogg": "audio/ogg" };
+            ".jpg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml",
+            ".woff2": "font/woff2", ".woff": "font/woff", ".ttf": "font/ttf",
+            ".mp3": "audio/mpeg", ".ogg": "audio/ogg", ".wav": "audio/wav",
+            ".mp4": "video/mp4", ".json": "application/json", ".css": "text/css" };
 
 const server = createServer(async (rq, rs) => {
   try {
     const f = join(ROOT, rq.url === "/" ? "index.html" : decodeURIComponent(rq.url.split("?")[0]));
+    const body = await readFile(f);            // read BEFORE the header, or a miss
     rs.writeHead(200, { "content-type": T[extname(f)] || "application/octet-stream" });
-    rs.end(await readFile(f));
-  } catch { rs.writeHead(404).end(); }
+    rs.end(body);                              // tries to send a second header
+  } catch { if (!rs.headersSent) rs.writeHead(404); rs.end(); }
 });
 await new Promise((r) => server.listen(0, r));
 
-const chromium = await getChromium();
-const b = await chromium.launch();
-const p = await b.newPage({ viewport: { width: +W, height: +H } });
-p.on("pageerror", (e) => console.error("[pageerror]", e.message));
-await p.addInitScript(() => { window.__timelines = {}; });
-await p.goto("http://127.0.0.1:" + server.address().port + "/index.html", { waitUntil: "domcontentloaded", timeout: 60000 });
+const page = await openPage({ width: +W, height: +H });
+await page.evaluate(() => { window.__timelines = {}; });   // no-op if the runtime beats us
+await page.goto("http://127.0.0.1:" + server.address().port + "/index.html");
+
+// the runtime creates the registry itself; poll rather than assume a load order
+let ready = false;
 for (let i = 0; i < 80; i++) {
-  if (await p.evaluate(() => !!(window.__timelines && window.__timelines.main && window.__MF))) break;
-  await p.waitForTimeout(400);
+  ready = await page.evaluate(() => !!(window.__timelines && window.__timelines.main && window.__MF));
+  if (ready) break;
+  await sleep(400);
+}
+if (!ready) {
+  await page.close(); server.close();
+  console.error("The composition never registered window.__timelines.main and window.__MF.\n" +
+    "  Without __MF there is nothing to measure — see references/delegation.md, 'The one thing we require back'.");
+  process.exit(3);
 }
 
-const report = await p.evaluate(({ FW, FH, FPS, ROLES }) => {
+const report = await page.evaluate(({ FW, FH, FPS, ROLES }) => {
   const root = document.getElementById("root");
   const fps = FPS;
   const dur = Math.round(parseFloat(root.dataset.duration) * fps);
@@ -70,7 +91,7 @@ const report = await p.evaluate(({ FW, FH, FPS, ROLES }) => {
   // clip a rect to every overflow:hidden ancestor, else a cropped image
   // measures at its full off-frame size
   const boxOf = (node) => {
-    let r = node.getBoundingClientRect();
+    const r = node.getBoundingClientRect();
     let q = { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
     for (let a = node.parentElement; a && a !== document.body; a = a.parentElement) {
       const cs = getComputedStyle(a);
@@ -89,28 +110,27 @@ const report = await p.evaluate(({ FW, FH, FPS, ROLES }) => {
   for (const d of window.__MF) {
     const node = document.querySelector(d.el);
     if (!node) { out.push({ ...d, bbox: [0, 0, 0, 0], missing: true }); continue; }
-    // measure on a STILL frame inside the element's own window, never mid-tween
     const f0 = d.frames[0], f1 = d.frames[1];
     // +10: entrances run up to 0.3s from entry and still_from is entry+6, so
-    // anything earlier measures a tween in flight, not the design (T9)
+    // anything earlier measures a tween in flight, not the design
     const at = Math.min(f1 - 1, Math.max(f0, (d.still_from ?? f0) + 10));
     tl.seek(at / fps, false);          // suppressEvents:false or onUpdate never fires
     showAt(at);
     const e = { ...d, bbox: boxOf(node) };
     if (d.zoneEl) {
       const zn = document.querySelector(d.zoneEl);
-      if (zn) { const k = 'z-' + d.id; extraZones[k] = boxOf(zn); e.zone = k; }
+      if (zn) { const k = "z-" + d.id; extraZones[k] = boxOf(zn); e.zone = k; }
     }
     delete e.el; delete e.zoneEl;
     out.push(e);
   }
 
+  for (const c of chapters) if (c.role === undefined) delete c.role;
+
   const zones = {};
   const declared = (window.__FMT && window.__FMT.zones) || {};
   for (const [k, v] of Object.entries(declared)) zones[k] = [v[0], v[1], v[0] + v[2], v[1] + v[3]];
   Object.assign(zones, extraZones);
-
-  for (const c of chapters) if (c.role === undefined) delete c.role;
 
   return {
     fps, duration_frames: dur, frame_size: [FW, FH],
@@ -118,14 +138,15 @@ const report = await p.evaluate(({ FW, FH, FPS, ROLES }) => {
       ? { y_min: window.__FMT.safeTop, y_max: window.__FMT.safeBottom }
       : undefined,
     zones, chapters,
-    motion_events: window.__MOTION,
+    motion_events: window.__MOTION || [],
     elements: out,
   };
 }, { FW: +W, FH: +H, FPS, ROLES });
 
 await writeFile(outPath, JSON.stringify(report, null, 2), "utf8");
 const missing = report.elements.filter((e) => e.missing).map((e) => e.id);
-console.log(`manifest → ${outPath}  (${report.elements.length} elements, ${report.chapters.length} chapters)`);
+console.log(`manifest → ${outPath}  (${report.elements.length} elements, ${report.chapters.length} chapters, via ${page.driver})`);
 if (missing.length) console.error("MISSING ELEMENTS:", missing.join(", "));
-await b.close();
+
+await page.close();
 server.close();

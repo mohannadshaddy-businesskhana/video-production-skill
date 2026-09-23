@@ -19,8 +19,13 @@ python scripts/verify.py \
 **Exit 0 = show it to the user. Exit 1 = fix and re-run.**
 No render is shown to anyone before the verifier passes. That is not a suggestion.
 
-Requires `ffmpeg` · `ffprobe` · `numpy` · `pillow`. Without numpy and Pillow, pass `--skip-palette`
-and every other check still runs.
+Requires `ffmpeg` and `ffprobe`, and nothing else — the Python is **standard library only**. The
+two checks that once needed numpy and Pillow (palette distance, beat continuity) are computed here
+directly: same tolerances, same numbers, verified against the numpy implementation on a real render
+and against a deliberately off-palette one. `--skip-palette` still exists, for speed, not for
+missing packages.
+
+Run `node scripts/doctor.mjs` to see what the machine has.
 
 ---
 

@@ -76,6 +76,7 @@ corrections were actually given in.
 
 | Script | Does |
 |---|---|
+| `doctor.mjs` | what the machine has, what is missing, what each thing costs — run it first |
 | `manifest.mjs` | measures a composition → `layout.json` |
 | `verify.py` | the external verifier — fails the build |
 | `delivery_qc.py` | the file against a platform spec (`--list` for the catalog) |
