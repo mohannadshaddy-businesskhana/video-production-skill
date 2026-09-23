@@ -27,7 +27,7 @@
 | 1 | الـseed data منظّفة وكل الأسماء المطلوبة موجودة | **قف** |
 | 2 | `brand.json` و`structure.json` موجودين وكاملين | **قف** |
 | 3 | كل التصحيحات المُرحَّلة من الرندر السابق اتعملت في الكومبوننتات المشتركة | **قف** |
-| 4 | `verify.py` بيشتغل على رندر قديم من غير أخطاء تشغيل | **قف** |
+| 4 | `verify.mjs` بيشتغل على رندر قديم من غير أخطاء تشغيل | **قف** |
 | 5 | `toolchain-traps.md` مقروء وكل مصايده متفادية في الكومبوننتات | **قف** |
 
 **قف = اكتب السبب في `run-log.md` وما تبدأش.** ساعة انتظار أرخص من 18 فيديو غلط.
@@ -37,7 +37,7 @@
 ابني **فيديو واحد** (الأول في القائمة) · نسبة واحدة · صامت.
 
 ```bash
-python scripts/verify.py \
+node scripts/verify.mjs \
   --video pilot.mp4 --manifest pilot.json \
   --config brand.json --structure structure.json \
   --json reports/pilot.json
@@ -58,7 +58,7 @@ python scripts/verify.py \
 لكل فيديو باقي، بالترتيب:
 
 1. ابنيه · نسبة واحدة · صامت
-2. شغّل `verify.py --json reports/NN.json`
+2. شغّل `verify.mjs --json reports/NN.json`
 3. حلقة الإصلاح · **ميزانية 4 دورات لكل فيديو**
 4. عدّى → `DONE` · فشل → **`FAILED` وكمّل للفيديو اللي بعده**
 
@@ -196,7 +196,7 @@ python scripts/verify.py \
 ## التجميع الصباحي
 
 ```bash
-python scripts/batch_report.py --reports reports/ --out run-log-summary.md
+node scripts/batch_report.mjs --reports reports/ --out run-log-summary.md
 ```
 
 بيقرا كل `reports/*.json` ويطلّع جدول واحد: إيه اللي عدّى، إيه اللي فشل وفي إيه، وإيه أكتر فحص اتكرر فشله — ده آخر مؤشر بيقول لو المشكلة في القالب.

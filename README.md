@@ -41,13 +41,13 @@ An external verifier reads the rendered file and a layout manifest, and fails on
 | relation shapes drawn | a diagram captioned "everything is connected", drawn with zero lines |
 | single language | a stray Latin string in an Arabic cut |
 
-Plus `delivery_qc.py` against platform specs — resolution, frame rate, duration bounds, codec,
+Plus `delivery_qc.mjs` against platform specs — resolution, frame rate, duration bounds, codec,
 loudness, true peak, silence, bitrate, file size.
 
 ## Install
 
 ```bash
-git clone https://github.com/<you>/video-production-skill
+git clone https://github.com/mohannadshaddy-businesskhana/video-production-skill
 cp -r video-production-skill/skills/video-production ~/.claude/skills/
 ```
 
@@ -61,14 +61,14 @@ node skills/video-production/scripts/doctor.mjs
 
 ### Requirements
 
-**There is nothing to install for the skill itself.** No `npm install`, no `pip install`. It needs
-four things that a machine which can make video almost certainly already has:
+**There is nothing to install for the skill itself.** No `npm install`, no `pip install`, no
+runtime beyond the one the renderer already needs. Three things, and a machine that can make video
+almost certainly has all of them:
 
 | | | |
 |---|---|---|
-| **Node 18+** | the measurer and the batch scripts | 22+ uses the built-in WebSocket; below that, Playwright covers it |
+| **Node 18+** | every script in the skill | 22+ uses the built-in WebSocket; below that, Playwright covers it |
 | **FFmpeg** + `ffprobe` | render, normalise, probe, and every frame the verifier reads | [download](https://ffmpeg.org/download.html) |
-| **Python 3.8+** | `verify.py` and `delivery_qc.py` | **standard library only** |
 | **a Chromium** | measuring what actually rendered | Chrome, Edge, Chromium — or the one the renderer downloads itself |
 
 Plus **[HyperFrames](https://hyperframes.heygen.com)** — the rendering framework this delegates to.
@@ -111,7 +111,7 @@ skills/video-production/
 ├── scripts/
 │   ├── doctor.mjs             what is installed, and what you lose without it
 │   ├── manifest.mjs           measures what actually rendered
-│   ├── verify.py              the gate — stdlib only
+│   ├── verify.mjs             the gate — 15+ checks, no dependencies
 │   ├── lib/                   a zero-dependency CDP browser driver
 │   └── …                      delivery_qc · normalize · cutdown · budget
 │                              shoot_plan · cue_sheet · localize · timeline_export

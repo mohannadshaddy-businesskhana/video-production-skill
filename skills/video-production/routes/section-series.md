@@ -87,7 +87,7 @@ Also hide at capture time: time-tracker widgets, onboarding tooltips, toasts, ha
    same check do.**
 4. Only when every video passes in ratio one: **a pilot per additional ratio**, then its batch.
    Coverage is measured per ratio — a number tuned for 16:9 says nothing about 9:16.
-5. `batch_report.py` → one table.
+5. `batch_report.mjs` → one table.
 
 ## Ship-blocking checks specific to this route
 

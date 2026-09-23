@@ -13,8 +13,8 @@ production" for a type that needs a camera is misleading, and it is the fastest 
 ## What this route produces
 
 ```bash
-python <SKILL_DIR>/scripts/budget.py     --brief BRIEF.md --rates rate-card.yaml --out quote.md
-python <SKILL_DIR>/scripts/shoot_plan.py --script script.json --out plan/
+node <SKILL_DIR>/scripts/budget.mjs     --brief BRIEF.md --rates rate-card.yaml --out quote.md
+node <SKILL_DIR>/scripts/shoot_plan.mjs --script script.json --out plan/
 ```
 
 - `quote.md` — line items, revision rounds, and the change-order terms in writing

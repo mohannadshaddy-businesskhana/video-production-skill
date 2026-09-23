@@ -3,7 +3,7 @@
 ## Running it
 
 ```bash
-python scripts/verify.py \
+node scripts/verify.mjs \
   --video out.mp4 \
   --manifest layout.json \
   --config brand.json
@@ -19,11 +19,13 @@ python scripts/verify.py \
 **Exit 0 = show it to the user. Exit 1 = fix and re-run.**
 No render is shown to anyone before the verifier passes. That is not a suggestion.
 
-Requires `ffmpeg` and `ffprobe`, and nothing else — the Python is **standard library only**. The
-two checks that once needed numpy and Pillow (palette distance, beat continuity) are computed here
-directly: same tolerances, same numbers, verified against the numpy implementation on a real render
-and against a deliberately off-palette one. `--skip-palette` still exists, for speed, not for
-missing packages.
+Requires `ffmpeg`, `ffprobe` and Node. Nothing else — **no npm install, no pip install.** The
+verifier was originally Python with numpy and Pillow; the palette distance and the beat analysis are
+now computed directly in Node, and the port was accepted only after it reproduced the Python output
+byte for byte on 18 real renders, on 14 deliberately broken manifests (one per check), on an
+off-palette render and on a truncated file.
+
+`--skip-palette` still exists, for speed, not for missing packages.
 
 Run `node scripts/doctor.mjs` to see what the machine has.
 
@@ -165,7 +167,7 @@ Every time the user corrects something:
 
 1. Add the mistake to `failure-log.md` **with its cost**
 2. Ask: **is it measurable?**
-   - **Yes** → add a check to `verify.py` and a line to `production-rules.md`
+   - **Yes** → add a check to `verify.mjs` and a line to `production-rules.md`
    - **No** → add a rule to `narrative.md`
 3. If the rule concerns where or when an element is, it **probably needs a new manifest field**,
    not a pixel check

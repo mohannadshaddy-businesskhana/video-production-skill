@@ -89,4 +89,4 @@ for (const target of marks.durations) {
 }
 
 await rm(tmp, { recursive: true, force: true });
-console.log("\nRe-run delivery_qc.py on each cutdown — a trim changes duration, and duration is a spec.");
+console.log("\nRe-run delivery_qc.mjs on each cutdown — a trim changes duration, and duration is a spec.");

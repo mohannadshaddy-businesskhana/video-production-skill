@@ -152,7 +152,7 @@ Text advance widths differ between Chromium builds. Measuring a composition with
 while a bundled Chromium renders it produced boxes up to **23px wider** than the video actually
 contained — on text at 23px and below, where a font-fallback difference shows most.
 
-No verdict changed in our comparison (`verify.py` passed on both manifests), which is exactly why
+No verdict changed in our comparison (`verify.mjs` passed on both manifests), which is exactly why
 this is dangerous: the error is small enough to survive the gate and wrong enough to matter at a
 zone boundary. `lib/page.mjs` prefers the renderer's own Playwright when it is installed, and
 otherwise sorts the renderer's cached Chromium ahead of any system browser.

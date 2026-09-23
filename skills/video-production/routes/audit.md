@@ -5,7 +5,7 @@ Use when a video already exists and something is wrong, or before accepting some
 ## If a manifest exists
 
 ```bash
-python <SKILL_DIR>/scripts/verify.py --video in.mp4 --manifest layout.json --config brand.json
+node <SKILL_DIR>/scripts/verify.mjs --video in.mp4 --manifest layout.json --config brand.json
 ```
 
 ## If it does not
@@ -13,7 +13,7 @@ python <SKILL_DIR>/scripts/verify.py --video in.mp4 --manifest layout.json --con
 The file alone still answers a lot:
 
 ```bash
-python <SKILL_DIR>/scripts/delivery_qc.py --video in.mp4 --spec <platform> --json qc.json
+node <SKILL_DIR>/scripts/delivery_qc.mjs --video in.mp4 --spec <platform> --json qc.json
 ```
 
 That covers integrity, duration, resolution, frame rate, loudness, true peak, silence and bitrate.

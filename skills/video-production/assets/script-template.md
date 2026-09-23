@@ -124,11 +124,11 @@
 2. ابني **`ZoneGuard` أولاً** — بيرفض الرسم برّه المنطقة **وبيكتب المانيفست**
 3. نفّذ الفصول من الأبسط للأعقد
 4. **نسبة واحدة · صامتة · وقف** `#36`
-5. شغّل `verify.py` — **لازم يعدّي قبل ما المستخدم يشوف** `#35`
+5. شغّل `verify.mjs` — **لازم يعدّي قبل ما المستخدم يشوف** `#35`
 6. بعد الموافقة: باقي المخرجات
 
 ```bash
-python scripts/verify.py --video out.mp4 --manifest layout.json --config brand.json
+node scripts/verify.mjs --video out.mp4 --manifest layout.json --config brand.json
 ```
 
 ### فحوصات يدوية

@@ -37,7 +37,7 @@ once**, not a blind trim:
   ] }
 ```
 
-Every cutdown re-runs `delivery_qc.py` — a trim changes duration, and duration is a spec.
+Every cutdown re-runs `delivery_qc.mjs` — a trim changes duration, and duration is a spec.
 
 ## Order
 

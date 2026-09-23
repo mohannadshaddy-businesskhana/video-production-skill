@@ -50,25 +50,6 @@ for (const bin of ["ffmpeg", "ffprobe"]) {
   else { lines.push(no(`${bin} — no render, no verify. https://ffmpeg.org/download.html`)); blocking++; }
 }
 
-// ── Python ──────────────────────────────────────────────────────────────────
-let py = null;
-for (const c of ["python", "python3", "py"]) {
-  const v = probe(c, ["--version"]);
-  if (v && /Python 3\.(\d+)/.test(v)) {
-    const minor = Number(v.match(/Python 3\.(\d+)/)[1]);
-    if (minor >= 8) { py = c; lines.push(ok(`${c} — ${v} (verify.py, delivery_qc.py)`)); break; }
-  }
-}
-if (!py) { lines.push(no("python 3.8+ — the verifier will not run, so nothing can ship")); blocking++; }
-else {
-  // the whole point of the rewrite: no third-party packages
-  const r = spawnSync(py, ["-c", "import math,array,statistics,json,subprocess;print('stdlib ok')"],
-    { encoding: "utf8", timeout: 20000 });
-  lines.push((r.stdout || "").includes("stdlib ok")
-    ? ok("python standard library only — no pip install needed")
-    : no("python stdlib probe failed — unusual install?"));
-}
-
 // ── a browser to measure with ───────────────────────────────────────────────
 let browser = null;
 try {
