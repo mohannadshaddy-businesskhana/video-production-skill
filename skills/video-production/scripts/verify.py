@@ -8,7 +8,9 @@ until this exits 0.
 
     python verify.py --video out.mp4 --manifest layout.json --config brand.json
 
-Requires: ffmpeg/ffprobe on PATH, numpy, pillow.
+Requires: ffmpeg/ffprobe on PATH. Python standard library only — the two
+analyses that used to need numpy and pillow (palette distance, beat
+continuity) are computed here directly, so the skill installs with a clone.
 
 Every check maps to a numbered entry in references/failure-log.md.
 """
@@ -28,11 +30,9 @@ import tempfile
 from itertools import combinations
 from pathlib import Path
 
-try:
-    import numpy as np
-    from PIL import Image
-except ImportError:
-    sys.exit("needs numpy and pillow:  pip install numpy pillow")
+import math
+from array import array
+from statistics import median, pstdev
 
 
 # ── plumbing ──────────────────────────────────────────────────────────────
@@ -119,7 +119,11 @@ def load_audio(video, sr=22050):
         path = f.name
     run(["ffmpeg", "-y", "-v", "error", "-i", video,
          "-ac", "1", "-ar", str(sr), "-f", "f32le", path])
-    data = np.fromfile(path, dtype=np.float32)
+    data = array("f")
+    raw = Path(path).read_bytes()
+    data.frombytes(raw[:len(raw) - len(raw) % 4])
+    if sys.byteorder != "little":
+        data.byteswap()                 # ffmpeg wrote f32 LITTLE endian
     Path(path).unlink(missing_ok=True)
     return data, sr
 
@@ -137,34 +141,44 @@ def check_beat_continuity(video, rep):
     not for global drift, and we cross-check with a level dropout.
     """
     x, sr = load_audio(video)
-    if x.size < sr * 8:
+    if len(x) < sr * 8:
         rep.add("beat continuity", True, "track too short to test", "#27", warn=True)
         return
 
     hop = 256
     n = (len(x) - hop) // hop
-    env = np.array([np.sqrt(np.mean(x[i * hop:(i + 1) * hop] ** 2)) for i in range(n)])
-    flux = np.diff(env)
-    flux[flux < 0] = 0
-    if flux.std() < 1e-9:
+    env = [math.sqrt(sum(v * v for v in x[i * hop:(i + 1) * hop]) / hop)
+           for i in range(n)]
+    flux = [max(0.0, env[i + 1] - env[i]) for i in range(len(env) - 1)]
+    if pstdev(flux) < 1e-9:
         rep.add("beat continuity", True, "no rhythmic content", "#27", warn=True)
         return
-    flux -= flux.mean()
+    m = sum(flux) / len(flux)
+    flux = [v - m for v in flux]
     fps_env = sr / hop
 
-    ac = np.correlate(flux, flux, "full")[len(flux) - 1:]
+    # only the lags that can be a beat are needed, so this is ~80 dot products
+    # rather than a full correlation
     lo, hi = int(fps_env * 0.28), int(fps_env * 1.2)
-    if hi >= len(ac):
+    if hi >= len(flux):
         rep.add("beat continuity", True, "track too short", "#27", warn=True)
         return
-    period = lo + int(np.argmax(ac[lo:hi]))
+    period, best_ac = lo, -1e18
+    for k in range(lo, hi):
+        ac = 0.0
+        for i in range(len(flux) - k):
+            ac += flux[i] * flux[i + k]
+        if ac > best_ac:
+            best_ac, period = ac, k
     bpm = 60 * fps_env / period
 
     def phase(seg, offset):
-        idx = np.arange(len(seg)) + offset
         best, best_val = 0.0, -1e18
-        for p in np.linspace(0, 1, 64, endpoint=False):
-            v = float(np.dot(seg, np.cos(2 * np.pi * ((idx / period) - p))))
+        for pi in range(64):
+            p = pi / 64
+            v = 0.0
+            for j, s in enumerate(seg):
+                v += s * math.cos(2 * math.pi * (((j + offset) / period) - p))
             if v > best_val:
                 best_val, best = v, p
         return best
@@ -182,17 +196,16 @@ def check_beat_continuity(video, rep):
     for i in range(1, len(phases)):
         d = abs(phases[i] - phases[i - 1])
         deltas.append(min(d, 1 - d))
-    deltas = np.array(deltas)
-    baseline = float(np.median(deltas))
-    worst_i = int(np.argmax(deltas))
-    worst = float(deltas[worst_i])
+    baseline = float(median(deltas))
+    worst = max(deltas)
+    worst_i = deltas.index(worst)
 
     # a transport stop = one big jump against an otherwise stable grid
     isolated_jump = worst > 0.25 and baseline < 0.12
 
     # cross-check: a level dropout in the middle of the track
     mid = env[int(len(env) * 0.05):int(len(env) * 0.95)]
-    thresh = float(np.median(mid)) * 0.25
+    thresh = float(median(mid)) * 0.25
     longest, cur = 0, 0
     for v in mid:
         cur = cur + 1 if v < thresh else 0
@@ -226,7 +239,24 @@ def check_beat_continuity(video, rep):
 
 def hex_to_rgb(h):
     h = h.lstrip("#")
-    return np.array([int(h[i:i + 2], 16) for i in (0, 2, 4)], dtype=float)
+    return tuple(float(int(h[i:i + 2], 16)) for i in (0, 2, 4))
+
+
+def grab_rgb(video, t, width=240):
+    """One frame as (pixels, w, h), pixels a flat RGB byte string.
+
+    Straight from ffmpeg — decoding a PNG only to read it back needed Pillow
+    for nothing.
+    """
+    r = subprocess.run(
+        ["ffmpeg", "-y", "-v", "error", "-ss", f"{t:.2f}", "-i", video,
+         "-frames:v", "1", "-vf", f"scale={width}:-1",
+         "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+        capture_output=True)
+    buf = r.stdout
+    if not buf or len(buf) % (width * 3):
+        return None, 0, 0
+    return buf, width, len(buf) // (width * 3)
 
 
 def check_palette(video, colors, manifest, rep, samples=12, tol=26.0):
@@ -240,18 +270,35 @@ def check_palette(video, colors, manifest, rep, samples=12, tol=26.0):
     if not colors:
         rep.add("palette", True, "no colours configured", "#01", warn=True)
         return
-    base = np.array([hex_to_rgb(c) for c in colors])
+    base = [hex_to_rgb(c) for c in colors]
     # include pairwise blends so antialiasing and opacity overlays pass
     # Sample the ramp between every pair densely. Three stops left gaps wide
     # enough that ordinary antialiased text edges — ink on ivory, ink on
     # yellow — read as foreign colours and failed a clean render at 3.4%.
     # A genuinely sixth colour is still nowhere near any of these ramps.
-    allowed = [base]
+    # brand colours first: with the early exit below, a pixel that IS a brand
+    # colour costs one comparison instead of a hundred and thirty
+    allowed = list(base)
     for a, b in combinations(range(len(base)), 2):
         for k in range(1, 20):
             t = k / 20
-            allowed.append((base[a] * (1 - t) + base[b] * t)[None, :])
-    allowed = np.vstack(allowed)
+            allowed.append(tuple(base[a][c] * (1 - t) + base[b][c] * t
+                                 for c in range(3)))
+    tol2 = tol * tol
+    cache = {}                      # exact RGB → off-palette? shared across frames
+
+    def off_palette(rgb):
+        hit = cache.get(rgb)
+        if hit is None:
+            r, g, b = rgb
+            hit = True
+            for ar, ag, ab in allowed:
+                dr, dg, db = r - ar, g - ag, b - ab
+                if dr * dr + dg * dg + db * db <= tol2:
+                    hit = False
+                    break
+            cache[rgb] = hit
+        return hit
 
     fps = manifest["fps"]
     fw, fh = manifest["frame_size"]
@@ -259,31 +306,36 @@ def check_palette(video, colors, manifest, rep, samples=12, tol=26.0):
     dur = manifest["duration_frames"] / fps
     worst, worst_t, skipped = 0.0, 0.0, 0
 
-    with tempfile.TemporaryDirectory() as td:
-        for i in range(samples):
-            t = dur * (i + 0.5) / samples
-            frame_no = int(t * fps)
-            out = Path(td) / f"{i}.png"
-            run(["ffmpeg", "-y", "-v", "error", "-ss", f"{t:.2f}", "-i", video,
-                 "-frames:v", "1", "-vf", "scale=240:-1", str(out)])
-            if not out.exists():
+    for i in range(samples):
+        t = dur * (i + 0.5) / samples
+        frame_no = int(t * fps)
+        buf, w, h = grab_rgb(video, t)
+        if not buf:
+            continue
+
+        masked = [False] * (w * h)
+        for e in ui:
+            if e["frames"][0] <= frame_no < e["frames"][1]:
+                x0, y0, x1, y1 = e["bbox"]
+                for yy in range(max(0, int(y0 / fh * h)), min(h, int(y1 / fh * h))):
+                    row = yy * w
+                    for xx in range(max(0, int(x0 / fw * w)), min(w, int(x1 / fw * w))):
+                        masked[row + xx] = True
+
+        total = bad = 0
+        for p in range(w * h):
+            if masked[p]:
                 continue
-            img = np.asarray(Image.open(out).convert("RGB"), dtype=float)
-            h, w = img.shape[:2]
-            mask = np.ones((h, w), dtype=bool)
-            for e in ui:
-                if e["frames"][0] <= frame_no < e["frames"][1]:
-                    x0, y0, x1, y1 = e["bbox"]
-                    mask[int(y0 / fh * h):int(y1 / fh * h),
-                         int(x0 / fw * w):int(x1 / fw * w)] = False
-            px = img[mask]
-            if px.size == 0 or px.shape[0] < 500:
-                skipped += 1
-                continue
-            d = np.linalg.norm(px[:, None, :] - allowed[None, :, :], axis=2).min(axis=1)
-            frac = float((d > tol).mean())
-            if frac > worst:
-                worst, worst_t = frac, t
+            total += 1
+            if off_palette((float(buf[p * 3]), float(buf[p * 3 + 1]),
+                            float(buf[p * 3 + 2]))):
+                bad += 1
+        if total < 500:
+            skipped += 1
+            continue
+        frac = bad / total
+        if frac > worst:
+            worst, worst_t = frac, t
 
     ok = worst <= 0.02
     note = f" ({skipped} frame(s) fully masked by UI)" if skipped else ""

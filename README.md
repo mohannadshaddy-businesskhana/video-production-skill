@@ -53,13 +53,31 @@ cp -r video-production-skill/skills/video-production ~/.claude/skills/
 
 Then in a session: the skill announces itself for any video request.
 
+Check the machine first — it says what is missing and what each thing costs you:
+
+```bash
+node skills/video-production/scripts/doctor.mjs
+```
+
 ### Requirements
 
-- **[HyperFrames](https://hyperframes.heygen.com)** — the rendering framework this delegates to.
-  Apache-2.0, free, renders locally. `npx hyperframes` — no API key.
-- **FFmpeg** with `ffprobe`
-- **Python 3.10+** with `numpy` and `Pillow` (the verifier's palette check)
-- **Node 18+** with `@playwright/test` (the manifest measurer)
+**There is nothing to install for the skill itself.** No `npm install`, no `pip install`. It needs
+four things that a machine which can make video almost certainly already has:
+
+| | | |
+|---|---|---|
+| **Node 18+** | the measurer and the batch scripts | 22+ uses the built-in WebSocket; below that, Playwright covers it |
+| **FFmpeg** + `ffprobe` | render, normalise, probe, and every frame the verifier reads | [download](https://ffmpeg.org/download.html) |
+| **Python 3.8+** | `verify.py` and `delivery_qc.py` | **standard library only** |
+| **a Chromium** | measuring what actually rendered | Chrome, Edge, Chromium — or the one the renderer downloads itself |
+
+Plus **[HyperFrames](https://hyperframes.heygen.com)** — the rendering framework this delegates to.
+Apache-2.0, free, renders locally, no API key. `npx hyperframes` fetches it on first use, which is
+the one step that needs the network.
+
+Nothing is pinned to a particular browser: `VP_BROWSER` names an executable, `VP_DRIVER=cdp` or
+`playwright` forces a driver. If Playwright happens to be in the project, the measurer uses it —
+not for convenience, but because you should **measure with the browser that renders**.
 
 ## The one contract
 
@@ -90,8 +108,13 @@ skills/video-production/
 │   ├── verification.md        the manifest schema and every check
 │   ├── unattended.md          the overnight batch protocol
 │   └── …
-├── scripts/                   manifest · verify · delivery_qc · normalize · cutdown
-│                              budget · shoot_plan · cue_sheet · localize · timeline_export
+├── scripts/
+│   ├── doctor.mjs             what is installed, and what you lose without it
+│   ├── manifest.mjs           measures what actually rendered
+│   ├── verify.py              the gate — stdlib only
+│   ├── lib/                   a zero-dependency CDP browser driver
+│   └── …                      delivery_qc · normalize · cutdown · budget
+│                              shoot_plan · cue_sheet · localize · timeline_export
 └── assets/                    brand config · rate card · delivery specs · format table
 ```
 

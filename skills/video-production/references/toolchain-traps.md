@@ -102,6 +102,18 @@ const req = createRequire(pathToFileURL(join(process.cwd(), "noop.js")).href);
 const mod = await import(pathToFileURL(req.resolve(name)).href);
 ```
 
+Two follow-ons, both of which bit afterwards:
+
+- **A CommonJS package imported with `import()`** puts its exports on `.default`, and the lexer does
+  not always surface the named bindings. Read `mod?.chromium || mod?.default?.chromium`, never just
+  the first.
+- **On Windows an absolute path is not a valid ESM specifier** — `C:` parses as a URL scheme, so
+  `import("C:\\…\\lib\\cdp.mjs")` throws *"Only URLs with a scheme in: file, data, and node"*. Every
+  dynamic import of a path must go through `pathToFileURL()`.
+
+The real fix was to stop depending on the package at all: `lib/cdp.mjs` drives any Chromium over the
+DevTools Protocol using Node's built-in WebSocket, so nothing has to resolve.
+
 **And a trap inside the trap:** these packages are CommonJS. `import()` of a CJS file puts
 `module.exports` on `default`, and named exports are detected by a lexer that sometimes misses. So:
 
@@ -123,6 +135,27 @@ candidate, and eventually throws "not installed" — about a package that is ins
 | render fails needing disk space | `TEMP` on a small drive | point `TEMP` / `TMP` at a drive with ≥6 GB |
 | `missing_timeline_registry` | the lint reads `index.html` **as text**, so a `<script src>` reads as having no timeline | inline the JS into the file; keep the source in `_src/` **inside** the project directory |
 | `root_dimensions_mismatch` | the lint reads the **first** `html, body` rule | **replace** the rule; do not add another |
+
+### 4.1 A browser that exists is not a browser that runs
+
+`existsSync(chrome.exe)` is not a launch test. On this machine **both** full Chromium builds in the
+Playwright cache fail with `spawn UNKNOWN` (errno −4094) — present, complete, and blocked by the
+system; only the headless shell starts. Code that picks the first path that exists picks a browser
+that cannot open.
+
+Try every candidate and report all the failures together. `lib/cdp.mjs` does this; `doctor.mjs`
+launches one for real rather than asking whether a file is there.
+
+### 4.2 Measure with the browser that renders
+
+Text advance widths differ between Chromium builds. Measuring a composition with a system Chrome
+while a bundled Chromium renders it produced boxes up to **23px wider** than the video actually
+contained — on text at 23px and below, where a font-fallback difference shows most.
+
+No verdict changed in our comparison (`verify.py` passed on both manifests), which is exactly why
+this is dangerous: the error is small enough to survive the gate and wrong enough to matter at a
+zone boundary. `lib/page.mjs` prefers the renderer's own Playwright when it is installed, and
+otherwise sorts the renderer's cached Chromium ahead of any system browser.
 
 ---
 

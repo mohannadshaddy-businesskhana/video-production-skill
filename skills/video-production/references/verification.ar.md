@@ -18,7 +18,8 @@ python scripts/verify.py \
 **خروج 0 = اعرض على المستخدم. خروج 1 = صلّح وأعد.**
 مفيش رندر بيتعرض على حد قبل ما الفاحص يعدّي. ده مش اقتراح.
 
-المتطلبات: `ffmpeg` · `ffprobe` · `numpy` · `pillow`.
+المتطلبات: `ffmpeg` · `ffprobe` فقط — الـPython مكتبة قياسية بحتة، مفيش `pip install`.
+شغّل `node scripts/doctor.mjs` يقولك البيئة ناقصها إيه.
 
 ---
 
