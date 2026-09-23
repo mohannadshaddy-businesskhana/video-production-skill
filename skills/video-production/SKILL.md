@@ -78,16 +78,16 @@ corrections were actually given in.
 |---|---|
 | `doctor.mjs` | what the machine has, what is missing, what each thing costs — run it first |
 | `manifest.mjs` | measures a composition → `layout.json` |
-| `verify.py` | the external verifier — fails the build |
-| `delivery_qc.py` | the file against a platform spec (`--list` for the catalog) |
+| `verify.mjs` | the external verifier — fails the build |
+| `delivery_qc.mjs` | the file against a platform spec (`--list` for the catalog) |
 | `normalize.sh` | loudness + a true-peak ceiling that survives the encode |
 | `cutdown.mjs` | cutdowns from marked segments |
 | `shot.mjs` | still frames from a composition, without a full render |
-| `budget.py` · `shoot_plan.py` | quote · shot list, schedule, call sheet |
-| `cue_sheet.py` | cue sheet + licence audit from a media ledger |
-| `localize.py` | translatable strings, and what translation did to their length |
-| `timeline_export.py` | EDL / OTIO for a human post house |
-| `batch_report.py` | one table from a directory of verifier reports |
+| `budget.mjs` · `shoot_plan.mjs` | quote · shot list, schedule, call sheet |
+| `cue_sheet.mjs` | cue sheet + licence audit from a media ledger |
+| `localize.mjs` | translatable strings, and what translation did to their length |
+| `timeline_export.mjs` | EDL / OTIO for a human post house |
+| `batch_report.mjs` | one table from a directory of verifier reports |
 
 ## Routing
 
@@ -118,8 +118,8 @@ brief → plan → build → VERIFY → deliver
 `/hyperframes` already runs a full intent interview and writes `BRIEF.md`. **Use it, don't rebuild
 it.** This layer adds only what a production house needs beyond a creative brief:
 
-- `scripts/budget.py` — a quote from a rate card (`assets/rate-card.template.json`)
-- `scripts/shoot_plan.py` — shot list, schedule, call sheet, when a camera is involved
+- `scripts/budget.mjs` — a quote from a rate card (`assets/rate-card.template.json`)
+- `scripts/shoot_plan.mjs` — shot list, schedule, call sheet, when a camera is involved
 
 ### 2. Brand contract
 
@@ -153,14 +153,14 @@ Delegate to `/hyperframes`. The one thing this layer requires of the composition
 
 ```bash
 node   <SKILL_DIR>/scripts/manifest.mjs <projectDir> <w> <h> layout.json
-python <SKILL_DIR>/scripts/verify.py --video out.mp4 --manifest layout.json \
+node <SKILL_DIR>/scripts/verify.mjs --video out.mp4 --manifest layout.json \
        --config brand.json --structure structure.json --json report.json
 ```
 
 Then, for anything that ships to a platform:
 
 ```bash
-python <SKILL_DIR>/scripts/delivery_qc.py --video out.mp4 --spec youtube-16x9 --json qc.json
+node <SKILL_DIR>/scripts/delivery_qc.mjs --video out.mp4 --spec youtube-16x9 --json qc.json
 ```
 
 Fix and re-run until both pass. **Only then** show the user.
@@ -171,8 +171,8 @@ Fix and re-run until both pass. **Only then** show the user.
   the encode. `loudnorm` alone measured −14.0 LUFS and **+3.5 dBFS true peak** — normalized and
   clipping.
 - `scripts/cutdown.mjs` — 6/15/30s cutdowns and aspect variants from a marked master
-- `scripts/cue_sheet.py` — every music and SFX asset with its licence, as a deliverable
-- `scripts/timeline_export.py` — EDL / OTIO when a human post house takes over
+- `scripts/cue_sheet.mjs` — every music and SFX asset with its licence, as a deliverable
+- `scripts/timeline_export.mjs` — EDL / OTIO when a human post house takes over
 
 ### 7. Review and iterate
 

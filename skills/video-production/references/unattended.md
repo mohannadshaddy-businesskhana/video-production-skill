@@ -30,7 +30,7 @@ pilot fails   →  stop. No second video.
 | 1 | Seed data is clean and every required name exists | **stop** |
 | 2 | `brand.json` and `structure.json` exist and are complete | **stop** |
 | 3 | Every correction carried over from the previous run has been made in the shared components | **stop** |
-| 4 | `verify.py` runs on an old render with no runtime errors | **stop** |
+| 4 | `verify.mjs` runs on an old render with no runtime errors | **stop** |
 | 5 | `toolchain-traps.md` has been read and its traps avoided in the components | **stop** |
 
 **Stop = write the reason in `run-log.md` and do not start.** An hour of waiting is cheaper than
@@ -41,7 +41,7 @@ eighteen wrong videos.
 Build **one video** (the first in the list) · one aspect ratio · silent.
 
 ```bash
-python scripts/verify.py \
+node scripts/verify.mjs \
   --video pilot.mp4 --manifest pilot.json \
   --config brand.json --structure structure.json \
   --json reports/pilot.json
@@ -64,7 +64,7 @@ Then the **fix loop** (below). **Pilot budget: 8 fix cycles in total.**
 For every remaining video, in order:
 
 1. Build it · one aspect ratio · silent
-2. Run `verify.py --json reports/NN.json`
+2. Run `verify.mjs --json reports/NN.json`
 3. Fix loop · **budget 4 cycles per video**
 4. Passed → `DONE` · failed → **`FAILED`, and continue to the next video**
 
@@ -207,7 +207,7 @@ not create success.
 ## The morning summary
 
 ```bash
-python scripts/batch_report.py --reports reports/ --out run-log-summary.md
+node scripts/batch_report.mjs --reports reports/ --out run-log-summary.md
 ```
 
 Reads every `reports/*.json` and produces one table: what passed, what failed and on what, and which

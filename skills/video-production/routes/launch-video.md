@@ -70,7 +70,7 @@ A starting shape, not a template. Not every project needs exactly three highligh
 3. **Build.** Hand the plan to the `/hyperframes` workflow. This layer owns the angle, tone, source
    material, and delivery expectations; the framework owns composition structure, timing, animation
    mechanics, and the render.
-4. **Verify.** `manifest.mjs` → `verify.py` → `delivery_qc.py`. Nothing is shown before they pass.
+4. **Verify.** `manifest.mjs` → `verify.mjs` → `delivery_qc.mjs`. Nothing is shown before they pass.
 5. **Deliver.** `normalize.sh` for loudness, pick a real poster frame (not an arbitrary one) and
    bake it as frame 0, write share copy.
 

@@ -3,7 +3,7 @@
 ## التشغيل
 
 ```bash
-python scripts/verify.py \
+node scripts/verify.mjs \
   --video out.mp4 \
   --manifest layout.json \
   --config brand.json
@@ -18,7 +18,7 @@ python scripts/verify.py \
 **خروج 0 = اعرض على المستخدم. خروج 1 = صلّح وأعد.**
 مفيش رندر بيتعرض على حد قبل ما الفاحص يعدّي. ده مش اقتراح.
 
-المتطلبات: `ffmpeg` · `ffprobe` فقط — الـPython مكتبة قياسية بحتة، مفيش `pip install`.
+المتطلبات: `ffmpeg` · `ffprobe` · Node فقط — مفيش `npm install` ولا `pip install`.
 شغّل `node scripts/doctor.mjs` يقولك البيئة ناقصها إيه.
 
 ---
@@ -133,7 +133,7 @@ ffmpeg -v error -i out.mp4 -vf "fps=1/2.5,scale=610:-1,tile=6x4" -frames:v 1 she
 
 1. ضيف الغلطة في `failure-log.md` **بتكلفتها**
 2. اسأل: **دي قابلة للقياس؟**
-   - **أيوة** → ضيف فحص في `verify.py` وسطر في `production-rules.md`
+   - **أيوة** → ضيف فحص في `verify.mjs` وسطر في `production-rules.md`
    - **لأ** → ضيف قاعدة في `narrative.md`
 3. لو القاعدة متعلقة بمكان أو زمن عنصر، **غالباً محتاجة حقل جديد في المانيفست** مش فحص بكسلات
 

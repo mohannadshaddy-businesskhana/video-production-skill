@@ -37,7 +37,7 @@ These are ours because the framework is a **rendering framework**, not a product
 | Ours | Why it is not theirs |
 |---|---|
 | Brand contract enforcement | The framework has no opinion about your brand |
-| External verifier (`verify.py`) | `check` proves the composition is valid; it cannot prove the video is *right* — that the claim reads, the frame is filled, the text can be read, the story has its six beats |
+| External verifier (`verify.mjs`) | `check` proves the composition is valid; it cannot prove the video is *right* — that the claim reads, the frame is filled, the text can be read, the story has its six beats |
 | Multi-aspect **design** system | The framework renders whatever aspect you give it; deciding that 9:16 is re-laid-out and not cropped is a production decision |
 | Loudness to a platform target | `hyperframes-audio` mixes; nobody normalises to −14 LUFS with a true-peak ceiling that survives AAC |
 | Delivery QC against platform specs | No deliverables matrix exists upstream |

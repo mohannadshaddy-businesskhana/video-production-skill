@@ -1,4 +1,4 @@
-/* Measures a rendered composition and writes the layout manifest verify.py reads.
+/* Measures a rendered composition and writes the layout manifest verify.mjs reads.
  *
  * This is the other half of the ZoneGuard contract: the timeline DECLARES
  * (window.__MF) and this MEASURES what actually landed. A disagreement between

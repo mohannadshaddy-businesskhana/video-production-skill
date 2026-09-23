@@ -15,8 +15,8 @@ length-dependent, and `single language` inverts — the allow-list is the only L
 Arabic cut, and the reverse in an English one.
 
 ```bash
-python <SKILL_DIR>/scripts/localize.py --manifest layout.json --out strings.json
-python <SKILL_DIR>/scripts/localize.py --strings strings.ar.json --check --base strings.json
+node <SKILL_DIR>/scripts/localize.mjs --manifest layout.json --out strings.json
+node <SKILL_DIR>/scripts/localize.mjs --strings strings.ar.json --check --base strings.json
 ```
 
 The first call extracts every `text` field from the manifest into a translatable table. The second

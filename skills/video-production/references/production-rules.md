@@ -183,7 +183,7 @@ The exponent **1.4** — perceptible acceleration without a jump.
 
 > ⚠️ **`silencedetect` passes straight over mistake #27.** If the track stopped and came back off
 > the rhythmic grid there is no silence, but the ear hears a fault.
-> **The correct check is pulse regularity in the spectrum across the ducked region.** `verify.py`
+> **The correct check is pulse regularity in the spectrum across the ducked region.** `verify.mjs`
 > does it.
 
 ---
