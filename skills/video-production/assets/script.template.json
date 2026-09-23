@@ -1,0 +1,56 @@
+{
+  "_": [
+    "The script as an artifact. Fill it, run script_check.mjs, and do not write",
+    "a line of composition code until it exits 0.",
+    "",
+    "The five fields above `beats` are not paperwork — they are the five",
+    "questions the template has always told you to ASK THE USER rather than",
+    "guess. Guessing them is how both pilot demos were written, and both were",
+    "rejected by the first person who watched them.",
+    "",
+    "Delete this key before use."
+  ],
+
+  "title": "",
+
+  "audience": "ONE named group, and what they do all day. 'Everyone' is not an audience.",
+  "category_noun": "The word this audience would use for what kind of thing this is. Not your branding.",
+  "alternative": "What they use instead today. If there is no alternative, there is no reason to switch.",
+
+  "mechanism": "What the software DOES. One sentence, subject = the product.",
+  "claim": "What the VIEWER GETS. One sentence, subject = the viewer. Ask 'so what?' of the mechanism until the answer happens to a person, then stop.",
+  "repeat_sentence": "The one sentence a viewer says to a colleague afterwards. If you cannot write it, they will not say it.",
+
+  "fps": 30,
+
+  "assumed_known": [
+    "Facts the audience already has before the video starts.",
+    "Keep this list SHORT and defend every entry — it is the escape hatch that",
+    "turns the cold-read ledger back into a rubber stamp."
+  ],
+
+  "jargon": [
+    {
+      "term": "every word on screen that is not everyday language",
+      "plain": "what it means to someone who has never heard it",
+      "explained_in": "the beat id where the video makes it mean something"
+    }
+  ],
+
+  "beats": [
+    {
+      "id": "ch1",
+      "frames": [0, 150],
+      "job": "what this beat is FOR in the story — not what it contains",
+      "says": ["each line that appears, in order"],
+      "shows": "what is on screen besides the words",
+      "needs": ["facts the viewer must already have"],
+      "establishes": ["facts this beat hands the viewer"],
+
+      "names_category": "true on the beat that says the category noun out loud, before 6s",
+      "states_stakes": "true on the beat that names what the viewer LOSES, in the first third",
+      "shows_subject": "true on any beat that shows the actual thing rather than describing it",
+      "is_claim": "true on exactly ONE beat — the one that lands the claim"
+    }
+  ]
+}
