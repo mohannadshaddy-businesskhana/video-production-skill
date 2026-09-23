@@ -1,258 +1,304 @@
-# قواعد الإنتاج
+# Production rules
 
-> كل قاعدة هنا **قابلة للقياس**. اللي مش قابل للقياس مكانه `narrative.md`.
-> كل قاعدة معاها رقم غلطتها في `failure-log.md`.
+> Every rule here is **measurable**. What cannot be measured belongs in `narrative.md`.
+> Each rule carries the number of its mistake in `failure-log.md`.
 
-## فهرس
-1. المناطق والتخطيط
-2. التيبوغرافي والقراءة
-3. الحركة
-4. الصوت
-5. الواجهة
-6. الهوية
-7. النسب المتعددة
-8. النسختان (تعليق / صامت)
-9. الـ CTA
-10. المانيفست
+## Index
+
+1. Zones and layout
+2. Typography and reading
+3. Motion
+4. Audio
+5. Interface
+6. Brand
+7. Multiple aspect ratios
+8. The two variants (voiceover / silent)
+9. The CTA
+10. The manifest
 
 ---
 
-## 1. المناطق والتخطيط
+## 1. Zones and layout
 
-### النطاق الآمن `#18`
-كل نص وكل عنصر حيوي **بين 12% و72% من ارتفاع الكادر**.
+### The safe band `#18`
 
-| النسبة | النطاق `y` | ممنوع |
+Every piece of text and every essential element sits **between 12% and 72% of frame height**.
+
+| Ratio | `y` band | Forbidden |
 |---|---|---|
 | 16:9 · 1080 | 130 → 778 | 0–129 · 779–1080 |
 | 9:16 · 1920 | 230 → 1382 | 0–229 · 1383–1920 |
 | 1:1 · 1080 | 130 → 778 | 0–129 · 779–1080 |
 
-آخر 28% = الكابشن واسم الحساب وزراير التفاعل على المنصات.
+The bottom 28% belongs to the caption, the account name, and the platform's own interaction buttons.
 
-### نظام المناطق `#20`
-**«ممنوع التراكب» كقاعدة نثرية اتخالفت مرتين.** الحل مناطق بإحداثيات + `ZoneGuard`.
+### The zone system `#20`
 
-| المنطقة | 16:9 | المحتوى |
+**"No overlapping" as a prose rule was violated twice.** The answer is zones with coordinates plus a
+zone guard.
+
+| Zone | 16:9 | Contents |
 |---|---|---|
-| **A** | `x 96→560` · `y 140→300` | عدّاد / مؤشر حالة — **محجوزة** |
-| **B** | `x 1560→1824` · `y 140→260` | لوجو ثابت — **محجوزة** |
-| **C** | `x 96→900` · `y 340→700` | كتل النص السردي |
-| **D** | `x 940→1824` · `y 300→760` | الواجهة / العنصر البصري |
-| **E** | `x 96→1500` · `y 140→220` | رأس ثابت للفصل |
+| **A** | `x 96→560` · `y 140→300` | counter / status indicator — **reserved** |
+| **B** | `x 1560→1824` · `y 140→260` | fixed logo — **reserved** |
+| **C** | `x 96→900` · `y 340→700` | narrative text blocks |
+| **D** | `x 940→1824` · `y 300→760` | interface / visual element |
+| **E** | `x 96→1500` · `y 140→220` | fixed chapter header |
 
-- منطقة غير مستخدمة بتنضم للمجاورة لها
-- C و D بيتبادلوا يمين/شمال حسب المشهد — **بس مابيتراكبوش أبداً**
-- المناطق بتتحجم نسبياً في 9:16 و1:1
+- An unused zone merges into its neighbour
+- C and D swap left/right by scene — **but they never overlap**
+- Zones scale proportionally for 9:16 and 1:1
 
-### تغطية الكادر `#21`
-**bbox المحتوى ≥ 45%** من مساحة الكادر.
+### Frame coverage `#21`
+
+**The content bbox is ≥ 45%** of the frame area.
 
 ```
-bbox = أصغر مستطيل بيحيط بكل العناصر المرئية
-التغطية = مساحة bbox ÷ مساحة الكادر
+bbox     = the smallest rectangle enclosing every visible element
+coverage = bbox area ÷ frame area
 ```
 
-يتقاس على **عيّنة من كل فصل** مش مرة واحدة للفيديو.
-**الحل لما يفشل: التوزيع مش التكبير.**
+Measured **per chapter**, not once for the whole video. And measured at the chapter **midpoint** —
+an element arriving after it does not count.
 
-### التباين `#22`
-أي عنصر هندسي على أرضية غامقة:
-- تعبئة: لون فاتح من الباليتة بشفافية **≥ 20%**
-- حدود: **2px** بلون من الباليتة بشفافية **≥ 70%**
+**When it fails, the answer is distribution, not enlargement.**
 
-**ممنوع أي لون خارج الباليتة** — الرمادي بيتعمل بشفافية، مش بلون جديد.
+### Contrast `#22`
+
+Any geometric element on a dark ground:
+
+- fill: a light palette colour at **≥ 20%** opacity
+- border: **2px** in a palette colour at **≥ 70%** opacity
+
+**No colour outside the palette** — grey is made with opacity, not with a new colour.
 
 ---
 
-## 2. التيبوغرافي والقراءة
+## 2. Typography and reading
 
-### الخطوط `#04`
-من دليل الهوية **بالاسم**. مفيش استبدال ولا fallback ولا خط إضافي.
+### Fonts `#04`
 
-### سلّم الأحجام
-سلّم الدليل معمول لشاشات قريبة. الفيديو بيتشاف من مسافة أبعد، فالمستويات **بتتزحزح درجة لأعلى داخل نفس السلّم** — **بدون تجاوز سقف الدليل**.
+From the brand guide **by name**. No substitution, no fallback, no extra font.
 
-| مستوى الفيديو | @1920×1080 |
+### The size scale
+
+The guide's scale is built for screens at reading distance. Video is watched from further away, so
+the levels **shift one step up within the same scale** — **without exceeding the guide's ceiling**.
+
+| Video level | @1920×1080 |
 |---|---|
-| عنوان بطل | الحد الأعلى لـDISPLAY في الدليل |
-| رقم كبير | نفسه |
-| عنوان | الحد الأعلى لـHEADING |
-| جسم | الحد الأدنى لـHEADING |
-| تسمية | SUBHEAD |
+| Hero headline | the guide's DISPLAY maximum |
+| Large number | the same |
+| Headline | the guide's HEADING maximum |
+| Body | the guide's HEADING minimum |
+| Label | SUBHEAD |
 
 `9x16` × 1.25 · `1x1` × 1.1
 
-### زمن القراءة `#31`
-**≥ 1.5 ثانية سكون كامل بعد انتهاء حركة العنصر** — مش شاملة الحركة.
+### Reading time `#31`
 
-**استثناء وحيد:** نسيج بصري مش مقصود للقراءة. لو اتعمل، **يتكتب صراحةً في السكريبت كاستثناء بمبرره وبمواصفة بتمنع محاولة القراءة** (حجم صغير · شفافية منخفضة · في الركن).
+**≥ 1.5 seconds of complete stillness after the element's motion ends** — not counting the motion.
 
-### محاذاة لغتين
-نص RTL ولاتيني في نفس الصف: `align-items: baseline` + إزاحة RTL `+0.08em` لأسفل.
-من غيرها أي خط أفقي (شطب · تسطير) بيقطع اللغتين عند ارتفاعين مختلفين.
+**One exception:** visual texture that is not meant to be read. If it is used, it is **written into
+the script as an explicit exception, with its reason and with a specification that prevents an
+attempt to read it** (small size · low opacity · in a corner).
+
+### Mixed-script alignment
+
+RTL and Latin text on the same line: `align-items: baseline` plus an RTL offset of `+0.08em`
+downward. Without it any horizontal rule — a strikethrough, an underline — cuts the two scripts at
+two different heights.
 
 ---
 
-## 3. الحركة
+## 3. Motion
 
-### حركة واحدة في المرة `#28 #29`
-> **الحركة بتغلب الموضع والحجم واللون.**
+### One motion at a time `#28 #29`
 
-| الحالة | الحل |
+> **Motion beats position, size and colour.**
+
+| Case | Answer |
 |---|---|
-| نص جديد + حركة في الكادر | النص يظهر ويستقر **والكادر ساكن تماماً** ≥ 1.5ث، وبعدين الحركة |
-| حركتان كبيرتان | الأولى تخلص قبل التانية |
-| حركة مستمرة (عدّاد · مؤشر كتابة) | مايتزامنش مع أي نص جديد |
+| New text + motion in frame | the text arrives and settles **with the frame completely still** for ≥1.5s, then the motion starts |
+| Two large motions | the first finishes before the second |
+| Continuous motion (counter, typing cursor) | never coincides with new text |
 
-**القاعدة العملية:** لو في الكادر حاجة بتتحرك، مفيش نص جديد. ولو في نص جديد، الكادر ساكن.
+**The practical rule:** if something in the frame is moving, there is no new text. If there is new
+text, the frame is still.
 
-### التراكم بدل الاستبدال `#30`
-في مشاهد التعداد، **العناصر بتتراكم وبتفضل**.
+### Accumulation, not replacement `#30`
+
+In any enumerating scene, **items accumulate and stay**.
 
 | ❌ | ✅ |
 |---|---|
-| عنصر بيروح وعنصر بييجي | عنصر بيظهر وبيفضل والتاني بيظهر جنبه |
-| نص عنصرين عند خط التماس | قائمة بتكبر |
-| مفيش حاجة كاملة في أي لحظة | الفريم الأخير بيجمع كل حاجة |
+| one item leaves as another arrives | one item appears and stays, the next appears beside it |
+| two items' text at the crossover point | a list that grows |
+| nothing is ever complete | the last frame holds everything |
 
-لو الاستبدال ضروري: **قطع مباشر مش انزلاق متصل**.
+If replacement is unavoidable: **a hard cut, not a continuous slide.**
 
-### الانتقال بالتحوّل
-في سلسلة مشاهد متتابعة، الانتقال يكون **تحوّل الشكل نفسه** مش خروج ودخول.
-مثال: `22 مربع → مربع واحد → 4 عقد → 13 شريط → 3 أسطر`
+### Transition by transformation
 
-- 14 فريم · **easing خطي** (التحوّل الهندسي أنضف خطي) · بدون fade
-- بيوفّر فريمات (14 بدل 26) وبيمنع الكادر الفاضي بين مشهدين
+In a sequence of related scenes, the transition is **the shape itself transforming**, not an exit
+and an entrance.
+Example: `22 squares → one square → 4 nodes → 13 bars → 3 rows`
 
-### الانتقالات المسموحة `#33`
-**قطع · انزلاق كتل · تحوّل الشكل.**
-أي انتقال فيه عشرات العناصر بتتغير في < 10 فريمات **هيقرا كعطل**.
+- 14 frames · **linear easing** (geometric transformation is cleanest linear) · no fade
+- It saves frames (14 instead of 26) and removes the empty frame between two scenes
 
-### ممنوع
-motion blur ناعم · glow · drop shadow · تدرّج لوني · cross-dissolve طويل.
-**مفيش كادر ساكن:** drift مستمر `scale 1.00 → 1.04` أو إزاحة 20px.
+### Permitted transitions `#33`
 
-### العدّادات `#32`
+**Cut · block slide · shape transformation.**
+Any transition where dozens of elements change in under 10 frames **will read as a glitch**.
+
+### Forbidden
+
+Soft motion blur · glow · drop shadow · colour gradients · long cross-dissolves.
+**No frozen frame:** a continuous drift of `scale 1.00 → 1.04` or a 20px move.
+
+### Counters `#32`
+
 ```
-value = total × t^1.4          حيث t = (frame − start) / (end − start)
+value = total × t^1.4          where t = (frame − start) / (end − start)
 ```
-الأُس **1.4** — تسارع محسوس بدون قفزة.
-**حدد 5 نقاط تحقق بالفريم في المواصفة** وافحصهم في الرندر (±3 وحدات).
-`font-variant-numeric: tabular-nums` إلزامي.
+
+The exponent **1.4** — perceptible acceleration without a jump.
+**Define 5 checkpoints by frame in the spec** and verify them in the render (±3 units).
+`font-variant-numeric: tabular-nums` is mandatory.
 
 ---
 
-## 4. الصوت
+## 4. Audio
 
-| البند | المواصفة |
+| Item | Spec |
 |---|---|
-| Integrated | **−14 LUFS** ±1 · `loudnorm=I=-14:TP=-1.5:LRA=11` `#25` |
-| True peak | −1.5 dBTP |
-| **التراك** | **بيشتغل من الفريم 0 لآخر فريم بدون توقف** `#27` |
-| كل التغيّرات | **أتوميشن gain فوق تراك متصل** — مفيش قص ولا إعادة تشغيل |
-| الحد الأدنى للخفض | **−30dB** — ممنوع الصفر `#26` |
-| الضربات | **low-pass عند 12kHz** — الضربة عريضة الطيف بتقرا كليك |
-| fade-out | بعد استقرار الـCTA فقط |
+| Integrated | **−14 LUFS** ±1 for digital · −23 EBU · −24 ATSC `#25` |
+| True peak | ≤ −1.0 dBTP, with real headroom before the encode |
+| **The track** | **runs from frame 0 to the last frame without stopping** `#27` |
+| Every change | **gain automation over a continuous track** — no cut, no restart |
+| Minimum duck | **−30 dB** — never to zero `#26` |
+| Hits | **low-passed at 12 kHz** — a full-spectrum hit reads as a click |
+| Fade-out | only after the CTA has settled |
 
-> ⚠️ **`silencedetect` بيعدّي على غلطة #27.** لو التراك وقف ورجع خارج الشبكة الإيقاعية، مفيش صمت بس الودن بتحس بعطل.
-> **الفحص الصحيح: انتظام النبضات في الطيف عبر منطقة الخفض.** `verify.py` بيعمله.
-
----
-
-## 5. الواجهة
-
-- **من كومبوننتات المنتج الفعلية** — مفيش تقريب ولا screenshots `#13`
-- **شرط قابل للفحص:** عُدّ عناصر التنقل في الرندر — لازم تطابق ملف الإعدادات في الكود
-- **مفيش** onboarding · empty state · loading spinner `#14`
-- **مفيش** أثر تسجيل شاشة `#15`
-- **مفيش** مستطيل إخفاء — بيانات تجريبية بأسماء ظاهرة `#16`
-- القص عند **حافة منطقية** (نهاية صف · حافة كارت) مش نص كارت
-- سرعة التفاعل **1.6×** من الواقع · مؤشر مرئي · **تغيّر state حقيقي**
-- كل رقم في النص لازم يكون **ظاهر بصرياً** (لو النص بيقول «18 تبويبا»، التبويبات تبان)
-
-### البيانات التجريبية `#17`
-**افحصها قبل أي رندر.** كل اسم شخص وكل اسم عميل أصلي.
-لو فيها إشارة لملكية فكرية للغير: **قف واسأل**، وصلّح في قاعدة البيانات مش في الفيديو.
+> ⚠️ **`silencedetect` passes straight over mistake #27.** If the track stopped and came back off
+> the rhythmic grid there is no silence, but the ear hears a fault.
+> **The correct check is pulse regularity in the spectrum across the ducked region.** `verify.py`
+> does it.
 
 ---
 
-## 6. الهوية
+## 5. Interface
 
-- الألوان **من الدليل بالهيكس**. ممنوع أخذ لون من صورة أو فيديو `#01`
-- **لا يُضاف أي عنصر بصري غير موجود في الدليل** `#02`
-- قواعد اللوجو **منقولة حرفياً**. قبل ما تشخّص عيب في أصل — اقرا الدليل `#03`
-- **اللوجو ثابت في كل مشهد خلاصة أو وعد** بعد لحظة التحوّل `#23`
-- **الشكل لازم يطابق معنى عنوانه** `#24`
+- **From the product's actual components** — no approximations, no borrowed screenshots `#13`
+- **A checkable condition:** count the navigation items in the render — they must match the config
+  file in the code
+- **No** onboarding · empty state · loading spinner `#14`
+- **No** screen-recording artefacts `#15`
+- **No** black redaction rectangle — use demo data with visible names `#16`
+- Crop at a **logical edge** (the end of a row, the edge of a card), never mid-card
+- Interaction speed **1.6×** real time · a visible cursor · **a real state change**
+- Every number in the narration must be **visible on screen** (if the text says "18 tabs", the tabs
+  are there to count)
 
-| المعنى | الشكل | مش الشكل |
+### Demo data `#17`
+
+**Check it before any render.** Every person's name and every client name.
+If it references someone else's intellectual property: **stop and ask.**
+
+> The source production's answer was to fix it **in the database**. A later production could not —
+> the demo organisation was live on production and visible to prospects. The alternative that
+> worked: **swap the names at capture time on the DOM**, and fail the capture loudly if any risky
+> token survives. Never write to production data to improve a shot.
+
+---
+
+## 6. Brand
+
+- Colours **from the guide, as hex**. Never sample a colour from an image or a video `#01`
+- **No visual element that is not in the guide** `#02`
+- Logo rules **transcribed verbatim**. Before diagnosing a fault in an asset — read the guide `#03`
+- **The logo is present in every summary or promise scene** after the turn `#23`
+- **The shape must match the meaning of its caption** `#24`
+
+| Meaning | The shape | Not the shape |
 |---|---|---|
-| مترابط | شبكة — كل عقدة بكل العقد | سلسلة خطية |
-| متتالي | سلسلة مرتبة | شبكة |
-| مُجمَّع | عناصر بتتقارب في واحد | صف منتظم |
-| موزّع | عنصر بينقسم | تكديس |
+| Connected | a mesh — every node to every node | a linear chain |
+| Sequential | an ordered chain | a mesh |
+| Consolidated | elements converging into one | a tidy row |
+| Distributed | one element splitting | a stack |
 
-> **قبل رسم أي شكل اسأل: الشكل ده بيقول إيه لوحده بدون العنوان؟**
+> **Before drawing any shape ask: what does this shape say on its own, without the caption?**
 
-### مصادر الحقيقة `#05`
-| النوع | المصدر |
+### Sources of truth `#05`
+
+| Type | Source |
 |---|---|
-| ألوان · خطوط · لوجو · مسافات | **دليل الهوية** |
-| أرقام · أسماء أقسام · عدد ميزات | **كود المنتج** |
-| الادعاءات والوعود | **المستخدم** |
+| Colours · fonts · logo · spacing | **the brand guide** |
+| Numbers · section names · feature counts | **the product's code** |
+| Claims and promises | **the user** |
 
-أرقام الغلاف والمواد التسويقية القديمة **مش مصدر**.
-
----
-
-## 7. النسب المتعددة `#19`
-
-**إعادة تخطيط مش قص.** نفس الكومبوننتات بترتيب مختلف حسب النسبة.
-
-```
-16x9 → كتلتان جنب بعض أفقياً
-9x16 → كتلتان فوق بعض
-1x1  → النص فوق بحجم أصغر، البصري تحت
-```
-
-**ممنوع** `scale` أو crop على الكادر كله.
-**اختبار:** قص مركزي 9:16 من تصميم 16:9 — لو اختفى أي نص، التصميم فاشل.
+Cover figures and old marketing material are **not a source**.
 
 ---
 
-## 8. النسختان `#09`
+## 7. Multiple aspect ratios `#19`
 
-نفس اللقطات ونفس التوقيتات — **طبقة النص بس هي اللي بتتبدّل.**
+**A re-layout, not a crop.** The same components in a different arrangement per ratio.
 
-| | نسخة التعليق | النسخة الصامتة |
+```
+16x9 → two blocks side by side horizontally
+9x16 → two blocks stacked
+1x1  → text above at a smaller size, visual below
+```
+
+**No** `scale` or crop applied to the whole frame.
+**The test:** centre-crop a 9:16 out of the 16:9 design — if any text disappears, the design failed.
+
+> And rearranging blocks is not sufficient either. That was itself a logged correction: a 9:16 that
+> merely stacks the 16:9 blocks reads as a compromise. Each ratio is designed, and coverage is
+> measured against **that ratio's own** numbers.
+
+---
+
+## 8. The two variants `#09`
+
+The same shots and the same timings — **only the text layer changes.**
+
+| | Voiceover version | Silent version |
 |---|---|---|
-| النص المكتوب | **كلمتان لأربع** — مرساة بصرية | **جملة مترابطة** تحمل الحكاية |
-| عدد لحظات النص | أقل | أكتر |
-| الموسيقى | −20 LUFS تحت التعليق | +3 dB |
+| On-screen text | **two to four words** — a visual anchor | **a connected sentence** carrying the story |
+| Number of text moments | fewer | more |
+| Music | −20 LUFS under the voice | +3 dB |
 
-**القاعدة المضادة للحدس:** النص المكتوب في نسخة التعليق **أقصر** من المنطوق. المشاهد بيقرا ويسمع في نفس اللحظة فيتشتت.
+**The counter-intuitive rule:** the on-screen text in the voiceover version is **shorter** than what
+is spoken. The viewer reading and listening at the same moment is a viewer doing neither.
 
-`hasVoiceover: boolean` على نفس الـcomposition — **مش مشروعين**.
+`hasVoiceover: boolean` on the same composition — **not two projects.**
 
 ---
 
-## 9. الـ CTA `#34`
+## 9. The CTA `#34`
 
-| البند | المواصفة |
+| Item | Spec |
 |---|---|
-| المدة | **≥ 3.5 ثانية سكون كامل** بعد اكتمال الكارت |
-| الرابط / الإجراء | **أعلى تباين بعد زر الإجراء** |
-| زر الإجراء | لون الإجراء حسب الدليل · نص عالي التباين |
-| الدخول | انزلاق متتابع · **بدون fade** |
-| fade-out الموسيقى | **بعد** استقرار الكارت |
-| 9:16 | زر الإجراء في **الثلث الأوسط** — مش السفلي |
-| كله | **فوق خط 72%** بما فيه الرابط |
+| Duration | **≥ 3.5 seconds of complete stillness** after the card completes |
+| The link / action | **the highest contrast after the action button** |
+| Action button | the guide's action colour · high-contrast text |
+| Entrance | sequential slide · **no fade** |
+| Music fade-out | **after** the card settles |
+| 9:16 | the action button in the **middle third**, not the bottom |
+| All of it | **above the 72% line**, including the link |
+
+> A practical consequence found the hard way: 45 frames of number stillness plus 105 frames of CTA
+> stillness plus entrances is exactly 180 frames. In a 6-second chapter there is no slack, so the
+> CTA lockup enters as **one block with no stagger** — any stagger eats the stillness.
 
 ---
 
-## 10. المانيفست
+## 10. The manifest
 
-`ZoneGuard` بيكتب `layout.json` أثناء الرندر:
+The zone guard writes `layout.json` during the render:
 
 ```json
 {
@@ -279,12 +325,16 @@ value = total × t^1.4          حيث t = (frame − start) / (end − start)
 }
 ```
 
-| الحقل | بيتفحص |
+| Field | What it checks |
 |---|---|
-| `bbox` + `zone` | داخل المنطقة · مفيش تقاطع مع bbox تاني |
-| `bbox` مجمّع لكل فصل | تغطية ≥ 45% |
-| `frames` + `still_from` | سكون ≥ 1.5 ثانية لكل نص |
-| `motion_events` | مفيش حركتان `large` متداخلتان · مفيش نص جديد أثناء حركة |
-| `chapters` | متصلة بدون فجوات · المجموع = المدة |
+| `bbox` + `zone` | inside the zone · no intersection with another bbox |
+| `bbox` unioned per chapter | coverage ≥ 45% |
+| `frames` + `still_from` | ≥ 1.5 seconds of stillness for every text |
+| `motion_events` | no two overlapping `large` motions · no new text during motion |
+| `chapters` | contiguous with no gaps · summing to the duration |
 
-**من غير المانيفست الفاحص أعمى.** الكود اللي بيرسم عارف كل حاجة فين — خليه يقولها.
+Optional flags the narrative checks read: `names_hero` · `sweep_item` · `texture` · `critical` ·
+`claims_relation` + `relation` + `nodes` + `edges` · `text`.
+
+**Without the manifest the verifier is blind.** The code that draws knows where everything is — make
+it say so.

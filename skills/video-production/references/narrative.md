@@ -1,144 +1,169 @@
-# السرد واللغة
+# Narrative and language
 
-> القواعد اللي مش قابلة للقياس الآلي. دي اللي محتاجة حكم — وبعضها محتاج **المستخدم** مش الموديل.
-
----
-
-## 1. العمود الفقري
-
-**بطل واحد · موقف واحد · ادعاء واحد.**
-
-```
-1. الموقف           5–8ث     شخص محدد · مشكلة بتحصل فعلاً
-2. الطريقة القديمة  10–14ث   نفس الشخص · الأدوات المتفرقة · مؤشر تكلفة (وقت/فلوس)
-3. التحوّل          4–6ث     القديم بيتقفل · المنتج بيتفتح · التعريف + السلوجن
-4. الطريقة الجديدة  6–8ث     نفس الموقف · الحل · المؤشر بيقف
-5. التوسيع          8–14ث    نتيجة الحكاية — مش ادعاء جديد
-6. CTA              3.5ث+
-```
-
-**الحكاية لازم تقفل قبل نص الفيديو.** اللي بعدها توسيع لوعد **اتثبت**، مش دعاوى إضافية.
-
-### ممنوع `#07 #08`
-- أكتر من ادعاء أساسي واحد
-- فوضى عامة («إدارة الشركة صعبة») — الفوضى دايماً موقف محدد
-- تعداد ميزات بدون شخص
-- بداية بدون تعريف الفئة والبطل **قبل الثانية السادسة**
-
-### اختبار الأوتلاين
-اكتب ادعاء كل فصل في سطر. لو طلعوا أكتر من واحد **بدون رابط سببي بينهم**، ده بروشور مش حكاية. اقطع.
+> The rules no tool can measure. These need judgement — and some of them need **the user**, not the
+> model.
 
 ---
 
-## 2. اختيار الادعاء — أهم قرار في الفيديو `#11`
+## 1. The spine
 
-> **اسأل: الادعاء ده بيلغي الموقف ولا بيسرّعه؟**
+**One protagonist · one situation · one claim.**
 
-| مستوى | مثال | القوة |
+```
+1. The situation     5–8s     a specific person · a problem that actually happens
+2. The old way      10–14s    the same person · scattered tools · a cost counter (time or money)
+3. The turn          4–6s     the old thing closes · the product opens · definition + slogan
+4. The new way       6–8s     the same situation · the solution · the counter stops
+5. The widening      8–14s    the consequence of the story — not a new claim
+6. CTA               3.5s+
+```
+
+**The story must close before the halfway point.** Everything after it widens a promise that has
+already been **proven**, rather than adding claims.
+
+### Forbidden `#07 #08`
+
+- More than one primary claim
+- Generic chaos ("running a company is hard") — chaos is always a specific situation
+- A feature list with no person in it
+- An opening that does not name the category and the protagonist **before second six**
+
+### The outline test
+
+Write each chapter's claim on one line. If more than one survives **with no causal link between
+them**, it is a brochure, not a story. Cut.
+
+---
+
+## 2. Choosing the claim — the most important decision in the video `#11`
+
+> **Ask: does this claim eliminate the situation, or speed it up?**
+
+| Level | Example | Strength |
 |---|---|---|
-| تحسين كفاءة | «الرد في 9 ثواني بدل ساعتين» | ضعيف — كل منافس بيوعد بيه |
-| **إلغاء الموقف** | **«العميل ما بقاش محتاج يسأل»** | قوي — صعب التقليد |
+| Efficiency gain | "Answer in 9 seconds instead of two hours" | Weak — every competitor promises it |
+| **Eliminating the situation** | **"The client no longer needs to ask"** | Strong — hard to imitate |
 
-**الفرق ده كلّف إعادة كتابة فصل كامل في الإنتاج المصدر.**
+**This distinction cost a full chapter rewrite in the source production.**
 
-### كل ميزة لازم ترد على اعتراض حقيقي `#12`
-لو محدش بيسأل عنها، شيلها. الادعاء الدفاعي بيزرع شك مكانش موجود.
+### Every feature must answer a real objection `#12`
 
-### فرّق بين رقمين `#06`
+If nobody is asking about it, cut it. A defensive claim plants a doubt that was not there.
 
-| الرقم | معناه | الصياغة |
+### Two numbers that are not the same number `#06`
+
+| The number | What it is | How to phrase it |
 |---|---|---|
-| واقع المشاهد | اللي هو فعلاً بيعمله | «إنت شغّال على 7 أدوات» |
-| قدرة المنتج | اللي المنتج بيقدر يستبدله | «22 قسم، كل واحد بيغني عن أداة» |
+| The viewer's reality | What they actually do | "You are running seven tools" |
+| The product's capacity | What the product can replace | "22 sections, each replacing a tool" |
 
-**الادعاء دايماً عن المنتج مش عن المشاهد.** «إنت بتستخدم 22 أداة» هيخلّي المشاهد يقول «أنا مش كده» ويخسر التصديق في كل حاجة تانية.
+**The claim is always about the product, never about the viewer.** "You use 22 tools" makes the
+viewer say *I don't*, and you lose their belief in everything else.
 
 ---
 
-## 3. اللغة — نظام بمستويين `#10`
+## 3. Language — a two-level system `#10`
 
-### المستوى الأول — حوار جوه الواجهة
-رسائل · تعليقات · أسماء · إشعارات → **زي ما الناس بتكتب فعلاً.**
-في اللهجات: **العامية**. في الإنجليزية: كما يُكتب في الواقع.
+### Level one — dialogue inside the interface
+
+Messages, comments, names, notifications → **the way people actually write.**
+In a dialect market: **the dialect.** In English: the way it is really typed.
 
 ```
-✅ «البوست نزل ولا لسه؟»
-❌ «هل تم نشر المنشور أم لا؟»
+✅ "did the post go out yet?"
+❌ "Has the aforementioned post been published?"
 ```
 
-ده اللي بيخلّي الواجهة تحس حقيقية.
+This is what makes an interface feel real.
 
-### المستوى الثاني — السرد والتعليق
-**جمل مترابطة بأدوات ربط.**
+### Level two — narration and voiceover
 
-> ⛔ **القاعدة الحاسمة: بلاش جمل مقطوعة بنقط جنب بعض.** اربط بـ«و / فـ / لكن / لأن».
+**Connected sentences, with connecting words.**
 
-| ❌ مقطوع | ✅ مترابط |
+> ⛔ **The decisive rule: no clipped fragments strung together with full stops.** Join them —
+> and, so, but, because.
+
+| ❌ Clipped | ✅ Connected |
 |---|---|
-| السؤال نفسه. رابط واحد. | نفس السؤال، والإجابة أمامه قبل أن ينتهي من قراءته |
-| بضغطة واحدة — أصبح عميلا ببياناته كاملة. 18 تبويبا. | بضغطة واحدة يصبح عميلا ببياناته كاملة في ثمانية عشر تبويبا |
+| The same question. One link. | The same question, and the answer in front of him before he finishes reading it |
+| One click — a customer with full data. 18 tabs. | One click makes them a customer with their full data across eighteen tabs |
 
-**العبارات الاسمية المرصوصة بنقط تركيب إنجليزي.** المستخدم في الإنتاج المصدر وصفها: «الصياغة مش عربية وكأنها إنجليزية مترجمة».
+**Stacked noun phrases separated by dots are English syntax.** The user in the source production
+described it exactly: *"the phrasing isn't Arabic, it reads like translated English."* The same
+failure exists in reverse — English narration written as a list of nouns reads like a slide, not a
+sentence.
 
-**استثناء وحيد:** السلوجن وكتل العناوين — عبارة واحدة موزّعة على كتلتين، مش جملتين منفصلتين.
+**One exception:** the slogan and headline blocks — a single phrase split across two blocks, not two
+separate sentences.
 
-### النص يقول حاجة مش على الشاشة `#09`
-لو النص بيوصف الصورة، واحد منهم زيادة.
+### The words say something the screen does not `#09`
+
+If the narration describes the picture, one of them is redundant.
 
 ```
-❌ (والشاشة بتوري كارت بيتحرك) «المحتوى يرتبط بالعميل تلقائيا»
-✅ (نفس الشاشة) «سلمى لم تفتح شيئا»
+❌ (screen shows a card moving) "Content links to the client automatically"
+✅ (same screen)                "Salma did not open anything"
 ```
 
-### مفردات الفئة
-**اسأل المستخدم عن المفردة الصح واستخدمها في كل حاجة.** في الإنتاج المصدر كان الفرق بين كلمتين مترادفتين ظاهرياً قرار تموضع.
+### Category vocabulary
+
+**Ask the user for the right word and use it everywhere.** In the source production the difference
+between two apparently interchangeable words was a positioning decision.
 
 ---
 
-## 4. نبرة العلامة
+## 4. Brand voice
 
-من دليل الهوية لو فيه قسم voice. لو مفيش، اسأل المستخدم عن:
-- ثلاث جمل «افعل» وثلاث «لا تفعل»
-- كلمات ممنوعة
-- مستوى الرسمية
+From the brand guide, if it has a voice section. If it does not, ask the user for:
 
-**الافتراضي في غياب التوجيه:** جمل قصيرة · كلمات مباشرة · ثقة بلا مبالغة · مفيش صفات مكدّسة ولا تعجّبات متعددة ولا وعود ضخمة.
+- Three "do" sentences and three "don't"
+- Banned words
+- Level of formality
 
-الميزة تتكتب من زاوية **الفائدة** مش الخاصية. والأرقام المحددة أقوى من الصفات.
+**The default, absent direction:** short sentences · plain words · confidence without inflation ·
+no stacked adjectives, no multiple exclamations, no enormous promises.
+
+A feature is written from the angle of the **benefit**, not the property. And a specific number
+beats any adjective.
 
 ---
 
-## 5. تصميم سلسلة
+## 5. Designing a series
 
-لو الفيديوهات أكتر من واحد:
+When there is more than one video:
 
-- **نفس العمود الفقري لكل فيديو** — بطل واحد، موقف واحد
-- **أبطال مختلفون من نفس الفريق** — بيدي السلسلة إحساس الحلقات
-- **الفيديو الجامع بيعرّف العالم** · فيديوهات الأقسام بتعمّق جزء منه
-- **مفيش تكرار للادعاء الجامع** في فيديوهات الأقسام — كل واحد له ادعاؤه
-- **بيانات تجريبية موحّدة** عبر السلسلة كلها. رقم مختلف لنفس الشيء في فيديوين = خلل مصداقية
+- **The same spine in every video** — one protagonist, one situation
+- **Different protagonists from the same team** — this is what gives a series the feel of episodes
+- **The umbrella video defines the world**; section videos go deeper into part of it
+- **Never repeat the umbrella claim** in a section video — each one has its own
+- **One consistent set of demo data across the whole series.** A different number for the same thing
+  in two videos is a credibility fault, and viewers notice it faster than any craft error
 
-### موجز الأقسام
-قبل كتابة سكريبتات السلسلة، اعمل جدول:
+### The section brief
 
-| القسم | البطل | الموقف المحدد | الادعاء | الأداة المستبدَلة |
+Before writing any script in the series, build this table:
+
+| Section | Protagonist | The specific situation | The claim | The tool it replaces |
 |---|---|---|---|---|
 
-**املا الجدول واعرضه على المستخدم قبل كتابة أي سكريبت.** عمود «الموقف» و«الادعاء» **محتاجين المستخدم** — دي معرفة سوق مش استنتاج.
+**Fill it and show it to the user before writing a single script.** The *situation* and *claim*
+columns **need the user** — that is market knowledge, not inference.
 
 ---
 
-## 6. اللي محتاج المستخدم — مش الموديل
+## 6. What needs the user, not the model
 
-في الإنتاج المصدر، **خمسة قرارات** محدش غير المستخدم كان يقدر ياخدها:
+In the source production, **five decisions** nobody but the user could make:
 
-1. **الادعاء الصحيح** — إلغاء المشكلة بدل تسريع الحل
-2. **الكلمة اللي العميل بيكتبها فعلاً** — مفردة المجال مش المرادف العام
-3. **الاحتكاك اللي بيهم في السوق ده** — احتكاك حقيقي في سوق ممكن يكون بلا معنى في سوق تاني
-4. **الميزة اللي مش ميزة** — حاجة تبان فارقة وهي مش كده
-5. **مفردة الفئة** — بين مرادفين، واحد بيموضع صح والتاني لأ
+1. **The right claim** — eliminating the problem instead of speeding up the solution
+2. **The word the customer actually types** — the domain term, not the generic synonym
+3. **The friction that matters in this market** — real friction in one market can be meaningless in
+   another
+4. **The feature that is not a differentiator** — something that looks decisive and is not
+5. **The category vocabulary** — between two synonyms, one positions correctly and the other does not
 
-**اسأل عن الخمسة دول صراحةً في مرحلة الأوتلاين.** متخمّنش.
+**Ask about all five explicitly at the outline stage.** Do not guess.
 
-اعرض الأوتلاين بالسؤال ده:
-> «الادعاء ده هو الصح للسوق ده؟ والكلمات دي هي اللي عميلك بيستخدمها؟»
+Present the outline with this question:
+
+> "Is this the right claim for this market? And are these the words your customer uses?"

@@ -1,318 +1,452 @@
-# سجل الأخطاء — Failure Log
+# Failure log
 
-> كل غلطة هنا حصلت فعلاً في إنتاج حقيقي، وكل واحدة كلّفت جولة رندر كاملة.
-> **اقرا الملف ده بالكامل قبل أي شغل.** القاعدة من غير سببها بتتبرر بعيداً وبتتخالف تاني.
+> Every mistake here actually happened in a real production, and every one cost a full render round.
+> **Read this file in full before any work.** A rule without its reason gets rationalised away and
+> violated again.
 >
-> **لما المستخدم يصحح حاجة جديدة — ضيفها هنا بتكلفتها.** السجل هو الأصل، الفيديوهات هي المُخرَج.
+> **When the user corrects something new — add it here with its cost.** The log is the asset; the
+> videos are the output.
 
-## فهرس
+## Index
 
-| # | الغلطة | الفئة |
+| # | The mistake | Category |
 |---|---|---|
-| 01 | أخذ الألوان من بكسلات فيديو | الهوية |
-| 02 | إضافة عناصر بصرية مش في الدليل | الهوية |
-| 03 | تشخيص «عيب» مش عيب واقتراح حل مخالف | الهوية |
-| 04 | تخمين الخطوط | الهوية |
-| 05 | استخدام رقم قديم من غلاف الدليل | البيانات |
-| 06 | ادعاء رقم المشاهد مش بيصدقه | الرسالة |
-| 07 | سبع دعاوى في فيديو واحد | السرد |
-| 08 | مفيش تعريف بالفئة ولا الجمهور | السرد |
-| 09 | تعليقات توضيحية بدل حكاية | اللغة |
-| 10 | لغة لافتات — جمل اسمية مقطوعة | اللغة |
-| 11 | ادعاء «تحسين كفاءة» بدل «إلغاء المشكلة» | الرسالة |
-| 12 | ميزة دفاعية بترد على اعتراض محدش أثاره | الرسالة |
-| 13 | واجهة مُقلَّدة بدل واجهة المنتج الحقيقية | الواجهة |
-| 14 | شريط onboarding ظاهر في لقطة المنتج | الواجهة |
-| 15 | أثر تسجيل شاشة في اللقطة | الواجهة |
-| 16 | مستطيل إخفاء أسود في مادة ترويجية | الواجهة |
-| 17 | بيانات تجريبية فيها ملكية فكرية للغير | قانوني |
-| 18 | نص تحت خط الكادر — منطقة واجهة الموبايل | التخطيط |
-| 19 | تكوين ملزوق ناحية واحدة | التخطيط |
-| 20 | تراكب النص فوق معلومة | التخطيط |
-| 21 | فراغ أكتر من نص الكادر | التخطيط |
-| 22 | تباين شبه معدوم على الأرضية الغامقة | التخطيط |
-| 23 | مفيش لوجو في مشاهد الوعود | الهوية |
-| 24 | الشكل بيناقض العنوان اللي فوقه | التصميم |
-| 25 | صوت أهدأ بـ11 dB من المعيار | الصوت |
-| 26 | قطع الموسيقى للصفر | الصوت |
-| 27 | إيقاف التراك ورجوعه خارج الشبكة الإيقاعية | الصوت |
-| 28 | حركتان كبيرتان متزامنتان — «جليتش» | الحركة |
-| 29 | عنصر متحرك صغير بيسحب العين من نص ثابت كبير | الحركة |
-| 30 | استبدال سريع — نص عنصرين في كل فريم | الحركة |
-| 31 | نص ظاهر أقل من ثانية | الحركة |
-| 32 | منحنى عدّاد أسّي بيقفز | الحركة |
-| 33 | انتقال زخرفي بيقرا كتلف رقمي | الحركة |
-| 34 | CTA بثانية واحدة وأقل تباين في الكادر | التحويل |
-| 35 | ملف رندر ناقص اتسلّم للمراجعة | الإنتاج |
-| 36 | ست مخرجات قبل الموافقة على واحد | الإنتاج |
-| 37 | اقتراح ستاك بديل والفريق عنده ستاك شغّال | العملية |
-| 38 | تصحيح مواصَف واتنفّذ بالعكس | التصميم |
-| 39 | نص بلغة تانية في فيديو أحادي اللغة | اللغة |
-| 40 | إعادة تخطيط على مستوى الكتل مش الشكل | التخطيط |
-| 41 | حدود الفحص الآلي للصوت | العملية |
+| 01 | Sampling colours from video pixels | Brand |
+| 02 | Adding visual elements that are not in the guide | Brand |
+| 03 | Diagnosing a "fault" that was not one, and prescribing a violation | Brand |
+| 04 | Guessing at fonts | Brand |
+| 05 | Using an old number from the guide's cover | Data |
+| 06 | A claim about a number the viewer does not believe | Message |
+| 07 | Seven claims in one video | Narrative |
+| 08 | Never naming the category or the audience | Narrative |
+| 09 | Captions instead of a story | Language |
+| 10 | Signage language — clipped noun phrases | Language |
+| 11 | An efficiency claim instead of an elimination claim | Message |
+| 12 | A defensive feature answering an objection nobody raised | Message |
+| 13 | An imitated interface instead of the product's real one | Interface |
+| 14 | An onboarding bar visible in a product shot | Interface |
+| 15 | Screen-recording artefacts in a capture | Interface |
+| 16 | A black redaction rectangle in promotional material | Interface |
+| 17 | Demo data containing third-party intellectual property | Legal |
+| 18 | Text below the frame line — the mobile interface zone | Layout |
+| 19 | A composition stuck to one side | Layout |
+| 20 | Text overlapping information | Layout |
+| 21 | More empty space than content | Layout |
+| 22 | Almost no contrast on the dark ground | Layout |
+| 23 | No logo in the promise scenes | Brand |
+| 24 | A shape contradicting the caption above it | Design |
+| 25 | Audio 11 dB quieter than the standard | Audio |
+| 26 | Cutting the music to zero | Audio |
+| 27 | Stopping the track and returning off the rhythmic grid | Audio |
+| 28 | Two large motions at once — a "glitch" | Motion |
+| 29 | A small moving element pulling the eye off large still text | Motion |
+| 30 | Fast replacement — half of two items in every frame | Motion |
+| 31 | Text visible for under a second | Motion |
+| 32 | An exponential counter curve that jumps | Motion |
+| 33 | A decorative transition that reads as digital corruption | Motion |
+| 34 | A one-second CTA with the lowest contrast in frame | Conversion |
+| 35 | A truncated render file handed over for review | Production |
+| 36 | Six outputs before one was approved | Production |
+| 37 | Proposing an alternative stack when the team had a working one | Process |
+| 38 | A correction that was specified and implemented backwards | Design |
+| 39 | Text in another language inside a monolingual video | Language |
+| 40 | Re-layout at the block level instead of the design level | Layout |
+| 41 | The limits of automated audio checking | Process |
 
 ---
 
-## الهوية
+## Brand
 
-### 01 · أخذ الألوان من بكسلات فيديو
-**حصل:** استخرجت الباليتة من فريمات فيديو مرجعي.
-**النتيجة:** **الخمس قيم كلهم غلط.** ضغط JPEG بيزحزح كل قيمة.
-**التكلفة:** جولة كاملة + كل أصل اتعمل بالقيم الغلط.
-**القاعدة:** الألوان من دليل الهوية فقط. **ممنوع أخذ لون من صورة أو فيديو أبداً** — ولا حتى كتقدير مؤقت.
+### 01 · Sampling colours from video pixels
 
-### 02 · إضافة عناصر بصرية مش في الدليل
-**حصل:** اخترعت «رقم شبح» (رقم ضخم بشفافية 6% خلف المحتوى) علشان أدي «عمق وإيقاع». اتشال. استبدلته بشريط فسيفساء. اتشال. بعدين شريط تقدّم. اتشال.
-**النتيجة:** تلات جولات على تلات عناصر كلهم زخرفة.
-**القاعدة:** **لا يُضاف أي عنصر بصري غير موجود في دليل الهوية.** لو الكادر حاسس إنه فاضي، المشكلة في التوزيع مش في نقص عناصر.
+**What happened:** I extracted the palette from frames of a reference video.
+**Result:** **all five values were wrong.** JPEG compression shifts every one.
+**Cost:** a full round, plus every asset produced with the wrong values.
+**Rule:** colours come from the brand guide only. **Never sample a colour from an image or a
+video** — not even as a temporary estimate.
 
-### 03 · تشخيص «عيب» مش عيب واقتراح حل مخالف
-**حصل:** شفت لوجو أسود على خلفية سودا وافتكرتها مشكلة. كتبت قاعدة: «اللوجو دايماً على بلاطة فاتحة».
-**النتيجة:** اللوجو له **إطار أبيض جزء منه**، والوضع كان صح. والقاعدة اللي كتبتها كانت **مخالفة صريحة** للدليل («لا تضع اللوجو الملوّن على أرضية ملوّنة»).
-**القاعدة:** قبل ما تشخّص عيب في أصل موجود — **اقرا الدليل الأول**. اللي شكله غلط ممكن يكون هو المواصفة.
+### 02 · Adding visual elements that are not in the guide
 
-### 04 · تخمين الخطوط
-**حصل:** كتبت «اقرا الكونفيج، وfallback لخط معقول».
-**النتيجة:** الدليل كان بيحدد تلات خطوط بالاسم و«لا تستبدل ولا تضيف خطاً رابعاً».
-**القاعدة:** الخطوط من الدليل بالاسم. مفيش fallback ولا اجتهاد.
+**What happened:** I invented a "ghost number" (a huge numeral at 6% opacity behind the content) to
+give "depth and rhythm". Removed. Replaced it with a mosaic strip. Removed. Then a progress bar.
+Removed.
+**Result:** three rounds on three elements, all decoration.
+**Rule:** **no visual element that is not in the brand guide.** If the frame feels empty, the problem
+is distribution, not a shortage of elements.
 
-### 23 · مفيش لوجو في مشاهد الوعود
-**حصل:** مشاهد الميزات كانت عناوين على أرضية سودا بدون أي علامة.
-**النتيجة:** المشاهد بيشوف وعود من غير ما يعرف مين بيوعد. ومحدش بيتفرج على الفيديو من أوله دايماً.
-**القاعدة:** بعد لحظة التحوّل، **اللوجو ثابت في الكادر** في كل مشهد خلاصة أو وعد.
+### 03 · Diagnosing a "fault" that was not one
 
----
+**What happened:** I saw a black logo on a black background and assumed it was a problem. I wrote a
+rule: "the logo always sits on a light plate."
+**Result:** the logo **has a white frame as part of it**, and the placement was correct. The rule I
+wrote was an **explicit violation** of the guide ("do not place the coloured logo on a coloured
+ground").
+**Rule:** before diagnosing a fault in an existing asset — **read the guide first**. What looks wrong
+may be the specification.
 
-## البيانات والرسالة
+### 04 · Guessing at fonts
 
-### 05 · استخدام رقم قديم من غلاف الدليل
-**حصل:** غلاف دليل الهوية كتب «10 أقسام». كود المنتج فيه 21.
-**النتيجة:** الواجهة المبنية في الفيديو طلعت بـ10 عناصر سايدبار.
-**القاعدة:** **الدليل حاكم في التصميم · كود المنتج حاكم في الأرقام.** حدد المصدر لكل نوع بيانات صراحةً.
+**What happened:** I wrote "read the config, and fall back to a reasonable font."
+**Result:** the guide named three fonts explicitly and said "do not substitute and do not add a
+fourth."
+**Rule:** fonts come from the guide by name. No fallback, no judgement call.
 
-### 06 · ادعاء رقم المشاهد مش بيصدقه
-**حصل:** «بديل 22 أداة» — والمنتج فعلاً بيستبدل 22.
-**النتيجة:** مفيش عميل بيستخدم 22 أداة. المشاهد بيقول «أنا مش كده» ويخسر التصديق في كل حاجة تانية.
-**القاعدة:** فرّق بين **رقم واقع المشاهد** و**رقم قدرة المنتج**. الادعاء دايماً عن المنتج، مش عن المشاهد.
-> ✅ «22 قسم، كل واحد بيغني عن أداة» · ❌ «إنت بتستخدم 22 أداة»
+### 23 · No logo in the promise scenes
 
-### 11 · ادعاء «تحسين كفاءة» بدل «إلغاء المشكلة»
-**حصل:** الفيديو كان بيقول «الرد بيوصل في 9 ثواني بدل ساعتين».
-**النتيجة:** ده تحسين كفاءة — **وأي منافس بيوعد بيه**. الادعاء الحقيقي كان «العميل ما بقاش محتاج يسأل من الأصل».
-**القاعدة:** اسأل: **هل الادعاء ده بيلغي الموقف ولا بيسرّعه؟** الإلغاء أقوى وأصعب في التقليد.
-**ملاحظة:** الاكتشاف ده جه من المستخدم مش من التحليل. **ده نوع الحكم اللي محتاج بني آدم.**
-
-### 12 · ميزة دفاعية بترد على اعتراض محدش أثاره
-**حصل:** مشهد كامل عن «المنتج ده أصلي مش مترجم».
-**النتيجة:** بيزرع شك مكانش موجود. اتشال بالكامل.
-**القاعدة:** كل ميزة لازم ترد على اعتراض **حقيقي**. لو محدش بيسأل عنها، شيلها.
-
-### 17 · بيانات تجريبية فيها ملكية فكرية للغير
-**حصل:** الحساب التجريبي كان اسمه مقتبس من فيلم، والـseed data جواه أسماء شخصيات من نفس الفيلم.
-**النتيجة:** مخاطرة قانونية حقيقية على الشركة لو الفيديو اتنشر. والفيديو بيقرا الأسماء من قاعدة البيانات مباشرةً، فمكانش ينفع يتصلح في الفيديو.
-**القاعدة:** **افحص البيانات التجريبية قبل أي رندر.** كل اسم شخص وكل اسم عميل لازم يكون أصلياً. لو لقيت إشارة لملكية فكرية للغير — **قف واسأل**، وصلّح في قاعدة البيانات مش في الفيديو.
+**What happened:** the feature scenes were headlines on a black ground with no mark at all.
+**Result:** the viewer sees promises without knowing who is promising. And nobody watches a video
+from the beginning every time.
+**Rule:** after the turn, **the logo is fixed in frame** in every summary or promise scene.
 
 ---
 
-## السرد واللغة
+## Data and message
 
-### 07 · سبع دعاوى في فيديو واحد
-**حصل:** الفيديو كان: بياناتك متفرقة · 22 أداة · الأقسام مربوطة · بوابة العميل · أرقام · أصلي · اشترك.
-**النتيجة:** مفيش رابط سببي بين أي اتنين. المستخدم وصفه: «القصة مش واضحة ومش مترابطة».
-**القاعدة:** **ادعاء واحد لكل فيديو.** لو الأوتلاين فيه أكتر من واحد، اقطع لحد ما يفضل واحد.
+### 05 · Using an old number from the guide's cover
 
-### 08 · مفيش تعريف بالفئة ولا الجمهور
-**حصل:** كلمة الفئة («شركة تسويق») مكانتش موجودة **في الفيديو كله**.
-**النتيجة:** المشاهد في الثانية 3 مش عارف الإعلان ده لمين ولا بيبيع إيه.
-**القاعدة:** **الفئة والبطل يتعرّفوا قبل الثانية السادسة.** كلمة الفئة تتقال صراحةً.
+**What happened:** the brand guide's cover said "10 sections". The product's code had 21.
+**Result:** the interface built for the video shipped with 10 sidebar items.
+**Rule:** **the guide governs design · the product's code governs numbers.** State the source for
+each kind of data explicitly.
 
-### 09 · تعليقات توضيحية بدل حكاية
-**حصل:** كل سطر كان بيوصف اللي على الشاشة: «المحتوى يرتبط بالعميل تلقائيا».
-**النتيجة:** في فيديو بدون تعليق صوتي، النص هو الحكاية — والتعليقات التوضيحية مابتحكيش.
-**القاعدة:** النص يقول حاجة **مش موجودة على الشاشة**. لو النص بيوصف الصورة، واحد منهم زيادة.
+### 06 · A claim about a number the viewer does not believe
 
-### 10 · لغة لافتات — جمل اسمية مقطوعة
-**حصل:** «بضغطة واحدة — أصبح عميلا ببياناته كاملة. 18 تبويبا.»
-**النتيجة:** المستخدم وصفها: «الصياغة مش عربية وكأنها إنجليزية مترجمة».
-**السبب:** عبارات اسمية مرصوصة بنقط — ده تركيب إنجليزي.
-**القاعدة:** **جمل مترابطة بأدوات ربط.** والنظام بمستويين:
-> **حوار جوه الواجهة** (رسائل · تعليقات) = زي ما الناس بتكتب فعلاً، بالعامية
-> **السرد والتعليق** = فصحى محكية، جمل موصولة بـ«و / فـ / لكن / لأن»
+**What happened:** "replaces 22 tools" — and the product genuinely replaces 22.
+**Result:** no customer uses 22 tools. The viewer says *I don't*, and loses belief in everything
+else.
+**Rule:** distinguish **the viewer's reality** from **the product's capacity**. The claim is always
+about the product, never about the viewer.
 
-**استثناء:** السلوجن وكتل العناوين — عبارة واحدة موزّعة على كتلتين، مش جملتين.
+> ✅ "22 sections, each replacing a tool" · ❌ "You use 22 tools"
+
+### 11 · An efficiency claim instead of an elimination claim
+
+**What happened:** the video said "the reply arrives in 9 seconds instead of two hours."
+**Result:** that is an efficiency gain — **and every competitor promises it**. The real claim was
+"the client no longer needs to ask at all."
+**Rule:** ask: **does this claim eliminate the situation, or speed it up?** Elimination is stronger
+and harder to imitate.
+**Note:** this came from the user, not from analysis. **That is the kind of judgement that needs a
+human.**
+
+### 12 · A defensive feature answering an objection nobody raised
+
+**What happened:** a whole scene about "this product is original, not a translation."
+**Result:** it plants a doubt that was not there. Removed entirely.
+**Rule:** every feature must answer a **real** objection. If nobody is asking, cut it.
+
+### 17 · Demo data containing third-party intellectual property
+
+**What happened:** the demo account was named after a film, and its seed data carried character
+names from the same film.
+**Result:** a genuine legal risk to the company if the video shipped. And the video read the names
+straight from the database, so it could not be fixed in the video.
+**Rule:** **check demo data before any render.** Every person's name and every client name must be
+original. If you find a reference to someone else's IP — **stop and ask.**
+
+> **Update from a later production:** the fix cannot always be "correct the database". In that case
+> the demo organisation was live on production and was what prospects saw. The answer that worked:
+> **swap the names at capture time on the DOM**, leave the database untouched, and make the capture
+> **fail loudly** if any risky token survives. Never write to production data to improve a shot.
 
 ---
 
-## الواجهة
+## Narrative and language
 
-### 13 · واجهة مُقلَّدة بدل واجهة المنتج الحقيقية
-**حصل:** الفيديو عرض «صفحة عميل» مبنية بالتقريب: سايدبار 10 عناصر، 4 كروت، و60% من الكادر فراغ.
-**النتيجة:** النص قال «18 تبويبا» ومكانش فيه **ولا تبويب على الشاشة**. الادعاء نفى نفسه بصرياً.
-**القاعدة:** **الواجهة من كومبوننتات المنتج الفعلية.** وشرط قبول قابل للفحص: **عُدّ عناصر السايدبار في الرندر ــ لازم تطابق ملف الإعدادات في الكود.**
+### 07 · Seven claims in one video
 
-### 14 · شريط onboarding ظاهر في لقطة المنتج
-**حصل:** لقطة لوحة التحكم كان عليها شريط «مرحباً بك» بمؤشر تقدّم.
-**النتيجة:** أول ظهور للمنتج في الفيديو بيقول «حساب جديد فاضي».
-**القاعدة:** مفيش onboarding ولا empty state ولا loading spinner في أي لقطة. جهّز حساب فيه بيانات حقيقية قبل التصوير.
+**What happened:** the video said: your data is scattered · 22 tools · the sections are connected ·
+a client portal · numbers · it is original · subscribe.
+**Result:** no causal link between any two of them. The user's words: "the story isn't clear and
+doesn't hold together."
+**Rule:** **one claim per video.** If the outline has more than one, cut until one remains.
 
-### 15 · أثر تسجيل شاشة في اللقطة
-**حصل:** widget تايمر تسجيل ظاهر في السايدبار لمدة 6 ثواني.
-**القاعدة:** افحص كل لقطة واجهة بحثاً عن عناصر مش من المنتج.
+### 08 · Never naming the category or the audience
 
-### 16 · مستطيل إخفاء أسود في مادة ترويجية
-**حصل:** اسم عميل متغطي بمستطيل أسود.
-**النتيجة:** بيقرا كـscreenshot متسرّب.
-**القاعدة:** بيانات تجريبية بأسماء كاملة ظاهرة. **الإخفاء مش حل في مادة ترويجية.**
+**What happened:** the category word ("marketing agency") appeared **nowhere in the entire video**.
+**Result:** at second 3 the viewer does not know who this is for or what it sells.
+**Rule:** **the category and the protagonist are named before second six.** The category word is
+said explicitly.
+
+### 09 · Captions instead of a story
+
+**What happened:** every line described what was on screen: "content links to the client
+automatically."
+**Result:** in a video with no voiceover, the text **is** the story — and captions do not tell one.
+**Rule:** the text says something **that is not on the screen**. If the text describes the picture,
+one of them is redundant.
+
+### 10 · Signage language — clipped noun phrases
+
+**What happened:** "One click — a customer with full data. 18 tabs."
+**Result:** the user's words: "the phrasing isn't Arabic, it reads like translated English."
+**Cause:** noun phrases strung together with full stops — that is English syntax.
+**Rule:** **connected sentences with connecting words.** And a two-level system:
+
+> **Dialogue inside the interface** (messages, comments) = the way people actually write, in the
+> dialect
+> **Narration** = spoken register, sentences joined with *and / so / but / because*
+
+**Exception:** the slogan and headline blocks — one phrase split across two blocks, not two
+sentences.
 
 ---
 
-## التخطيط
+## Interface
 
-### 18 · نص تحت خط الكادر
-**حصل:** النص السردي على بعد 29 بكسل من حافة الكادر السفلية.
-**النتيجة:** على الموبايل بيتشابك مع الكابشن واسم الحساب وزراير اللايك والشير.
-**القاعدة:** **كل نص وكل عنصر حيوي بين 12% و72% من ارتفاع الكادر.** آخر 28% منطقة واجهة المنصة.
+### 13 · An imitated interface instead of the product's real one
 
-### 19 · تكوين ملزوق ناحية واحدة
-**حصل:** كل المحتوى بين `x=752` و`x=1776` من 1920.
-**النتيجة:** قص مركزي لـ9:16 كان هيمسح كل النص الإنجليزي. الفيديو كان غير صالح لأي منصة عمودية.
-**القاعدة:** **ممنوع القص لإنتاج نسبة تانية — إعادة تخطيط.** نفس الكومبوننتات بترتيب مختلف.
+**What happened:** the video showed a "client page" built by approximation: a 10-item sidebar, four
+cards, and 60% of the frame empty.
+**Result:** the narration said "18 tabs" and there was **not a single tab on screen**. The claim
+refuted itself visually.
+**Rule:** **the interface comes from the product's actual components.** And a checkable acceptance
+condition: **count the sidebar items in the render — they must match the config file in the code.**
 
-### 20 · تراكب النص فوق معلومة
-**حصل مرتين.** المرة الأولى الكتلة غطت ساعة الرسالة. المرة التانية الجملة كانت متداخلة مع تلات طبقات (عدّاد + إيصال + واجهة) و**مش مقروءة ولا كلمة**.
-**ليه اتكررت:** القاعدة كانت مكتوبة «ممنوع التراكب» — نثر.
-**القاعدة:** **مناطق محددة بالإحداثيات لكل فصل، وكومبوننت `ZoneGuard` بيرفض يرسم برّه منطقته.** القاعدة النثرية اتخالفت مرتين؛ القاعدة الكودية مستحيل تتخالف.
+### 14 · An onboarding bar visible in a product shot
 
-### 21 · فراغ أكتر من نص الكادر
-**حصل:** فريم ميزة محتواه **أقل من 10%** من الكادر.
-**ليه:** العنصرين (عنوان + شكل) متكوّمين في المركز.
-**القاعدة:** **bbox المحتوى ≥ 45% من الكادر**، ويتقاس على عيّنة من **كل فصل** مش مرة واحدة. **الحل التوزيع مش التكبير.**
+**What happened:** the dashboard capture had a "welcome" bar with a progress indicator.
+**Result:** the product's first appearance in the video says "an empty new account."
+**Rule:** no onboarding, no empty state, no loading spinner in any capture. Prepare an account with
+real data before capturing.
 
-### 22 · تباين شبه معدوم
-**حصل:** 22 مربع رمادي غامق على أرضية سودا.
-**القاعدة:** أي عنصر هندسي على أرضية غامقة: **تعبئة ≥ 20% · حدود ≥ 70%**. والرمادي بيتعمل بشفافية لون من الباليتة، مش بلون جديد.
+### 15 · Screen-recording artefacts in a capture
 
-### 24 · الشكل بيناقض العنوان اللي فوقه
-**حصل:** عنوان «كل شيء مترابط» والرسمة **سلسلة رأسية**: `أ ← ب ← ج ← د`.
-**النتيجة:** السلسلة بتقول «خطوات متتالية» — عكس المعنى.
-**القاعدة:** **قبل رسم أي شكل اسأل: الشكل ده بيقول إيه لوحده بدون العنوان؟** لو الإجابة مش هي العنوان، الشكل غلط.
+**What happened:** a recording-timer widget was visible in the sidebar for 6 seconds.
+**Rule:** check every interface capture for elements that are not part of the product.
 
-| المعنى | الشكل | مش الشكل |
+### 16 · A black redaction rectangle in promotional material
+
+**What happened:** a client name covered with a black rectangle.
+**Result:** it reads as a leaked screenshot.
+**Rule:** demo data with full, visible names. **Redaction is not a solution in promotional
+material.**
+
+---
+
+## Layout
+
+### 18 · Text below the frame line
+
+**What happened:** the narrative text sat 29 pixels from the bottom edge of the frame.
+**Result:** on mobile it tangles with the caption, the account name, and the like and share buttons.
+**Rule:** **every piece of text and every essential element between 12% and 72% of frame height.**
+The bottom 28% belongs to the platform's interface.
+
+### 19 · A composition stuck to one side
+
+**What happened:** all content lived between `x=752` and `x=1776` of 1920.
+**Result:** a centre crop to 9:16 would have erased every English string. The video was unusable on
+any vertical platform.
+**Rule:** **never crop to produce another ratio — re-lay it out.** The same components in a
+different arrangement.
+
+### 20 · Text overlapping information
+
+**Happened twice.** The first time the block covered the message's timestamp. The second time the
+sentence overlapped three layers (counter + receipt + interface) and **not one word was legible**.
+**Why it recurred:** the rule was written as "no overlapping" — prose.
+**Rule:** **zones defined by coordinates per chapter, and a zone guard component that refuses to
+draw outside its zone.** The prose rule was violated twice; the code rule cannot be.
+
+### 21 · More empty space than content
+
+**What happened:** a feature frame whose content was **under 10%** of the frame.
+**Why:** the two elements (headline + shape) were piled in the centre.
+**Rule:** **the content bbox is ≥ 45% of the frame**, sampled in **every chapter**, not once.
+**The answer is distribution, not enlargement.**
+
+### 22 · Almost no contrast
+
+**What happened:** 22 dark grey squares on a black ground.
+**Rule:** any geometric element on a dark ground: **fill ≥ 20% · border ≥ 70%**. And grey is made
+with the opacity of a palette colour, not with a new colour.
+
+### 24 · A shape contradicting the caption above it
+
+**What happened:** the caption said "everything is connected" and the drawing was a **vertical
+chain**: `A → B → C → D`.
+**Result:** a chain says "sequential steps" — the opposite of the meaning.
+**Rule:** **before drawing any shape ask: what does this shape say on its own, without the
+caption?** If the answer is not the caption, the shape is wrong.
+
+| Meaning | The shape | Not the shape |
 |---|---|---|
-| مترابط | شبكة — كل عقدة بكل العقد | سلسلة خطية |
-| متتالي | سلسلة مرتبة | شبكة |
-| مُجمَّع | عناصر بتتقارب في واحد | صف منتظم |
-| موزّع | عنصر بينقسم | تكديس |
+| Connected | a mesh — every node to every node | a linear chain |
+| Sequential | an ordered chain | a mesh |
+| Consolidated | elements converging into one | a tidy row |
+| Distributed | one element splitting | a stack |
 
 ---
 
-## الصوت
+## Audio
 
-### 25 · صوت أهدأ بـ11 dB من المعيار
-**حصل:** الرندر طلع −24.8 LUFS. المنصات بتطبّع عند −14.
-**النتيجة:** على موبايل بصوت عادي الفيديو شبه مكتوم وسط الفيد.
-**القاعدة:** `ffmpeg -af loudnorm=I=-14:TP=-1.5:LRA=11` على كل مخرج. **افحص بـ`ebur128`.**
+### 25 · Audio 11 dB quieter than the standard
 
-### 26 · قطع الموسيقى للصفر
-**حصل:** مواصفة قالت «صمت 8 فريمات» عند لحظة التحوّل.
-**النتيجة:** انقطاع كامل 0.4 ثانية. في فيديو **بدون تعليق صوتي**، الصمت الكامل بيقرا **كعطل تقني** مش كصمت مقصود.
-**القاعدة:** ممنوع الصفر المطلق. خفض لـ−30dB بحد أقصى.
+**What happened:** the render came out at −24.8 LUFS. Platforms normalise at −14.
+**Result:** on a phone at normal volume the video is almost muted in the feed.
+**Rule:** `ffmpeg -af loudnorm=I=-14:TP=-1.5:LRA=11` on every output. **Verify with `ebur128`.**
 
-### 27 · إيقاف التراك ورجوعه خارج الشبكة الإيقاعية
-**حصل:** بعد إصلاح 26، `silencedetect` طلع فاضي — **ولسه بيقرا كعطل**.
-**السبب بالقياس:** التراك نفسه كان بيقف وسايب ذيل صدى. الإيقاع 110 BPM (النبضة 0.546ث)، والفجوة 0.32ث = **0.59 نبضة**. الموسيقى رجعت **متأخرة نص نبضة** — أسوأ إزاحة ممكنة.
-**القاعدة:** **التراك الموسيقي مايقفش من أول الفيديو لآخره. أتوميشن على الـgain فقط فوق تراك متصل.** ساعتها الشبكة الإيقاعية مابتتكسرش مهما كان طول الخفض.
-**ملاحظة:** `silencedetect` **بيعدّي على الغلطة دي**. الفحص الصحيح: انتظام النبضات في الطيف.
-**وكمان:** الضربة الصوتية كانت عريضة الطيف لحد 46kHz — دي كليك مش ضربة. **low-pass عند 12kHz.**
+### 26 · Cutting the music to zero
 
----
+**What happened:** a spec said "8 frames of silence" at the turn.
+**Result:** a complete 0.4-second cut-out. In a video **with no voiceover**, total silence reads as
+**a technical fault**, not as intentional silence.
+**Rule:** never absolute zero. Duck to −30 dB at most.
 
-## الحركة
+### 27 · Stopping the track and returning off the rhythmic grid
 
-### 28 · حركتان كبيرتان متزامنتان
-**حصل:** بلاطات بتتشفط للمركز في نفس الوقت اللي عناوين بتدخل فيه.
-**النتيجة:** المستخدم وصفها «كأن الفيديو بيحصل فيه جليتش».
-**القاعدة:** **حركة واحدة كبيرة في المرة.** الأولى تخلص قبل التانية.
-
-### 29 · عنصر متحرك صغير بيسحب العين من نص ثابت كبير
-**حصل:** مؤشر كتابة (أصغر عنصر في الكادر، تحت يمين) + نص سردي ثابت (كبير، فوق شمال).
-**النتيجة:** النص **ما اتقراش خالص**.
-**القاعدة:** **الحركة بتغلب الموضع والحجم واللون.** لو في الكادر حاجة بتتحرك، مفيش نص جديد بيظهر. ولو في نص جديد، الكادر ساكن ≥ 1.5 ثانية.
-**الحل مش تكبير النص — هو الفصل الزمني.**
-
-### 30 · استبدال سريع — نص عنصرين في كل فريم
-**حصل:** 20 شاشة بتعدّي بانزلاق متصل، 0.4 ثانية لكل واحدة.
-**النتيجة:** معظم الفريمات بتوري **نص شاشتين عند خط التماس**. مفيش حاجة كاملة قدام المشاهد في أي لحظة.
-**القاعدة:** في مشاهد التعداد، **العناصر بتتراكم وبتفضل** مش بتستبدل بعضها. والتراكم بيدي زخم كمان — القائمة بتكبر قدام المشاهد.
-لو لازم استبدال: **قطع مباشر مش انزلاق متصل**.
-
-### 31 · نص ظاهر أقل من ثانية
-**حصل:** آخر صفين في قائمة ظهروا أقل من 0.5 ثانية.
-**القاعدة:** **≥ 1.5 ثانية سكون كامل بعد انتهاء حركة العنصر** — مش شاملة الحركة.
-**استثناء وحيد:** نسيج بصري مش مقصود للقراءة (وسوم صغيرة بشفافية منخفضة). لو اتعمل، **يتكتب صراحةً كاستثناء بمبرره**.
-
-### 32 · منحنى عدّاد أسّي بيقفز
-**حصل:** عدّاد بتسارع أسّي عالي راكم **أكتر من نص القيمة في آخر ثانيتين**.
-**القاعدة:** `value = total × t^1.4`. الأُس 1.4 بيدي تسارع محسوس بدون قفزة. **حدد 5 نقاط تحقق بالفريم في المواصفة.**
-
-### 33 · انتقال زخرفي بيقرا كتلف رقمي
-**حصل:** «مسح بالفسيفساء» — مربعات 40px بتمسح الكادر. على 1920 ده ~1300 مربع بيرفرفوا في 8 فريمات، واشتغل بعد القطع للأسود.
-**النتيجة:** أسود ← شطرنج ملوّن بيرفرف ← أسود. بيقرا كتلف فيديو.
-**القاعدة:** الانتقالات المسموحة: **قطع · انزلاق كتل · تحوّل الشكل**. أي انتقال فيه عشرات العناصر بتتغير في أقل من 10 فريمات هيقرا كعطل.
+**What happened:** after fixing 26, `silencedetect` came back empty — **and it still read as a
+fault.**
+**The cause, measured:** the track itself was stopping and leaving a reverb tail. The tempo was
+110 BPM (a 0.546s pulse) and the gap was 0.32s = **0.59 of a pulse**. The music came back **half a
+beat late** — the worst possible offset.
+**Rule:** **the music track does not stop from the first frame to the last. Gain automation only,
+over a continuous track.** Then the rhythmic grid never breaks, however long the duck.
+**Note:** `silencedetect` **passes straight over this mistake.** The correct check is pulse
+regularity in the spectrum.
+**Also:** the audio hit was full-spectrum up to 46 kHz — that is a click, not a hit. **Low-pass at
+12 kHz.**
 
 ---
 
-## التحويل والإنتاج
+## Motion
 
-### 34 · CTA بثانية واحدة وأقل تباين في الكادر
-**حصل:** الفيديو انتهى بلوجو + دومين رمادي باهت لمدة ~1 ثانية.
-**النتيجة:** 20 ثانية شغل بتروح. الدومين هو العنصر الوحيد اللي بيحوّل وكان أقل عنصر تباين.
-**القاعدة:** **CTA ≥ 3.5 ثانية سكون كامل.** الرابط أعلى تباين بعد زر الإجراء. الموسيقى مابتبدأش fade إلا بعد استقرار الكارت.
+### 28 · Two large motions at once
 
-### 35 · ملف رندر ناقص اتسلّم للمراجعة
-**حصل:** آخر 5 ثواني مكانتش بتتفك.
-**القاعدة:** `ffmpeg -v error -i out.mp4 -f null -` **لازم يطلع فاضي** قبل ما الملف يتعرض على حد.
+**What happened:** tiles sucking toward the centre at the same moment headlines were entering.
+**Result:** the user's words: "it looks like the video is glitching."
+**Rule:** **one large motion at a time.** The first finishes before the second.
 
-### 36 · ست مخرجات قبل الموافقة على واحد
-**القاعدة:** **نسبة واحدة، صامتة، وقف.** بعد الموافقة أنتج الباقي.
+### 29 · A small moving element pulling the eye off large still text
 
-### 37 · اقتراح ستاك بديل والفريق عنده ستاك شغّال
-**حصل:** اقترحت إطار عمل معيّن للرندر، وكان الفريق عنده ستاك مجرّب وشغّال بالفعل.
-**النتيجة:** وقت ضايع في تقييم بديل مش مطلوب، وتحذير ترخيص مالوش لزمة.
-**القاعدة:** **اسأل عن الستاك الموجود قبل ما تقترح واحد.** وحدد **المتطلبات** اللي لازم يحققها بدل ما تسمّي أداة.
+**What happened:** a typing cursor (the smallest element in frame, bottom right) plus still
+narrative text (large, top left).
+**Result:** the text **was not read at all**.
+**Rule:** **motion beats position, size and colour.** If something in frame is moving, no new text
+appears. If new text appears, the frame is still for ≥1.5s.
+**The answer is not bigger text — it is temporal separation.**
+
+### 30 · Fast replacement — half of two items in every frame
+
+**What happened:** 20 screens passing in a continuous slide, 0.4 seconds each.
+**Result:** most frames show **half of two screens at the seam**. Nothing is ever complete in front
+of the viewer.
+**Rule:** in enumerating scenes, **items accumulate and stay** rather than replacing each other. And
+accumulation adds momentum — the list grows in front of the viewer.
+If replacement is unavoidable: **a hard cut, not a continuous slide.**
+
+### 31 · Text visible for under a second
+
+**What happened:** the last two rows of a list appeared for under 0.5 seconds.
+**Rule:** **≥ 1.5 seconds of complete stillness after the element's motion ends** — not counting the
+motion.
+**One exception:** visual texture not meant to be read (small low-opacity tags). If used, it is
+**written in explicitly as an exception with its reason.**
+
+### 32 · An exponential counter curve that jumps
+
+**What happened:** a counter with steep exponential acceleration accumulated **more than half its
+value in the last two seconds**.
+**Rule:** `value = total × t^1.4`. The exponent 1.4 gives perceptible acceleration without a jump.
+**Define 5 checkpoints by frame in the spec.**
+
+### 33 · A decorative transition that reads as digital corruption
+
+**What happened:** a "mosaic wipe" — 40px squares wiping the frame. At 1920 that is ~1300 squares
+flickering across 8 frames, and it ran after a cut to black.
+**Result:** black → flickering coloured chequerboard → black. It reads as video corruption.
+**Rule:** permitted transitions: **cut · block slide · shape transformation.** Any transition where
+dozens of elements change in under 10 frames will read as a glitch.
 
 ---
 
-## من مراجعة v3.2
+## Conversion and production
 
-### 38 · تصحيح مواصَف واتنفّذ بالعكس
-**حصل:** المواصفة قالت «4 عقد متوصلة ببعضها كلها بـ6 خطوط» تصحيحاً لسلسلة رأسية غلط.
-**النتيجة:** الرندر طلع **4 مربعات في شبكة 2×2 بدون أي خط**. أسوأ من الأصل — على الأقل السلسلة كانت بتقول «تتابع»، دلوقتي الصورة بتقول «أربع حاجات منفصلة» تحت عنوان «كل شيء مترابط».
-**القاعدة:** التصحيح البصري لازم يتفحص **بصرياً** بعد الرندر. الوصف النصي للشكل مش كافي — استخرج الفريم وبُص.
-**فحص عملي:** لأي شكل بيدّعي علاقة — **عُدّ الخطوط**. 4 عقد مترابطة = 6 خطوط. صفر خطوط = الشكل بينفي عنوانه.
+### 34 · A one-second CTA with the lowest contrast in frame
 
-### 39 · نص بلغة تانية في فيديو أحادي اللغة
-**حصل:** «11 external integrations» و«18 Sep» في فيديو عربي بالكامل.
-**النتيجة:** بيكسر الاتساق وبيبان كأنه قالب مترجم نص ترجمة.
-**القاعدة:** **كل نص واجهة المستخدم بلغة الفيديو.** الاستثناء الوحيد أسماء العلامات التجارية (Slack · Notion). التواريخ والأرقام الموصوفة والتسميات **تتترجم**.
+**What happened:** the video ended with a logo and a pale grey domain for about 1 second.
+**Result:** 20 seconds of work wasted. The domain is the only element that converts, and it had the
+least contrast in frame.
+**Rule:** **CTA ≥ 3.5 seconds of complete stillness.** The link is the highest contrast after the
+action button. The music does not start its fade until the card has settled.
 
-### 40 · إعادة تخطيط على مستوى الكتل مش على مستوى الشكل
-**حصل:** نسخة 9:16 اتعملت بإعادة ترتيب الكتل (مش قص — وده صح)، **لكن** المحتوى فضل في شريط أفقي وسط الكادر و40–50% من الارتفاع فاضي فوق وتحت.
-**النتيجة:** الفورمات العمودي اتهدر. على الموبايل الفيديو بيبان كشريط صغير في النص.
-**القاعدة:** إعادة التخطيط مش نقل عناصر — **إعادة تصميم للشكل**. في 9:16 المحتوى بيتمدد **رأسياً** (كتل فوق بعض · نص أكبر · واجهة بتملى العرض). فحص التغطية لازم يتشغّل **على كل نسبة على حدة**.
+### 35 · A truncated render file handed over for review
 
-### 41 · حدود الفحص الآلي للصوت
-**حصل:** الفاحص كان بيقيس انحراف طور النبضة عالمياً ويفشل عليه.
-**النتيجة:** إيجابية كاذبة — التراك الموسيقي بيغيّر مقطع (build/breakdown) فبيتزحزح الطور من غير أي عطل.
-**القاعدة:** **تحليل الطور لوحده مش بيفرّق بين تغيّر مقطع موسيقي وتوقف تراك.** العلامة القابلة للقياس هي **هبوط المستوى**. الطور بقى تحذير بتوقيته للمراجعة البشرية، والفشل على الهبوط بس.
-**درس أعم:** لما الفاحص يدّي إيجابية كاذبة، **صلّح الفاحص فوراً**. فاحص بيصيح في الفاضي بيتجاهَل، وساعتها بيفقد قيمته كله.
+**What happened:** the last 5 seconds would not decode.
+**Rule:** `ffmpeg -v error -i out.mp4 -f null -` **must produce empty output** before the file is
+shown to anyone.
+
+### 36 · Six outputs before one was approved
+
+**Rule:** **one ratio, silent, and stop.** Produce the rest after approval.
+
+### 37 · Proposing an alternative stack when the team had a working one
+
+**What happened:** I proposed a particular rendering framework when the team already had a tested,
+working stack.
+**Result:** time lost evaluating an alternative nobody asked for, and a licence warning that was
+irrelevant.
+**Rule:** **ask what stack exists before proposing one.** And state the **requirements** it has to
+meet rather than naming a tool.
 
 ---
 
-## أنماط متكررة — اقرا دول لو معندكش وقت للسجل كله
+## From a later review
 
-1. **اللي اتكتب نثر بيتخالف.** أربع قواعد اتكتبت بوضوح واتخالفت في الرندر اللي بعدها مباشرةً. لو القاعدة قابلة للقياس، **اكتبها كود**.
-2. **كل عنصر أضفته من عندي اتشال.** الرقم الشبح · الفسيفساء · شريط التقدّم. تلاتتهم كانوا حلول لمشكلة «الكادر حاسس إنه فاضي» — والمشكلة الحقيقية كانت التوزيع.
-3. **الحركة بتغلب كل حاجة.** أكبر نص في الكادر مش بيتقرا لو في مؤشر صغير بيرمش في الركن.
-4. **القياس بيغلب الانطباع.** «الصوت فيه مشكلة» بقت قابلة للإصلاح لما قِست إن الإزاحة 0.59 نبضة عند 110 BPM.
-5. **الأخطاء الاستراتيجية أغلى من الأخطاء التقنية.** خطأ الادعاء (#11) كلّف إعادة كتابة فصل كامل؛ كل أخطاء الهوية مع بعض كلّفت جولة واحدة.
+### 38 · A correction that was specified and implemented backwards
+
+**What happened:** the spec said "4 nodes all connected to each other with 6 lines", correcting a
+wrong vertical chain.
+**Result:** the render produced **4 squares in a 2×2 grid with no lines at all**. Worse than the
+original — at least the chain said "sequence"; now the picture says "four separate things" under a
+caption reading "everything is connected".
+**Rule:** a visual correction must be checked **visually** after the render. A textual description of
+a shape is not enough — pull the frame and look.
+**A practical check:** for any shape claiming a relation — **count the lines.** 4 connected nodes = 6
+lines. Zero lines means the shape refutes its own caption.
+
+### 39 · Text in another language inside a monolingual video
+
+**What happened:** "11 external integrations" and "18 Sep" in an entirely Arabic video.
+**Result:** it breaks the consistency and makes the piece look like a half-translated template.
+**Rule:** **all interface text in the video's language.** The only exception is brand names (Slack ·
+Notion). Dates, described numbers and labels **are translated.**
+
+### 40 · Re-layout at the block level instead of the design level
+
+**What happened:** the 9:16 version was made by rearranging the blocks (not cropping — that part was
+right), **but** the content stayed in a horizontal band in the middle of the frame with 40–50% of
+the height empty above and below.
+**Result:** the vertical format was wasted. On a phone the video looks like a small strip in the
+middle.
+**Rule:** re-layout is not moving elements — it is **redesigning the composition**. In 9:16 the
+content extends **vertically** (blocks stacked, larger text, an interface that fills the width). The
+coverage check must run **on each ratio separately.**
+
+### 41 · The limits of automated audio checking
+
+**What happened:** the verifier measured pulse phase drift globally and failed on it.
+**Result:** a false positive — the music track changes section (a build or a breakdown) and the
+phase shifts with no fault at all.
+**Rule:** **phase analysis alone cannot distinguish a musical section change from a stopped track.**
+The measurable signal is a **level dropout**. Phase became a warning with its timestamp for human
+review, and the failure fires on the dropout only.
+**The broader lesson:** when the verifier produces a false positive, **fix the verifier
+immediately.** A checker that cries wolf gets ignored, and then it is worth nothing at all.
+
+---
+
+## Recurring patterns — read these if you have no time for the whole log
+
+1. **What is written as prose gets violated.** Four rules were written clearly and violated in the
+   very next render. If a rule is measurable, **write it as code.**
+2. **Every element I added on my own initiative was removed.** The ghost number, the mosaic, the
+   progress bar. All three were solutions to "the frame feels empty" — and the real problem was
+   distribution.
+3. **Motion beats everything.** The largest text in frame is not read if a small indicator is
+   blinking in a corner.
+4. **Measurement beats impression.** "Something's wrong with the audio" became fixable once the
+   offset was measured at 0.59 of a beat at 110 BPM.
+5. **Strategic mistakes cost more than technical ones.** The claim error (#11) cost a full chapter
+   rewrite; every brand error combined cost one round.
