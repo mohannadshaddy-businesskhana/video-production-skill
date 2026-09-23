@@ -1,0 +1,50 @@
+{
+  "_about": "Copy into the project, fill with the studio's real numbers, and keep it OUT of any public repo. Rates are commercially sensitive and they are the one thing in this system that must not be shared.",
+
+  "currency": "EGP",
+  "tax_pct": 14,
+  "validity_days": 30,
+  "revision_rounds": 2,
+  "contingency_pct": 10,
+  "payment_terms": "50% on signature, 50% on delivery of the approved master.",
+
+  "exclusions": [
+    "Music licensing and performing rights",
+    "Talent fees and usage buyout",
+    "Location fees and permits",
+    "Media spend",
+    "Versions or aspect ratios not listed under Deliverables"
+  ],
+
+  "items": {
+    "creative_director":  { "label": "Creative director",        "unit": "day",   "rate": 0 },
+    "director":           { "label": "Director",                 "unit": "day",   "rate": 0 },
+    "producer":           { "label": "Producer",                 "unit": "day",   "rate": 0 },
+    "line_producer":      { "label": "Line producer",            "unit": "day",   "rate": 0 },
+    "scriptwriter":       { "label": "Scriptwriter",             "unit": "script","rate": 0 },
+    "storyboard":         { "label": "Storyboard",               "unit": "frame", "rate": 0 },
+
+    "shoot_day":          { "label": "Shoot day (crew + kit)",   "unit": "day",   "rate": 0 },
+    "dop":                { "label": "Director of photography",  "unit": "day",   "rate": 0 },
+    "camera_assistant":   { "label": "Camera assistant",         "unit": "day",   "rate": 0 },
+    "gaffer":             { "label": "Gaffer",                   "unit": "day",   "rate": 0 },
+    "sound_recordist":    { "label": "Sound recordist",          "unit": "day",   "rate": 0 },
+    "art_department":     { "label": "Art department",           "unit": "day",   "rate": 0 },
+    "studio_rental":      { "label": "Studio rental",            "unit": "day",   "rate": 0 },
+    "drone":              { "label": "Drone operator",           "unit": "day",   "rate": 0 },
+
+    "editor":             { "label": "Editor",                   "unit": "day",   "rate": 0 },
+    "motion_designer":    { "label": "Motion designer",          "unit": "day",   "rate": 0 },
+    "3d_artist":          { "label": "3D artist",                "unit": "day",   "rate": 0 },
+    "colour_grade":       { "label": "Colour grade",             "unit": "piece", "rate": 0 },
+    "audio_mix":          { "label": "Audio mix and master",     "unit": "piece", "rate": 0 },
+    "voiceover":          { "label": "Voiceover session",        "unit": "piece", "rate": 0 },
+    "subtitles":          { "label": "Subtitles per language",   "unit": "lang",  "rate": 0 },
+
+    "cutdown":            { "label": "Cutdown",                  "unit": "piece", "rate": 0 },
+    "aspect_version":     { "label": "Aspect ratio version",     "unit": "piece", "rate": 0 },
+    "localised_version":  { "label": "Localised version",        "unit": "lang",  "rate": 0 },
+
+    "extra_revision_round": { "label": "Additional revision round", "unit": "round", "rate": 0 }
+  }
+}
