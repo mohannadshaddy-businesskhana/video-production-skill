@@ -33,11 +33,18 @@ ffmpeg -hide_banner -nostats -i "$IN" \
   -af "loudnorm=I=${TARGET}:TP=-1.0:LRA=11:print_format=json" -f null - 2>&1 \
   | sed -n '/^{/,/^}/p' > "$TMPJSON"
 
+# Read and parse it — never require() it. mktemp gives a file with no .json
+# extension, so require() treats it as CommonJS and dies on the first colon,
+# then `set -u` reports the symptom as "I: unbound variable" three lines later.
 eval "$(node -e '
-  const m = require(process.argv[1]);
-  const q = (k) => m[k];
-  console.log(`I=${q("input_i")} TP=${q("input_tp")} LRA=${q("input_lra")} TH=${q("input_thresh")} OFF=${q("target_offset")}`);
-' "$TMPJSON")"
+  const fs = require("fs");
+  let m;
+  try { m = JSON.parse(fs.readFileSync(process.argv[1], "utf8")); }
+  catch (e) { console.error("loudnorm produced no readable JSON: " + e.message); process.exit(1); }
+  for (const k of ["input_i","input_tp","input_lra","input_thresh","target_offset"])
+    if (m[k] === undefined) { console.error("loudnorm JSON is missing " + k); process.exit(1); }
+  console.log(`I=${m.input_i} TP=${m.input_tp} LRA=${m.input_lra} TH=${m.input_thresh} OFF=${m.target_offset}`);
+' "$TMPJSON")" || { echo "measurement pass failed — not writing an unnormalised file" >&2; exit 4; }
 
 # pass 2 — apply the measured values, then limit, then resample
 ffmpeg -y -hide_banner -nostats -loglevel error -i "$IN" \

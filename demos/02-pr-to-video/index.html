@@ -1,0 +1,255 @@
+<!doctype html>
+<!--
+  Demo 02 — a code change as a video
+  The opposite register to the brand film on purpose: dense, monospaced,
+  literal. Nothing here is styled as "design" — the diff IS the visual.
+-->
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>الكوميت اللي شال بايثون</title>
+
+    <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+
+    <style>
+      @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
+        font-weight:700; font-style:normal; font-display:block; }
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-arabic.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block;
+        unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0898-08E1,U+08E3-08FF,U+FB50-FDFF,U+FE70-FEFF; }
+
+      :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
+              --fail:#B23A2A; --white:#FFFFFF;
+      /* The brand green and red measure 2.78:1 and 2.73:1 on this ground —
+         under the 3:1 floor. These are those two colours mixed 25% toward the
+         bone, which lands at ~4.9:1 and stays ON the palette ramp, so the
+         palette check still sees five colours and not seven. */
+              --pass-lt:#5E8F78; --fail-lt:#C3685A; }
+
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:1080px; height:1920px; overflow:hidden; background:#14181F; }
+      #root { position:relative; width:100%; height:100%; overflow:hidden;
+              font-family:"Mono",monospace; color:var(--bone); font-weight:700; }
+      .scene { position:absolute; inset:0; overflow:hidden; }
+
+      /* the window chrome — one object, repeated identically in every chapter */
+      .term { position:absolute; left:56px; top:250px; width:968px; height:1030px;
+              border:3px solid rgba(245,242,234,.16); border-radius:10px;
+              background:rgba(245,242,234,.03); }
+      .bar  { position:absolute; left:0; top:0; width:100%; height:78px;
+              border-bottom:3px solid rgba(245,242,234,.16);
+              display:flex; align-items:center; padding:0 28px; gap:14px; }
+      .dot  { width:18px; height:18px; border-radius:50%; background:rgba(245,242,234,.22); }
+      .bar .t { margin-left:16px; font-size:26px; color:rgba(245,242,234,.55); letter-spacing:.04em; }
+      .body { position:absolute; left:0; top:78px; right:0; bottom:0; padding:34px 30px; }
+
+      .ln   { font-size:33px; line-height:1.85; white-space:nowrap; }
+      .dim  { color:rgba(245,242,234,.58); }
+      .amb  { color:var(--amber); }
+      .add  { color:var(--pass-lt); }
+      .del  { color:var(--fail-lt); }
+      .big  { font-size:46px; line-height:1.6; }
+
+      /* the Arabic caption strip — the only non-code voice in the piece */
+      .cap  { position:absolute; left:56px; top:1380px; width:968px;
+              font-family:"Cairo",sans-serif; font-weight:600; font-size:44px;
+              line-height:1.5; direction:rtl; text-align:right; color:var(--bone); }
+      .cap .q { color:var(--amber); }
+
+      .cursor { display:inline-block; width:20px; height:34px; background:var(--amber);
+                vertical-align:-5px; margin-left:4px; }
+
+      table.ev { width:100%; border-collapse:collapse; font-size:31px; }
+      table.ev td { padding:13px 0; border-bottom:2px solid rgba(245,242,234,.10);
+                    vertical-align:baseline; }
+      table.ev td.n { width:130px; color:var(--amber); font-variant-numeric:tabular-nums; }
+      table.ev td.w { color:rgba(245,242,234,.62); font-size:27px; }
+      table.ev td.r { width:120px; text-align:right; color:var(--pass-lt); }
+
+      .stamp { position:absolute; left:30px; top:40px; font-size:104px; line-height:1.12;
+               color:var(--pass-lt); }
+      .doc   { position:absolute; left:30px; top:330px; width:880px; }
+      .doc .r { display:flex; gap:22px; font-size:32px; line-height:2.0; }
+      .doc .k { color:var(--pass-lt); width:64px; }
+      .stamp .sub { display:block; font-size:34px; color:rgba(245,242,234,.6); margin-top:26px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="18"
+         data-fps="30" data-width="1080" data-height="1920">
+
+      <!-- 1 — what changed -->
+      <section id="ch1" class="scene clip" data-start="0" data-duration="4" data-track-index="0">
+        <div class="term">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="t">video-production-skill — git log</span></div>
+          <div class="body">
+            <div class="ln dim" id="a-h">commit dc70f9e</div>
+            <div class="ln big" id="a-t" style="margin-top:22px">
+              <span class="amb">feat(deps):</span> drop Python<span class="cursor" id="a-cur"></span>
+            </div>
+            <div class="ln dim" id="a-s" style="margin-top:28px">8 files · 1,773 lines removed</div>
+          </div>
+        </div>
+        <div class="cap" id="a-cap">كوميت واحد. <span class="q">1773 سطر</span> بايثون اتشالوا.</div>
+      </section>
+
+      <!-- 2 — the diff itself -->
+      <section id="ch2" class="scene clip" data-start="4" data-duration="5" data-track-index="1">
+        <div class="term">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="t">scripts/ — diff</span></div>
+          <div class="body">
+            <div class="ln del" id="b-1">- verify.py             676</div>
+            <div class="ln del" id="b-2">- delivery_qc.py        221</div>
+            <div class="ln del" id="b-3">- budget.py             167</div>
+            <div class="ln del" id="b-4">- shoot_plan.py         207</div>
+            <div class="ln del" id="b-5">- 4 more .py            502</div>
+            <div class="ln add" id="b-6" style="margin-top:26px">+ verify.mjs</div>
+            <div class="ln add" id="b-7">+ delivery_qc.mjs</div>
+            <div class="ln add" id="b-8">+ 6 more .mjs</div>
+            <div class="ln dim" id="b-9" style="margin-top:30px">requirements: 4 → 3</div>
+          </div>
+        </div>
+        <div class="cap" id="b-cap">المتطلبات بقت <span class="q">Node و FFmpeg ومتصفح</span> بس.</div>
+      </section>
+
+      <!-- 3 — why it was allowed to land -->
+      <section id="ch3" class="scene clip" data-start="9" data-duration="5" data-track-index="2">
+        <div class="term">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="t">evidence the port was accepted on</span></div>
+          <div class="body">
+            <table class="ev">
+              <tr id="c-r1"><td class="n">18</td><td class="w">real renders, reports compared</td><td class="r">same</td></tr>
+              <tr id="c-r2"><td class="n">14</td><td class="w">broken manifests, one per check</td><td class="r">same</td></tr>
+              <tr id="c-r3"><td class="n">33</td><td class="w">delivery spec combinations</td><td class="r">same</td></tr>
+              <tr id="c-r4"><td class="n">2</td><td class="w">rounding bugs the diff exposed</td><td class="r">fixed</td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="cap" id="c-cap">مقبول لإنه <span class="q">اتقارن</span>، مش لإنه شكله شغال.</div>
+      </section>
+
+      <!-- 4 — the state now -->
+      <section id="ch4" class="scene clip" data-start="14" data-duration="4" data-track-index="3">
+        <div class="term">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="t">doctor.mjs</span></div>
+          <div class="body">
+            <div class="stamp" id="d-st">READY<span class="sub">build · render · verify</span></div>
+            <div class="doc" id="d-doc">
+              <div class="r"><span class="k">OK</span><span>node 24.13.0</span></div>
+              <div class="r"><span class="k">OK</span><span>ffmpeg · ffprobe</span></div>
+              <div class="r"><span class="k">OK</span><span>browser launches</span></div>
+              <div class="r"><span class="k">OK</span><span>15 checks armed</span></div>
+            </div>
+            <div class="ln dim" id="d-n" style="position:absolute; left:30px; top:690px">
+              npm install: not required
+            </div>
+          </div>
+        </div>
+        <div class="cap" id="d-cap">تنسخ المجلد وتشتغل. <span class="q">مفيش حاجة تتثبت.</span></div>
+      </section>
+
+      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="18"
+             data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+window.__FMT = { id: "vertical", w: 1080, h: 1920, safeTop: 230, safeBottom: 1690, zones: {} };
+window.__MF = [];
+window.__MOTION = [];
+const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
+const F = (f) => f / 30;
+
+function build() {
+  const A = ["#a-h","#a-t","#a-s","#a-cap"];
+  const B = ["#b-1","#b-2","#b-3","#b-4","#b-5","#b-6","#b-7","#b-8","#b-9","#b-cap"];
+  const C = ["#c-r1","#c-r2","#c-r3","#c-r4","#c-cap"];
+  const D = ["#d-st","#d-doc","#d-n","#d-cap"];
+  // initial state outside the timeline — tl.set(…,0) does not apply at frame 0
+  gsap.set([...A, ...B, ...C, ...D], { opacity: 0 });
+  gsap.set(B, { x: -22 });
+  gsap.set(C, { x: -16 });
+  gsap.set("#d-st", { scale: 0.94, transformOrigin: "left center" });
+  gsap.set("#d-doc .r", { opacity: 0 });
+
+  const tl = gsap.timeline({ paused: true });
+
+  /* ── 1 · 0–120 — the commit lands ─────────────────────────────────── */
+  tl.to("#a-h",   { opacity: 1, duration: F(8) }, F(4));
+  tl.to("#a-t",   { opacity: 1, duration: F(10) }, F(12));
+  tl.to("#a-s",   { opacity: 1, duration: F(10) }, F(26));
+  tl.to("#a-cap", { opacity: 1, duration: F(12) }, F(40));
+  // a cursor blink, driven by a tween so it survives a per-frame seek
+  tl.to("#a-cur", { opacity: 0.15, duration: F(15), yoyo: true, repeat: 5,
+                    ease: "steps(1)" }, F(24));
+
+  /* ── 2 · 120–270 — the diff, line by line ─────────────────────────── */
+  tl.to(B.slice(0, 5), { opacity: 1, x: 0, duration: F(7), stagger: F(7),
+                         ease: "power1.out" }, F(126));
+  tl.to(B.slice(5, 8), { opacity: 1, x: 0, duration: F(7), stagger: F(7),
+                         ease: "power1.out" }, F(168));
+  tl.to("#b-9",   { opacity: 1, x: 0, duration: F(10) }, F(196));
+  tl.to("#b-cap", { opacity: 1, duration: F(12) }, F(206));
+
+  /* ── 3 · 270–420 — the evidence ───────────────────────────────────── */
+  tl.to(C.slice(0, 4), { opacity: 1, x: 0, duration: F(9), stagger: F(11),
+                         ease: "power1.out" }, F(278));
+  tl.to("#c-cap", { opacity: 1, duration: F(12) }, F(334));
+
+  /* ── 4 · 420–510 — the state now ──────────────────────────────────── */
+  tl.to("#d-st",  { opacity: 1, scale: 1, duration: F(14), ease: "power2.out" }, F(424));
+  tl.to("#d-doc", { opacity: 1, duration: F(2) }, F(438));
+  tl.to("#d-doc .r", { opacity: 1, duration: F(6), stagger: F(5) }, F(438));
+  tl.to("#d-n",   { opacity: 1, duration: F(8) }, F(458));
+  tl.to("#d-cap", { opacity: 1, duration: F(10) }, F(466));
+
+  /* ── music — one continuous track, gain automation only (#26 #27) ─── */
+  tl.fromTo("#bgm", { volume: 0 }, { volume: 0.38, duration: 0.9, ease: "none",
+            immediateRender: false }, 0);
+  tl.to("#bgm", { volume: 0.28, duration: F(10), ease: "none" }, F(270));
+  tl.to("#bgm", { volume: 0.38, duration: F(18), ease: "none" }, F(300));
+  tl.to("#bgm", { volume: 0, duration: 1.3, ease: "none" }, F(501));
+
+  /* ── the manifest ─────────────────────────────────────────────────── */
+  const t = (id, ch, fr, still, text, crit) =>
+    mf(id, { type: "text", chapter: ch, frames: fr, still_from: still,
+             text: text, critical: crit !== false, el: "#" + id });
+
+  t("a-h",   "ch1", [0, 120],  12,  "commit dc70f9e", false);
+  t("a-t",   "ch1", [0, 120],  22,  "feat(deps): drop Python");
+  t("a-s",   "ch1", [0, 120],  36,  "8 files · 1,773 lines removed", false);
+  t("a-cap", "ch1", [0, 120],  52,  "كوميت واحد. 1773 سطر بايثون اتشالوا.");
+
+  // the five removed lines settle together at the end of their stagger
+  ["b-1","b-2","b-3","b-4","b-5"].forEach((id, i) =>
+    t(id, "ch2", [120, 270], 133 + i * 7, "", false));
+  ["b-6","b-7","b-8"].forEach((id, i) =>
+    t(id, "ch2", [120, 270], 175 + i * 7, "", false));
+  t("b-9",   "ch2", [120, 270], 206, "requirements: 4 to 3", false);
+  t("b-cap", "ch2", [120, 270], 218, "المتطلبات بقت Node و FFmpeg ومتصفح بس.");
+
+  ["c-r1","c-r2","c-r3","c-r4"].forEach((id, i) =>
+    t(id, "ch3", [270, 420], 287 + i * 11, "", false));
+  t("c-cap", "ch3", [270, 420], 346, "مقبول لإنه اتقارن، مش لإنه شكله شغال.");
+
+  t("d-st",  "ch4", [420, 540], 438, "READY");
+  t("d-doc", "ch4", [420, 540], 459, "", false);
+  t("d-n",   "ch4", [420, 540], 466, "npm install: not required", false);
+  t("d-cap", "ch4", [420, 540], 476, "تنسخ المجلد وتشتغل. مفيش حاجة تتثبت.");
+
+  window.__timelines = window.__timelines || {};
+  window.__timelines["main"] = tl;
+  tl.seek(0);
+}
+
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(build);
+else build();
+    </script>
+  </body>
+</html>
