@@ -10,7 +10,7 @@
  * --roles by index, then omitted. Chapter roles only matter to routes that
  * declare a narrative skeleton.
  */
-import { chromium } from "@playwright/test";
+import { getChromium } from "./lib/browser.mjs";
 import { createServer } from "node:http";
 import { readFile, writeFile } from "node:fs/promises";
 import { extname, join, resolve } from "node:path";
@@ -37,6 +37,7 @@ const server = createServer(async (rq, rs) => {
 });
 await new Promise((r) => server.listen(0, r));
 
+const chromium = await getChromium();
 const b = await chromium.launch();
 const p = await b.newPage({ viewport: { width: +W, height: +H } });
 p.on("pageerror", (e) => console.error("[pageerror]", e.message));

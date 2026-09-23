@@ -1,7 +1,7 @@
 /* Frame preview without a full render — seeks the timeline and screenshots.
    Usage: node video-output/v32/shot.mjs <projectDir> <w> <h> <frame> [frame...]
    A 2-minute render to look at one frame is the slowest possible feedback loop. */
-import { chromium } from "@playwright/test";
+import { getChromium } from "./lib/browser.mjs";
 import { createServer } from "node:http";
 import { readFile, mkdir } from "node:fs/promises";
 import { extname, join, resolve } from "node:path";
@@ -19,6 +19,7 @@ const server = createServer(async (rq, rs) => {
 await new Promise((r) => server.listen(0, r));
 await mkdir(OUT, { recursive: true });
 
+const chromium = await getChromium();
 const b = await chromium.launch();
 const p = await b.newPage({ viewport: { width: +W, height: +H } });
 p.on("pageerror", e => console.error("[pageerror]", e.message));
