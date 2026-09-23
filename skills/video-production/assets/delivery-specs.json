@@ -1,0 +1,103 @@
+{
+  "_about": {
+    "purpose": "Platform delivery specs for scripts/delivery_qc.py. Copy this file into a project and edit it rather than editing the skill.",
+    "evidence": "Broadcast loudness targets (EBU R128 -23 LUFS, ATSC A/85 -24 LKFS) are published standards. Digital platform targets marked evidence:'unverified' are widely repeated community consensus, NOT vendor documentation — confirm before a contractual delivery.",
+    "fields": "resolution [w,h] | aspect w/h | fps [allowed] | duration_s [min,max] | video_codec [] | audio_codec [] | sample_rate [] | lufs | lufs_tolerance | true_peak | max_bitrate_mbps | max_size_mb | audio_required | no_silence | notes"
+  },
+
+  "youtube-16x9": {
+    "label": "YouTube — standard landscape",
+    "resolution": [1920, 1080], "aspect": 1.778, "fps": [24, 25, 30, 50, 60],
+    "video_codec": ["h264", "hevc", "vp9", "av1"],
+    "audio_codec": ["aac", "opus"], "sample_rate": [48000],
+    "lufs": -14, "lufs_tolerance": 1.0, "true_peak": -1.0,
+    "evidence": "unverified — platform normalises loudness on playback; -14 is consensus, not documented"
+  },
+
+  "youtube-shorts": {
+    "label": "YouTube Shorts — vertical, 3 min or less",
+    "resolution": [1080, 1920], "aspect": 0.563, "fps": [24, 25, 30, 60],
+    "duration_s": [1, 180],
+    "video_codec": ["h264", "hevc"], "audio_codec": ["aac"], "sample_rate": [48000],
+    "lufs": -14, "lufs_tolerance": 1.0, "true_peak": -1.0,
+    "notes": "Vertical or square at 3 minutes or less is treated as a Short (limit raised from 60s in Oct 2024)."
+  },
+
+  "reels-9x16": {
+    "label": "Instagram Reels / Facebook Reels",
+    "resolution": [1080, 1920], "aspect": 0.563, "fps": [24, 25, 30],
+    "duration_s": [3, 90],
+    "video_codec": ["h264"], "audio_codec": ["aac"], "sample_rate": [48000],
+    "lufs": -14, "lufs_tolerance": 1.5, "true_peak": -1.0,
+    "evidence": "unverified — no published vendor loudness figure found"
+  },
+
+  "tiktok-9x16": {
+    "label": "TikTok",
+    "resolution": [1080, 1920], "aspect": 0.563, "fps": [24, 25, 30, 60],
+    "duration_s": [3, 600], "max_size_mb": 500,
+    "video_codec": ["h264", "hevc"], "audio_codec": ["aac"], "sample_rate": [44100, 48000],
+    "lufs": -14, "lufs_tolerance": 1.5, "true_peak": -1.0,
+    "evidence": "unverified loudness"
+  },
+
+  "linkedin-1x1": {
+    "label": "LinkedIn feed — square",
+    "resolution": [1080, 1080], "aspect": 1.0, "fps": [24, 25, 30],
+    "duration_s": [3, 600], "max_size_mb": 5120,
+    "video_codec": ["h264"], "audio_codec": ["aac"], "sample_rate": [48000],
+    "lufs": -14, "lufs_tolerance": 1.5, "true_peak": -1.0
+  },
+
+  "linkedin-4x5": {
+    "label": "LinkedIn feed — portrait",
+    "resolution": [1080, 1350], "aspect": 0.8, "fps": [24, 25, 30],
+    "duration_s": [3, 600],
+    "video_codec": ["h264"], "audio_codec": ["aac"], "sample_rate": [48000],
+    "lufs": -14, "lufs_tolerance": 1.5, "true_peak": -1.0
+  },
+
+  "meta-feed-1x1": {
+    "label": "Meta feed ad — square",
+    "resolution": [1080, 1080], "aspect": 1.0, "fps": [24, 25, 30],
+    "duration_s": [1, 241],
+    "video_codec": ["h264"], "audio_codec": ["aac"], "sample_rate": [48000],
+    "lufs": -14, "lufs_tolerance": 1.5, "true_peak": -1.0,
+    "notes": "Most feed impressions start muted — the piece must work silent. Verify on-screen text carries the message."
+  },
+
+  "broadcast-ebu-r128": {
+    "label": "Broadcast — EBU R128 (Europe, MENA)",
+    "resolution": [1920, 1080], "aspect": 1.778, "fps": [25, 50],
+    "video_codec": ["h264", "mpeg2video", "prores"],
+    "audio_codec": ["pcm_s24le", "pcm_s16le", "aac"], "sample_rate": [48000],
+    "lufs": -23, "lufs_tolerance": 0.5, "true_peak": -1.0,
+    "notes": "Published standard. Deliverable is usually ProRes or an XDCAM-family master, not H.264 — confirm with the broadcaster."
+  },
+
+  "broadcast-atsc-a85": {
+    "label": "Broadcast — ATSC A/85 (US)",
+    "resolution": [1920, 1080], "aspect": 1.778, "fps": [29.97, 30, 59.94, 60],
+    "audio_codec": ["pcm_s24le", "pcm_s16le", "ac3"], "sample_rate": [48000],
+    "lufs": -24, "lufs_tolerance": 2.0, "true_peak": -2.0,
+    "notes": "Published standard (LKFS is the same measurement as LUFS)."
+  },
+
+  "web-hero-silent": {
+    "label": "Website hero loop — no audio",
+    "resolution": [1920, 1080], "aspect": 1.778, "fps": [24, 25, 30],
+    "duration_s": [3, 30], "max_size_mb": 8,
+    "video_codec": ["h264", "vp9", "av1"],
+    "audio_required": false, "no_silence": false,
+    "notes": "Autoplay requires a muted track or none. Keep it small — this ships on every page load."
+  },
+
+  "dooh-screen": {
+    "label": "Digital out-of-home — silent, no fine print",
+    "aspect": null, "fps": [25, 30],
+    "duration_s": [5, 30],
+    "video_codec": ["h264"],
+    "audio_required": false, "no_silence": false,
+    "notes": "Always silent and read at distance. Minimum type size is a physical constraint the verifier cannot judge — check on the real screen size."
+  }
+}

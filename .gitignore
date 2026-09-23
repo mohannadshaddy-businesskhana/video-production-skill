@@ -1,0 +1,18 @@
+# rates are commercially sensitive — the template ships, the real card never does
+rate-card.json
+brand-config.md
+brand.json
+
+# per-project output
+out/
+renders/
+*.mp4
+*.mov
+layout.json
+report.json
+qc.json
+run-log.md
+
+__pycache__/
+node_modules/
+.DS_Store
