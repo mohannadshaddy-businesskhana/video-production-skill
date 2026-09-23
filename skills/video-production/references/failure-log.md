@@ -22,6 +22,8 @@
 | 09 | Captions instead of a story | Language |
 | 10 | Signage language — clipped noun phrases | Language |
 | 11 | An efficiency claim instead of an elimination claim | Message |
+| 40 | Selling what the tool does instead of what the viewer gets | Message |
+| 41 | A script written for someone who watched it being built | Narrative |
 | 12 | A defensive feature answering an objection nobody raised | Message |
 | 13 | An imitated interface instead of the product's real one | Interface |
 | 14 | An onboarding bar visible in a product shot | Interface |
@@ -167,6 +169,38 @@ doesn't hold together."
 **Result:** at second 3 the viewer does not know who this is for or what it sells.
 **Rule:** **the category and the protagonist are named before second six.** The category word is
 said explicitly.
+
+### 40 · Selling what the tool does instead of what the viewer gets
+
+**What happened:** a brand film for this very skill was built on the line "it knows how to refuse
+the video." Four cards, all about the tool's internal behaviour: it measures, it compares, it
+refuses, it does not deliver.
+**Result:** the user's words — "weak as marketing." Nobody buys a tool because it refuses things.
+Refusing is the mechanism; it is not the reason anyone would want it. The film had no person in it,
+no moment, and nothing at stake.
+**Rule:** **the claim is what the viewer stops losing, not what the software starts doing.**
+Write the mechanism down, then ask "so what?" until the answer is something that happens to a human
+being. "It fails the build on a coverage violation" → so what → "it catches the thin frame" → so
+what → **"you don't hear about the mistake from your client."** That last one is the film.
+
+A useful test: if the sentence's subject is the product, it is a feature. If the subject is the
+viewer, it is a benefit.
+
+### 41 · A script written for someone who watched it being built
+
+**What happened:** a demo explaining a code change opened on `feat(deps): drop Python`, then showed
+`18 renders · same`, `requirements: 4 → 3`.
+**Result:** the user could not follow it **at all** — and he had commissioned the work the video was
+about. Compared against what? The same as what? Which requirements? Every line was true and every
+line assumed the viewer had been in the room. It was a changelog for a project nobody watching had
+been following.
+**Rule:** **walk the chapter boundaries and write down what the viewer knows at each one.** If any
+chapter needs a fact the earlier chapters did not supply, the script fails — no matter how correct
+it is. A term, a number and a name each arrive *after* the thing that makes them mean something.
+
+**The trap underneath it:** the author has just finished the work, so every reference feels obvious.
+Recency is indistinguishable from clarity from the inside. This is why the check has to be
+mechanical — a list of what has been established, in order — and not a feeling that it reads fine.
 
 ### 09 · Captions instead of a story
 
@@ -450,3 +484,7 @@ immediately.** A checker that cries wolf gets ignored, and then it is worth noth
    offset was measured at 0.59 of a beat at 110 BPM.
 5. **Strategic mistakes cost more than technical ones.** The claim error (#11) cost a full chapter
    rewrite; every brand error combined cost one round.
+6. **The verifier cannot read.** It measures whether text *can* be read — dwell, contrast, stillness,
+   coverage — and has nothing to say about whether it *means* anything to a stranger. Two demos
+   (#40, #41) passed all fifteen checks and failed with their first human viewer. Every gate in this
+   skill sits downstream of a script nobody validated.
