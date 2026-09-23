@@ -91,6 +91,28 @@ peaks فوق قمة الـPCM.
 
 ---
 
+### 3.1 سكربت بيدوّر على اعتماديّاته جنب نفسه بيتكسر أول ما يتنقل
+
+`import { chromium } from "@playwright/test"` بيتحل **نسبةً لمكان الملف**. فطول
+ما السكربت جوه المشروع شغال، وأول ما يتثبّت في `~/.claude/skills/` بيموت —
+ومفيش `node_modules` هناك. ده بيحصل لأي حد بيثبّت من repo أو حزمة.
+
+```js
+// الحل: حل الاعتمادية من مجلد العمل، مش من مجلد السكربت
+const req = createRequire(pathToFileURL(join(process.cwd(), "noop.js")).href);
+const mod = await import(pathToFileURL(req.resolve(name)).href);
+```
+
+**ومصيدة جواها:** الحزم دي CommonJS. `import()` لملف CJS بيحط `module.exports`
+في `default`، والـnamed exports بتتكشف بالـlexer وساعات بيفوته. فلازم:
+
+```js
+const pick = (mod) => mod?.chromium || mod?.default?.chromium;
+```
+
+من غير السطر ده الاستيراد بينجح والقيمة بتطلع `undefined`، والكود بيعدّي للمحاولة
+اللي بعدها ويرمي في الآخر «مش متثبّت» — وهي متثبّتة.
+
 ## 4. البيئة
 
 | العَرَض | السبب | الحل |
