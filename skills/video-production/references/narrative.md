@@ -76,7 +76,16 @@ viewer say *I don't*, and you lose their belief in everything else.
 
 ---
 
-## 2b. The cold-read gate — run this before anything is built `#41`
+## 2b. The script gate — `scripts/script_check.mjs` `#40` `#41`
+
+> Everything in this section is enforced by code. Fill `assets/script.template.json` and run it.
+> A rule that lives only in this file is a rule that will be violated — that is the whole thesis of
+> the skill, and the script stage was the last place it was not applied.
+
+The cold-read ledger below is **one** of its checks, and on its own it is not enough: a rejected
+demo passed the ledger and still failed on category, stakes, jargon and showing its subject.
+
+### The cold-read ledger `#41`
 
 The verifier measures whether text **can** be read: dwell, contrast, stillness, coverage. It has
 nothing whatever to say about whether a stranger **understands** it. That gap is where the two worst

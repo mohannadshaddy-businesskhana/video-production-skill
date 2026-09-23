@@ -77,6 +77,7 @@ corrections were actually given in.
 | Script | Does |
 |---|---|
 | `doctor.mjs` | what the machine has, what is missing, what each thing costs — run it first |
+| `script_check.mjs` | **the gate on the script, before any composition exists** |
 | `manifest.mjs` | measures a composition → `layout.json` |
 | `verify.mjs` | the external verifier — fails the build |
 | `delivery_qc.mjs` | the file against a platform spec (`--list` for the catalog) |
@@ -120,6 +121,32 @@ it.** This layer adds only what a production house needs beyond a creative brief
 
 - `scripts/budget.mjs` — a quote from a rate card (`assets/rate-card.template.json`)
 - `scripts/shoot_plan.mjs` — shot list, schedule, call sheet, when a camera is involved
+
+### 1b. Script — nothing is built before this passes
+
+Every other stage here has an author and a judge. The script had a judge only — a page of prose in
+`references/narrative.md` — and **prose rules get violated.** Two pilot demos passed all fifteen
+render checks and were incomprehensible to their first viewer, breaking rules that were already
+written down.
+
+So the script is an artifact, and the rules are code:
+
+```bash
+cp <SKILL_DIR>/assets/script.template.json script.json    # then fill it
+node <SKILL_DIR>/scripts/script_check.mjs script.json --ledger
+```
+
+It fails on: a claim that only restates the mechanism · more than one claim · the category or the
+audience never named · no stakes in the first third · a script that never shows its subject · a fact
+needed before it was established · jargon used before it is explained · a beat that says more than
+it has time to say · no sentence a viewer could repeat.
+
+> **The five fields above `beats` are questions for the user, not fields to fill in.** `audience`,
+> `category_noun`, `alternative`, `claim` and `repeat_sentence` are the ones the script template has
+> always said to ask about. Both rejected demos were written by guessing them.
+
+**`verify.mjs` asks whether the text can be read. This asks whether a stranger ends up knowing what
+you wanted them to know.** They catch different things and neither substitutes for the other.
 
 ### 2. Brand contract
 
