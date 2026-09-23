@@ -307,13 +307,13 @@ function checkPalette(video, colors, manifest, rep, samples = 12, tol = 26.0) {
   const [fw, fh] = manifest.frame_size;
   const ui = manifest.elements.filter((e) => ["ui", "image", "video"].includes(e.type));
   const dur = manifest.duration_frames / fps;
-  let worst = 0.0, worstT = 0.0, skipped = 0;
+  let worst = 0.0, worstT = 0.0, skipped = 0, measured = 0;
 
   for (let i = 0; i < samples; i++) {
     const t = dur * (i + 0.5) / samples;
     const frameNo = Math.trunc(t * fps);
     const g = grabRgb(video, t);
-    if (!g) continue;
+    if (!g) continue;                 // ffmpeg gave us nothing back
     const { buf, w, h } = g;
 
     const masked = new Uint8Array(w * h);
@@ -335,14 +335,26 @@ function checkPalette(video, colors, manifest, rep, samples = 12, tol = 26.0) {
       if (offPalette((r << 16) | (gg << 8) | b, r, gg, b)) bad++;
     }
     if (total < 500) { skipped++; continue; }
+    measured++;
     const frac = bad / total;
     if (frac > worst) { worst = frac; worstT = t; }
   }
 
+  /* The positive control. "0.0% off-palette" is also what a missing file, an
+   * unreadable codec and a broken ffmpeg all produce — the check reported a
+   * clean pass on a file that did not exist. A result of zero is only
+   * meaningful if something was actually looked at. */
+  if (measured === 0) {
+    rep.add("palette", false,
+      "no frame could be read — the palette was never checked "
+      + `(${samples} sample(s) attempted, ${skipped} fully masked)`, "#01");
+    return;
+  }
+
   const note = skipped ? ` (${skipped} frame(s) fully masked by UI)` : "";
   rep.add("palette", worst <= 0.02,
-          `worst ${f(worst * 100, 1)}% off-palette at ${f(worstT, 1)}s (limit 2%)${note}`,
-          "#01");
+          `worst ${f(worst * 100, 1)}% off-palette at ${f(worstT, 1)}s (limit 2%)`
+          + `${note} · ${measured}/${samples} frames read`, "#01");
 }
 
 // ── manifest ────────────────────────────────────────────────────────────────
@@ -395,7 +407,7 @@ function checkOverlap(manifest, rep) {
             : `${hits.length} collision(s): ${hits.slice(0, 3).join(", ")}`, "#20");
 }
 
-function checkCoverage(manifest, rep, floor = 0.45) {
+function checkCoverage(manifest, rep, floor) {
   // #21 — one feature frame carried under 10% content.
   const [fw, fh] = manifest.frame_size;
   const frameArea = fw * fh;
@@ -478,12 +490,21 @@ function checkStructure(manifest, structure, rep) {
   }
   const chs = manifest.chapters || [];
   const sorted = [...chs].sort((a, b) => a.start - b.start);
+  // A brand film or a music piece has no six-beat spine and must not be held to
+  // one. The skeleton is checked when the spec ASKS for it, never by default —
+  // but a declared `roles` is still checked exactly.
+  if (!structure.roles) {
+    rep.add("chapter roles", true, "spec declares no role skeleton", "", true);
+    if (!structure.skeleton) return;
+  }
   const roles = sorted.map((c) => c.role);
   const expected = structure.roles || ROLE_ORDER;
-  const ok = JSON.stringify(roles) === JSON.stringify(expected);
-  rep.add("chapter roles", ok,
-          ok ? "situation→old→transition→solution→sweep→cta" : `got ${pyRepr(roles)}`,
-          "#07");
+  if (structure.roles) {
+    const ok = JSON.stringify(roles) === JSON.stringify(expected);
+    rep.add("chapter roles", ok,
+            ok ? "situation→old→transition→solution→sweep→cta" : `got ${pyRepr(roles)}`,
+            "#07");
+  }
 
   // boundaries must match the declared duration class exactly
   const skel = structure.skeleton;
@@ -620,7 +641,7 @@ checkChapters(manifest, rep);
 checkSafeZone(manifest, rep);
 checkZones(manifest, rep);
 checkOverlap(manifest, rep);
-checkCoverage(manifest, rep);
+checkCoverage(manifest, rep, structure?.coverage_floor ?? 0.45);
 checkDwell(manifest, rep);
 checkMotion(manifest, rep);
 // narrative structure
