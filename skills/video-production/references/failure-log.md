@@ -474,6 +474,14 @@ lines. Zero lines means the shape refutes its own caption.
 **Result:** it breaks the consistency and makes the piece look like a half-translated template.
 **Rule:** **all interface text in the video's language.** The only exception is brand names (Slack ·
 Notion). Dates, described numbers and labels **are translated.**
+**It came back through the check itself.** "CHECKS PASSED", "OF 3", "CHECKED" and "SCRIPT PASSED"
+shipped in four Arabic demos with the language check green. Two holes: each label was declared to
+the manifest with empty text, so the check never saw it; and two demos had ordinary English words
+("OF", "SOMEONE", "ELSE", "FOUND", "IT"…) listed as *brand names*, so it let them through. The
+check now reads the text nodes the page actually contains (`text_nodes` in the manifest) as well as
+what was declared, and a brand list holds brands. A Latin label in the video's own chrome is
+translated, and set in the video's typeface: a monospace Latin font has no Arabic, and letter-spacing
+breaks the joins of the letters that fall back to another face.
 
 ### 40 · Re-layout at the block level instead of the design level
 

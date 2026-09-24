@@ -598,12 +598,13 @@ function checkLanguage(manifest, structure, rep) {
   };
   const offenders = [];
   for (const e of manifest.elements) {
-    const txt = (e.text || "").trim();
-    if (!txt || e.type !== "text") continue;
-    const latin = txt.split(/\s+/).map(strip)
+    // the declared text AND the text the page actually holds: a label declared
+    // as "" carried "CHECKS PASSED" through this check in four demos
+    const pieces = [...(e.text_nodes || []), e.type === "text" ? (e.text || "") : ""];
+    const latin = new Set(pieces.flatMap((p) => p.trim().split(/\s+/)).map(strip)
       // every char ASCII and at least one a letter — Python's isascii/isalpha
-      .filter((w) => w && /^[\x00-\x7F]+$/.test(w) && /[A-Za-z]/.test(w) && !allow.has(w));
-    if (latin.length) offenders.push(`${e.id}:${latin.slice(0, 3).join(" ")}`);
+      .filter((w) => w && /^[\x00-\x7F]+$/.test(w) && /[A-Za-z]/.test(w) && !allow.has(w)));
+    if (latin.size) offenders.push(`${e.id}:${[...latin].slice(0, 3).join(" ")}`);
   }
   rep.add("single language", !offenders.length,
           !offenders.length ? `all ${lang}` : offenders.slice(0, 3).join("; "), "#39");
