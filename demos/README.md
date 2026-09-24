@@ -10,7 +10,7 @@ All of them explain the skill itself, so the content is a constant and the
 | | Type | What it demonstrates |
 |---|---|---|
 | `01-brand-film` | brand film | one claim, said slowly; the form earns its weight by refusing to list things |
-| `02-pr-to-video` | a code change | dense, monospaced, literal — the terminal *is* the visual |
+| `02-pr-to-video` | step-by-step tutorial | numbered steps on a light ground, a lead CTA that names its word |
 
 Each composition's header comment carries its **cold-read ledger**: what the viewer
 must already know at each chapter boundary, and which earlier chapter supplied it.

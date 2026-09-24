@@ -1,3 +1,8 @@
 {
-  "coverage_floor": 0.45
+  "coverage_floor": 0.45,
+  "text_language": "arabic",
+  "brand_names": [
+    "OF",
+    "video-production"
+  ]
 }
