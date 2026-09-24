@@ -1,0 +1,221 @@
+<!doctype html>
+<!-- Demo 11 — platform versions.  A spec table, three platform columns, and
+     pass/fail marks. The only demo in the set built as a DOCUMENT rather than
+     a scene, because that is what a delivery matrix is.
+     HOOK 0–3 · VALUE 3–14 · CTA 14–18 -->
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>كل منصة ليها مواصفة</title>
+    <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-arabic.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block;
+        unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0898-08E1,U+08E3-08FF,U+FB50-FDFF,U+FE70-FEFF; }
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-latin.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block; }
+      @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
+        font-weight:700; font-style:normal; font-display:block; }
+      :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
+              --fail:#B23A2A; --white:#FFFFFF; --amber-tx:#AC6C11; }
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:1080px; height:1920px; overflow:hidden; background:#F5F2EA; }
+      #root { position:relative; width:100%; height:100%; overflow:hidden;
+              font-family:"Cairo",sans-serif; color:var(--ink); background:var(--bone); }
+      .scene { position:absolute; inset:0; overflow:hidden; background:var(--bone); }
+      .pane  { position:absolute; inset:0; direction:rtl; }
+      .line  { position:absolute; right:88px; width:904px; font-weight:600;
+               line-height:1.34; letter-spacing:-.01em; }
+      .xl { font-size:84px; } .lg { font-size:58px; } .md { font-size:44px; }
+      .amber { color:var(--amber-tx); }
+
+      /* platform columns — three boxes at their real aspect ratios */
+      .plats { position:absolute; right:88px; width:904px; display:flex;
+               flex-direction:row-reverse; align-items:flex-end; gap:26px; }
+      .pl { flex:1; text-align:center; }
+      .pl .box { border:5px solid var(--ink); border-radius:8px;
+                 background:rgba(20,24,31,.05); margin:0 auto; position:relative; }
+      .pl .r916 { width:132px; height:235px; } .pl .r11 { width:180px; height:180px; }
+      .pl .r169 { width:260px; height:146px; }
+      .pl .nm { margin-top:16px; font-size:32px; font-weight:700; }
+      .pl .st { margin-top:6px; font-family:"Mono",monospace; font-size:24px; font-weight:700; }
+      .pl .st.ok { color:var(--pass); } .pl .st.no { color:var(--fail); }
+
+      /* the spec table — this demo is a document */
+      .tbl { position:absolute; right:88px; width:904px;
+             border:4px solid rgba(20,24,31,.25); border-radius:10px; overflow:hidden; }
+      .tbl .r { display:flex; flex-direction:row-reverse;
+                border-bottom:3px solid rgba(20,24,31,.14); }
+      .tbl .r:last-child { border-bottom:none; }
+      .tbl .r.h { background:rgba(20,24,31,.07); }
+      .tbl .c { flex:1; padding:20px 18px; font-size:30px; font-weight:600; text-align:center; }
+      .tbl .c.k { flex:1.3; text-align:right; font-weight:700; }
+      .tbl .r.h .c { font-family:"Mono",monospace; font-size:24px; letter-spacing:.08em;
+                     color:rgba(20,24,31,.65); }
+
+      /* three checks running */
+      .checks { position:absolute; right:88px; width:904px; }
+      .ck { display:flex; flex-direction:row-reverse; align-items:center; gap:22px;
+            margin-bottom:26px; font-size:44px; font-weight:600; }
+      .ck i { width:62px; height:62px; border:6px solid rgba(20,24,31,.3);
+              border-radius:10px; flex:none; position:relative; display:block; }
+      .ck.on i { border-color:var(--pass); background:rgba(44,110,82,.16); }
+      .ck .v { margin-right:auto; font-family:"Mono",monospace; font-size:30px;
+               color:rgba(20,24,31,.6); font-weight:700; }
+
+      .name { position:absolute; right:88px; top:1520px; width:904px;
+              font-family:"Mono",monospace; font-size:40px; letter-spacing:.06em;
+              color:var(--amber-tx); direction:ltr; text-align:right; font-weight:700; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="18"
+         data-fps="30" data-width="1080" data-height="1920">
+
+      <section id="ch1" class="scene clip" data-start="0" data-duration="3" data-track-index="0">
+        <div class="pane">
+          <div class="line xl" id="h1" style="top:320px">نفس الملف.<br>تلات منصات.<br><span class="amber">تلات نتايج.</span></div>
+          <div class="plats" id="h2" style="top:1010px">
+            <div class="pl"><div class="box r169"></div><div class="nm">يوتيوب</div><div class="st ok">مقبول</div></div>
+            <div class="pl"><div class="box r11"></div><div class="nm">لينكدإن</div><div class="st no">مضغوط</div></div>
+            <div class="pl"><div class="box r916"></div><div class="nm">ريلز</div><div class="st no">مرفوض</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="ch2" class="scene clip" data-start="3" data-duration="6" data-track-index="1">
+        <div class="pane">
+          <div class="line lg" id="a1" style="top:280px">المنصة بترفض ولا بتضغط<br>من غير ما تقولك.</div>
+          <div class="tbl" id="a2" style="top:620px">
+            <div class="r h"><div class="c k">المواصفة</div><div class="c">ريلز</div><div class="c">لينكدإن</div><div class="c">يوتيوب</div></div>
+            <div class="r"><div class="c k">المقاس</div><div class="c">9:16</div><div class="c">1:1</div><div class="c">16:9</div></div>
+            <div class="r"><div class="c k">المدة</div><div class="c">٩٠ث</div><div class="c">١٠د</div><div class="c">١٢س</div></div>
+            <div class="r"><div class="c k">الصوت</div><div class="c">−14</div><div class="c">−14</div><div class="c">−14</div></div>
+          </div>
+          <div class="line md" id="a3" style="top:1300px">الأداة عندها مواصفة كل منصة.</div>
+        </div>
+      </section>
+
+      <section id="ch3" class="scene clip" data-start="9" data-duration="5" data-track-index="2">
+        <div class="pane">
+          <div class="line lg" id="b1" style="top:280px">مدة، ومقاس،<br>ومستوى صوت.</div>
+          <div class="checks" id="b2" style="top:660px">
+            <div class="ck" id="k1"><i></i><span>المقاس</span><span class="v">1080×1920</span></div>
+            <div class="ck" id="k2"><i></i><span>المدة</span><span class="v">18.0s</span></div>
+            <div class="ck" id="k3"><i></i><span>مستوى الصوت</span><span class="v">−14.0 LUFS</span></div>
+          </div>
+          <div class="line md" id="b3" style="top:1330px">بيتفحصوا قبل الرفع.</div>
+        </div>
+      </section>
+
+      <section id="ch4" class="scene clip" data-start="14" data-duration="4" data-track-index="3">
+        <div class="pane">
+          <div class="line xl" id="c1" style="top:400px">علّق «<span class="amber">مواصفة</span>»<br>وأبعتلك الجدول.</div>
+          <div class="plats" id="c2" style="top:1080px">
+            <div class="pl"><div class="box r169"></div><div class="st ok">مقبول</div></div>
+            <div class="pl"><div class="box r11"></div><div class="st ok">مقبول</div></div>
+            <div class="pl"><div class="box r916"></div><div class="st ok">مقبول</div></div>
+          </div>
+          <div class="name" id="c3">video-production</div>
+        </div>
+      </section>
+
+      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="18"
+             data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+window.__FMT = { id: "vertical", w: 1080, h: 1920, safeTop: 230, safeBottom: 1690, zones: {} };
+window.__MF = [];
+window.__MOTION = [];
+const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
+const F = (f) => f / 30;
+
+function build() {
+  // initial state OUTSIDE the timeline — tl.set(…,0) does not apply at frame 0
+  gsap.set(["#h1","#h2","#a1","#a2","#a3","#b1","#b2","#b3","#c1","#c2","#c3"], { opacity: 0 });
+  gsap.set(["#h1","#a1","#b1","#c1"], { y: 24 });
+  gsap.set(".pl", { opacity: 0, y: 26 });
+  gsap.set(".tbl .r", { opacity: 0, x: -24 });
+  gsap.set(".ck", { opacity: 0, x: -20 });
+
+  const tl = gsap.timeline({ paused: true });
+  const rise = { opacity: 1, y: 0, ease: "power2.out" };
+
+  /* ── HOOK · 0–90 — three platforms, three verdicts ──────────────── */
+  tl.to("#h2", { opacity: 1, duration: F(2) }, F(0));
+  tl.to("#h2 .pl", { opacity: 1, y: 0, duration: F(10), stagger: F(5),
+                     ease: "back.out(1.4)" }, F(0));
+  tl.to("#h1", { ...rise, duration: F(14) }, F(4));
+
+  /* ── VALUE · 90–270 — the table, row by row ─────────────────────── */
+  tl.to("#a1", { ...rise, duration: F(14) }, F(96));
+  tl.to("#a2", { opacity: 1, duration: F(2) }, F(130));
+  tl.to(".tbl .r", { opacity: 1, x: 0, duration: F(9), stagger: F(11),
+                     ease: "power2.out" }, F(130));
+  tl.to("#a3", { opacity: 1, duration: F(14) }, F(190));
+
+  /* ── VALUE · 270–420 — the checks tick through ──────────────────── */
+  tl.to("#b1", { ...rise, duration: F(14) }, F(276));
+  tl.to("#b2", { opacity: 1, duration: F(2) }, F(300));
+  tl.to(".ck", { opacity: 1, x: 0, duration: F(9), stagger: F(12),
+                 ease: "power2.out" }, F(300));
+  // the tick state is driven from onUpdate, never tl.call — a seek to any frame
+  // has to reconstruct it
+  const p = { n: 0 };
+  tl.to(p, { n: 3, duration: F(46), ease: "none",
+             onUpdate: () => {
+               document.querySelectorAll("#b2 .ck").forEach((el, i) =>
+                 el.classList.toggle("on", i < p.n));
+             } }, F(314));
+  tl.to("#b3", { opacity: 1, duration: F(14) }, F(352));
+
+  /* ── CTA · 420–540 ──────────────────────────────────────────────── */
+  tl.to("#c1", { ...rise, duration: F(16) }, F(426));
+  tl.to("#c2", { opacity: 1, duration: F(2) }, F(444));
+  tl.to("#c2 .pl", { opacity: 1, y: 0, duration: F(9), stagger: F(5),
+                     ease: "back.out(1.4)" }, F(444));
+  tl.to("#c3", { opacity: 1, duration: F(12) }, F(462));
+
+  /* ── music — one continuous track, gain automation only (#26 #27) ─ */
+  tl.fromTo("#bgm", { volume: 0 }, { volume: 0.40, duration: 0.9, ease: "none",
+            immediateRender: false }, 0);
+  tl.to("#bgm", { volume: 0.29, duration: F(8), ease: "none" }, F(270));
+  tl.to("#bgm", { volume: 0.40, duration: F(18), ease: "none" }, F(312));
+  tl.to("#bgm", { volume: 0, duration: 1.3, ease: "none" }, F(501));
+
+  const t = (id, ch, fr, still, text, crit) =>
+    mf(id, { type: "text", chapter: ch, frames: fr, still_from: still, text: text,
+             critical: crit !== false, el: "#" + id });
+  const sh = (id, ch, fr, still) =>
+    mf(id, { type: "shape", chapter: ch, frames: fr, still_from: still,
+             critical: false, el: "#" + id });
+
+  t("h1","ch1",[0,90],18,"نفس الملف. تلات منصات. تلات نتايج.");
+  sh("h2","ch1",[0,90],20);
+
+  t("a1","ch2",[90,270],110,"المنصة بترفض ولا بتضغط من غير ما تقولك.");
+  sh("a2","ch2",[90,270],172);
+  t("a3","ch2",[90,270],204,"الأداة عندها مواصفة كل منصة.");
+
+  t("b1","ch3",[270,420],290,"مدة، ومقاس، ومستوى صوت.");
+  sh("b2","ch3",[270,420],360);
+  t("b3","ch3",[270,420],366,"بيتفحصوا قبل الرفع.");
+
+  t("c1","ch4",[420,540],442,"علّق «مواصفة» وأبعتلك الجدول.");
+  sh("c2","ch4",[420,540],463);
+  t("c3","ch4",[420,540],474,"",false);
+
+  window.__timelines = window.__timelines || {};
+  window.__timelines["main"] = tl;
+  tl.seek(0);
+}
+
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(build);
+else build();
+    </script>
+  </body>
+</html>
