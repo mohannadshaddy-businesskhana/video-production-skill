@@ -15,7 +15,7 @@ script gate and the render gate.
 | `03-launch-video` | launch video | a burst, a week crossed down to a day, hard edges | **amber field** |
 | `04-section-series` | section series | a rail that never moves, an 18-cell grid, one frame whose contents swap | ink |
 | `05-explainer` | faceless explainer | ruled paper and a diagram that draws itself | **white** |
-| `06-motion-graphics` | motion graphics | type only — no diagram, no window, no plate. Six beats, not four | ink |
+| `06-motion-graphics` | motion graphics | **one amber shape for the whole film** — a circle, a day, a block, a chart, three steps, the circle again, a button. Nothing cuts, nothing fades | bone |
 | `07-music-video` | music video | **the whole frame cuts on every beat** — 33 hard cuts from the track's own beat map, no fades; the claim lands on the drop | amber · bone · ink, per beat |
 | `08-product-tour` | product tour | browser chrome, a real page, one push-in and a cursor | **grey** |
 | `09-talking-head` | talking-head recut | a footage plate that never changes, with cards arriving over it | ink |
