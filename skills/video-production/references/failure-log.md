@@ -545,6 +545,28 @@ below either.
 The other fix was raising the bed about 6 dB to clear the old floor. That would have put the music
 about 9 dB under the voice instead of 15, which is mixing for the instrument again (#46).
 
+### 48 · A free voice, and four ways it went wrong
+
+Getting an Egyptian Arabic narration from Gemini TTS's free tier went wrong four times:
+
+1. **The quota.** The free tier allows about ten TTS requests a day per project, so one request
+   per line spent a day's quota on one eight-line narration. The fix is `tts_gemini.mjs --whole`,
+   which sends every line in one request, joined by the model's own `<long pause>` tag.
+2. **The response.** The docs put the audio at `output_audio`, but the live API returned it as a
+   content part (`steps[].content[]` holding `{type: "audio", data}`). The tool now looks for
+   either, and on a miss prints the response's shape without its payload.
+3. **Cutting at the longest pauses.** A synthetic voice pauses as long at commas and dashes as it
+   does between lines. A seven-word line came out a second long, and a six-word one five seconds.
+   The fix is alignment rather than detection: the text is known, so `voice_timings.mjs` chooses the
+   N−1 pauses that cut the take into pieces matching what the lines' letter counts predict.
+4. **Levels.** Phone voice notes peak near 0 dBFS. Pushing each line to one fixed loudness
+   *lowered* the quiet lines it was meant to lift, and the takes spread 6.6 dB. The fix is to match
+   the lines, not maximise them: every line goes to the one level all of them can reach with peaks
+   under −1.5 dBFS, and the final loudness pass lifts the whole track.
+
+**Rule:** measure a voice, then place it. Assume nothing about it from the documentation, the
+punctuation or a target number.
+
 ---
 
 ## Recurring patterns — read these if you have no time for the whole log

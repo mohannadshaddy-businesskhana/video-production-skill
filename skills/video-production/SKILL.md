@@ -89,8 +89,8 @@ corrections were actually given in.
 | `budget.mjs` · `shoot_plan.mjs` | quote · shot list, schedule, call sheet |
 | `cue_sheet.mjs` | cue sheet + licence audit from a media ledger |
 | `localize.mjs` | translatable strings, and what translation did to their length |
-| `tts_gemini.mjs` | narration from Gemini TTS, Egyptian Arabic included, on the free tier — one file per line, with measured timings |
-| `voice_timings.mjs` | a recorded narration (a take per line, or one take with pauses) into the same timings |
+| `tts_gemini.mjs` | narration from Gemini TTS, Egyptian Arabic included, on the free tier (about ten requests a day). `--whole` spends one request on the whole narration |
+| `voice_timings.mjs` | a recorded or generated narration into per-line timings at one matched level. Takes either a take per line, or one take aligned to the script |
 | `timeline_export.mjs` | EDL / OTIO for a human post house |
 | `batch_report.mjs` | one table from a directory of verifier reports |
 

@@ -29,17 +29,28 @@ const API = "https://generativelanguage.googleapis.com/v1beta";
 const argv = process.argv.slice(2);
 const flag = (n, d) => { const i = argv.indexOf("--" + n); return i === -1 ? d : argv[i + 1]; };
 
+/* The key, from the environment or a file. A .env file is read for ONE named
+ * variable (--key-var, default GEMINI_API_KEY) and nothing else: taking "the
+ * first line" of a .env would send some other secret to Google as a key. A
+ * bare file (no KEY=VALUE lines) is taken as the key itself. Either way the
+ * value is checked for the shape of a Google API key before it is used. */
 function readKey() {
-  const file = flag("key-file");
+  const file = flag("key-file"), name = flag("key-var", "GEMINI_API_KEY");
+  let key = null;
   if (file) {
-    const txt = readFileSync(file, "utf8");
-    const m = txt.match(/^\s*GEMINI_API_KEY\s*=\s*["']?([^"'\s]+)/m);
-    const key = m ? m[1] : txt.split(/\r?\n/).map((l) => l.trim()).find(Boolean);
-    if (key) return key;
+    const lines = readFileSync(file, "utf8").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    if (lines.some((l) => /^[A-Za-z_][A-Za-z0-9_]*\s*=/.test(l))) {
+      const hit = lines.find((l) => new RegExp(`^${name}\\s*=`).test(l));
+      if (!hit) { console.error(`${file} has no ${name}= line`); process.exit(2); }
+      key = hit.slice(hit.indexOf("=") + 1).trim().replace(/^["']|["']$/g, "");
+    } else if (lines.length === 1) key = lines[0];
+  } else key = process.env[name] || process.env.GEMINI_API_KEY || null;
+  if (!key) { console.error("no key: set GEMINI_API_KEY or pass --key-file <path> [--key-var NAME]"); process.exit(2); }
+  if (!/^AIza[0-9A-Za-z_-]{35}$/.test(key)) {
+    console.error("that value does not have the shape of a Google API key — refusing to send it");
+    process.exit(2);
   }
-  if (process.env.GEMINI_API_KEY) return process.env.GEMINI_API_KEY;
-  console.error("no key: set GEMINI_API_KEY or pass --key-file <path>");
-  process.exit(2);
+  return key;
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -54,13 +65,25 @@ async function call(path, init, tries = 5) {
   }
 }
 
-/* the audio sits at output_audio.data in the interaction; look for it rather
-   than trust one exact nesting, so a wrapper object does not break the tool */
+/* The docs put the audio at output_audio.data; the live API (2026-09) returns
+   it as a content part — steps[].content[] = {type:"audio", mime_type, data}.
+   Look for either rather than trust one exact nesting. */
 function findAudio(o) {
   if (!o || typeof o !== "object") return null;
   if (o.output_audio && o.output_audio.data) return o.output_audio;
+  if (typeof o.data === "string" && (o.type === "audio" || /^audio\//.test(o.mime_type || ""))) return o;
   for (const v of Object.values(o)) { const f = findAudio(v); if (f) return f; }
   return null;
+}
+
+/* a response's structure without its payload: keys, types, short strings */
+function shape(o, depth = 0) {
+  if (depth > 6) return "…";
+  if (Array.isArray(o)) return `[${o.slice(0, 3).map((v) => shape(v, depth + 1)).join(", ")}${o.length > 3 ? ", …" : ""}]`;
+  if (o && typeof o === "object")
+    return `{${Object.entries(o).map(([k, v]) => `${k}: ${shape(v, depth + 1)}`).join(", ")}}`;
+  if (typeof o === "string") return o.length > 40 ? `"${o.slice(0, 20)}…"(${o.length})` : JSON.stringify(o);
+  return String(o);
 }
 
 /* a WAV's PCM and format, read from its chunks — not from a fixed 44-byte header */
@@ -99,8 +122,10 @@ if (argv.includes("--voices")) {
     console.log([v.name || v.id, v.displayName, v.gender, v.accent, v.languageCode || v.language_code,
                  v.persona].filter(Boolean).join(" · "));
   console.log(`${list.length} voice(s) for ${lang}`);
-  process.exit(0);
-}
+} else await synthesize();
+
+// no process.exit(): on Windows, exiting while fetch closes its socket trips a libuv assertion
+async function synthesize() {
 
 const linesPath = flag("lines"), out = flag("out");
 if (!linesPath || !out) {
@@ -112,6 +137,30 @@ const N = JSON.parse(readFileSync(linesPath, "utf8"));
 const voice = flag("voice", "Kore"), model = flag("model", "gemini-3.8-flash-tts");
 const style = flag("style", N.style || ""), gap = Number(flag("gap", "0.35"));
 mkdirSync(out, { recursive: true });
+
+/* --whole: the free tier allows about ten TTS requests a DAY per project, so
+ * one request per line spends a day's quota on a single narration. This asks
+ * for all the lines in ONE request, joined by the model's own <long pause>
+ * tag, and writes one take; voice_timings.mjs then splits it at those pauses
+ * into the same per-line timings. */
+if (argv.includes("--whole")) {
+  const content = { type: "text", text: N.lines.map((l) => l.text).join(" <long pause> ") };
+  if (style) content.annotations = [{ type: "speech_metadata", style }];
+  const res = await call("/interactions", {
+    method: "POST", headers,
+    body: JSON.stringify({ model, input: [{ type: "user_input", content: [content] }],
+                           response_format: { type: "audio" },
+                           generation_config: { speech_config: [{ voice }] } }),
+  });
+  const audio = findAudio(res);
+  if (!audio) throw new Error(`no audio in the response — its shape: ${shape(res)}`);
+  const w = parseWav(Buffer.from(audio.data, "base64"));
+  writeFileSync(join(out, "take.wav"), wav(w, w.pcm));
+  const dur = w.pcm.length / (w.rate * w.channels * w.bits / 8);
+  console.log(`${N.lines.length} line(s) in one take, ${dur.toFixed(2)}s → ${join(out, "take.wav")}`);
+  console.log(`next: voice_timings.mjs --lines ${linesPath} --in ${join(out, "take.wav")} --out <dir>`);
+  return;
+}
 
 let format = null, t = 0;
 const pcms = [], rows = [];
@@ -125,7 +174,7 @@ for (const [i, line] of N.lines.entries()) {
                            generation_config: { speech_config: [{ voice }] } }),
   });
   const audio = findAudio(res);
-  if (!audio) throw new Error(`${line.id}: no audio in the response`);
+  if (!audio) throw new Error(`${line.id}: no audio in the response — its shape: ${shape(res)}`);
   const w = parseWav(Buffer.from(audio.data, "base64"));
   if (format && (w.rate !== format.rate || w.channels !== format.channels || w.bits !== format.bits))
     throw new Error(`${line.id}: audio format changed between lines`);
@@ -148,3 +197,4 @@ writeFileSync(join(out, "timings.json"), JSON.stringify({
   source: "gemini", model, voice, style, gap, sample_rate: format.rate,
   total: +t.toFixed(3), lines: rows }, null, 2) + "\n");
 console.log(`\n${rows.length} line(s), ${t.toFixed(2)}s → ${join(out, "narration.wav")} + timings.json`);
+}
