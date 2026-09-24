@@ -65,6 +65,7 @@ A rule without its scar gets rationalized away.
 | `references/verification.md` | Before Phase Verify; when a check fails |
 | `references/production-rules.md` | Before writing the script; before building |
 | `references/narrative.md` | While writing copy |
+| `references/short-form.md` | **Before any script.** Hook, value, CTA — the shape every short video has |
 | `references/unattended.md` | **Before any batch the user will not watch** |
 | `references/whiteboard.md` | Hand-drawn / draw-on technique, inside any route |
 
@@ -136,10 +137,17 @@ cp <SKILL_DIR>/assets/script.template.json script.json    # then fill it
 node <SKILL_DIR>/scripts/script_check.mjs script.json --ledger
 ```
 
-It fails on: a claim that only restates the mechanism · more than one claim · the category or the
-audience never named · no stakes in the first third · a script that never shows its subject · a fact
-needed before it was established · jargon used before it is explained · a beat that says more than
-it has time to say · no sentence a viewer could repeat.
+It fails on: **no hook, or a hook landing after 3 seconds** · fewer than two stacked hook channels ·
+**a body with no value form**, or value under 55% of the running time · **no CTA**, a CTA that is not
+literal, or one that contradicts the content type · a claim that only restates the mechanism · more
+than one claim · the category or the audience never named · no stakes in the first third · a script
+that never shows its subject · a fact needed before it was established · jargon used before it is
+explained · a line over 15 words · a beat that says more than it has time to say · no sentence a
+viewer could repeat.
+
+> **HOOK (0–3s) → VALUE (~70%) → CTA (last 3–5s).** Four demo scripts were rejected in a row and not
+> one of them had any of the three. `references/short-form.md` has the nine hook types, the value
+> forms, the CTA kinds, and the YOU / ME split that decides which CTA belongs.
 
 > **The five fields above `beats` are questions for the user, not fields to fill in.** `audience`,
 > `category_noun`, `alternative`, `claim` and `repeat_sentence` are the ones the script template has
