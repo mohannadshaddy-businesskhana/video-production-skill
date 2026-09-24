@@ -28,3 +28,9 @@ _assets/sfx/
 # Voice takes — a recorded voice is a person's, and TTS output is regenerated;
 # neither is stored in a public repository
 _assets/voice/
+
+# The whiteboard's voice comparison: one folder per voice, emitted by
+# _src/whiteboard/emit.mjs from that voice's own timings — regenerated, and
+# the chosen voice is emitted into 05-explainer/ itself with --main
+05-explainer/*/
+reports/05-explainer-*.json

@@ -22,13 +22,27 @@ whether a voice or the music leads, and how the edit breathes
 | `06-motion-graphics` | motion graphics | **one shape for the whole film** — a circle, a day, a block, a chart, three steps, the circle again, a button. Nothing cuts, nothing fades | ✅ v2 |
 | `07-music-video` | music video | **the whole frame cuts on every beat** — 33 hard cuts from the track's own beat map; the claim lands on the drop | ✅ v2 |
 | `08-product-tour` | product tour | **a cursor drives the interface for the whole film** — scroll, push in, type, click, pull back | ✅ v3 |
-| `05-explainer` | whiteboard | a hand drawing on a board, **paced by a narrator** | ⏳ needs a voice |
+| `05-explainer` | whiteboard | **a hand drawing on a board while a narrator explains.** Each drawing starts on the line that names it, timed from the voice's own measured takes | 🔄 built in three voices, one to be chosen |
 | `09-talking-head` | talking head | a person on camera, cut on sentences | ⏳ needs a voice and a face |
 | `10-captions` | captions-led | speech, with its words lighting as they are spoken | ⏳ needs a voice |
 
 A type that is led by a voice is not faked here. The local speech engine has no
-Arabic, so those three wait for a voice that speaks it — a TTS account or the
-client's own recording — rather than shipping captions of nothing.
+Arabic, so a voice-led type waits for a voice that speaks it rather than
+shipping captions of nothing.
+
+05 now has one: Gemini TTS on the free tier, or a recorded voice
+(`05-explainer/recording-sheet.md`). Voices are not stored in the repository, so
+make one first:
+
+```bash
+node ../skills/video-production/scripts/tts_gemini.mjs --lines 05-explainer/narration.json --out _assets/voice/gemini-podcaster-1 --voice ar-eg-podcaster-1 --model gemini-3.8-flash-lite-tts --whole
+node ../skills/video-production/scripts/voice_timings.mjs --lines 05-explainer/narration.json --in _assets/voice/gemini-podcaster-1/take.wav --out _assets/voice/gemini-podcaster-1/measured
+node _src/whiteboard/emit.mjs
+./build.sh 05-explainer/gemini-male
+```
+
+`emit.mjs` writes one composition per measured voice into `05-explainer/<voice>/`.
+09 and 10 still wait for a voice.
 
 ## The operations
 
