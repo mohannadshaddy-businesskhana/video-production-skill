@@ -1,12 +1,32 @@
 <!doctype html>
-<!-- Demo 04 — section series.  A template you can SEE: a fixed rail, a grid of
-     episodes, and one frame whose contents swap while nothing else moves.
-     HOOK 0–3 · VALUE 3–14 · CTA 14–18 -->
+<!--
+  Demo 04 — series.  v2.
+
+  v1 drew a template — a rail, a grid, a frame whose contents swapped: a
+  picture of the idea. v2 plays three real episodes of one series, "نوع
+  النهارده", side by side. Each was generated from ONE template and one row of
+  data (demos/_src/series), and each passed the gate as a six-second bumper and
+  the full verifier on its own. Because they share the template's clock, at
+  every moment all three stand at the same point of it — badge and type, then
+  the line, then tomorrow's teaser — with different content. The template is
+  what the eye sees without being told.
+
+  Each episode's sample is a real excerpt of that type's own demo.
+  Needs the three episode renders in media/ — see demos/README.md.
+
+  Cold-read ledger (script.json):
+    ch1 0-65      establishes  three episodes, one template
+    ch2 65-196    needs ch1 · establishes a tool builds the series from a template; one-offs break a series
+    ch3 196-262   needs ch2 · establishes the look is fixed
+    ch4 262-393   needs ch3 · establishes only the content changes
+    claim 393-458 needs ch4 · establishes a new episode is quick
+    cta 458-540   needs claim
+-->
 <html lang="ar">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1080, height=1920" />
-    <title>ثمنتاشر فيديو شكل واحد</title>
+    <title>نفس القالب، تلات حلقات</title>
     <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
@@ -19,123 +39,68 @@
       @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
         font-weight:700; font-style:normal; font-display:block; }
       :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
-              --fail:#B23A2A; --white:#FFFFFF; --pass-lt:#5E8F78; }
+              --fail:#B23A2A; --white:#FFFFFF; }
       * { margin:0; padding:0; box-sizing:border-box; }
       html, body { width:1080px; height:1920px; overflow:hidden; background:#14181F; }
       #root { position:relative; width:100%; height:100%; overflow:hidden;
               font-family:"Cairo",sans-serif; color:var(--bone); background:var(--ink); }
-      .scene { position:absolute; inset:0; overflow:hidden; background:var(--ink); }
-      .pane  { position:absolute; inset:0; direction:rtl; }
-      .line  { position:absolute; right:88px; width:904px; font-weight:600;
-               line-height:1.36; letter-spacing:-.01em; }
-      .xl { font-size:96px; } .lg { font-size:66px; } .md { font-size:50px; }
-      .amber { color:var(--amber); }
+      .scene { position:absolute; inset:0; }
 
-      /* the rail — the one element that never moves across the whole series */
-      .rail { position:absolute; right:88px; top:250px; width:904px; height:74px;
-              border-bottom:4px solid rgba(245,242,234,.28);
-              display:flex; flex-direction:row-reverse; align-items:center; gap:20px; }
-      .rail .dot { width:22px; height:22px; border-radius:50%; background:var(--amber); }
-      .rail .ttl { font-family:"Mono",monospace; font-size:28px; letter-spacing:.14em;
-                   color:rgba(245,242,234,.7); font-weight:700; }
-      .rail .ep  { margin-right:auto; font-family:"Mono",monospace; font-size:28px;
-                   color:var(--amber); font-weight:700; }
+      /* episode one on the right, where Arabic starts */
+      .tile { position:absolute; top:540px; width:340px; height:604px; border-radius:16px;
+              object-fit:cover; background:var(--ink); }
+      .t1 { left:725px; } .t2 { left:370px; } .t3 { left:15px; }
+      .ring { position:absolute; top:532px; width:356px; height:620px; border-radius:22px;
+              border:6px solid rgba(245,242,234,.22); }
+      #r1 { left:717px; } #r2 { left:362px; } #r3 { left:7px; }
 
-      /* 18 cells filling in */
-      .grid { position:absolute; right:88px; top:900px; width:904px;
-              display:grid; grid-template-columns:repeat(6,1fr); gap:18px; }
-      .cell { aspect-ratio:9/16; border:4px solid rgba(245,242,234,.35); border-radius:6px;
-              background:rgba(245,242,234,.05); position:relative; }
-      .cell::after { content:""; position:absolute; left:18%; right:18%; top:26%;
-                     height:8px; background:var(--amber); border-radius:4px; }
-      .cell::before { content:""; position:absolute; left:18%; right:44%; top:44%;
-                      height:8px; background:rgba(245,242,234,.4); border-radius:4px; }
+      .lab { position:absolute; top:1180px; width:340px; text-align:center; direction:rtl;
+             font-size:40px; font-weight:800; line-height:1.3; color:rgba(245,242,234,.72); }
+      .lab b { color:var(--amber); }
+      #l1 { left:725px; } #l2 { left:370px; } #l3 { left:15px; }
 
-      /* three episodes, identical chrome */
-      .eps { position:absolute; right:88px; top:640px; width:904px; display:flex;
-             flex-direction:row-reverse; gap:24px; }
-      .ep  { flex:1; height:470px; border:4px solid rgba(245,242,234,.3); border-radius:8px;
-             background:rgba(245,242,234,.04); padding:20px; position:relative; }
-      .ep .hd { height:44px; border-bottom:3px solid rgba(245,242,234,.3); display:flex;
-                flex-direction:row-reverse; align-items:center; gap:12px; }
-      .ep .hd i { width:14px; height:14px; border-radius:50%; background:var(--amber); display:block; }
-      .ep .hd b { font-family:"Mono",monospace; font-size:18px; color:rgba(245,242,234,.65); }
-      .ep .bd { margin-top:26px; }
-      .ep .bd u { display:block; height:14px; border-radius:7px; margin-bottom:16px;
-                  background:rgba(245,242,234,.22); text-decoration:none; }
-      .ep .bd u.a { width:88%; } .ep .bd u.b { width:64%; } .ep .bd u.c { width:76%; }
-      .ep .no { position:absolute; left:20px; bottom:16px; font-family:"Mono",monospace;
-                font-size:22px; color:var(--amber); font-weight:700; }
-
-      /* one frame, contents swapping */
-      .slot { position:absolute; right:88px; top:760px; width:904px; height:560px;
-              border:5px solid var(--bone); border-radius:10px; overflow:hidden;
-              background:rgba(245,242,234,.05); }
-      .slot .hd { height:70px; border-bottom:4px solid rgba(245,242,234,.3);
-                  display:flex; flex-direction:row-reverse; align-items:center;
-                  gap:16px; padding:0 26px; }
-      .slot .hd i { width:20px; height:20px; border-radius:50%; background:var(--amber); }
-      .slot .hd b { font-family:"Mono",monospace; font-size:24px; color:rgba(245,242,234,.7); }
-      .swap { position:absolute; left:0; right:0; top:70px; bottom:0; padding:44px 34px; }
-      .swap u { display:block; height:24px; border-radius:12px; margin-bottom:26px;
-                background:var(--amber); text-decoration:none; }
-      .swap u.q { background:rgba(245,242,234,.3); }
-
-      .name { position:absolute; right:88px; top:1500px; width:904px;
-              font-family:"Mono",monospace; font-size:40px; letter-spacing:.06em;
-              color:var(--amber); direction:ltr; text-align:right; font-weight:700; }
+      .cap { position:absolute; right:88px; top:250px; width:904px; height:160px;
+             display:flex; flex-direction:column; justify-content:center; visibility:hidden; }
+      .cap .t { direction:rtl; text-align:right; font-size:58px; font-weight:800; line-height:1.3;
+                letter-spacing:-.01em; text-wrap:balance; }
+      .cap .x { color:var(--amber); }
+      .cap .tag { margin-top:10px; font-family:"Mono",monospace; font-size:30px; font-weight:700;
+                  letter-spacing:.1em; color:var(--amber); direction:ltr; text-align:right; }
     </style>
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="18"
          data-fps="30" data-width="1080" data-height="1920">
+      <!-- three runs of each six-second episode, all three in step -->
+      <video id="v1a" class="clip tile t1" src="media/ep1.mp4" muted playsinline data-start="0"  data-duration="6" data-track-index="1"></video>
+      <video id="v1b" class="clip tile t1" src="media/ep1.mp4" muted playsinline data-start="6"  data-duration="6" data-track-index="2"></video>
+      <video id="v1c" class="clip tile t1" src="media/ep1.mp4" muted playsinline data-start="12" data-duration="6" data-track-index="3"></video>
+      <video id="v2a" class="clip tile t2" src="media/ep2.mp4" muted playsinline data-start="0"  data-duration="6" data-track-index="4"></video>
+      <video id="v2b" class="clip tile t2" src="media/ep2.mp4" muted playsinline data-start="6"  data-duration="6" data-track-index="5"></video>
+      <video id="v2c" class="clip tile t2" src="media/ep2.mp4" muted playsinline data-start="12" data-duration="6" data-track-index="6"></video>
+      <video id="v3a" class="clip tile t3" src="media/ep3.mp4" muted playsinline data-start="0"  data-duration="6" data-track-index="7"></video>
+      <video id="v3b" class="clip tile t3" src="media/ep3.mp4" muted playsinline data-start="6"  data-duration="6" data-track-index="8"></video>
+      <video id="v3c" class="clip tile t3" src="media/ep3.mp4" muted playsinline data-start="12" data-duration="6" data-track-index="9"></video>
 
-      <section id="ch1" class="scene clip" data-start="0" data-duration="3" data-track-index="0">
-        <div class="pane">
-          <div class="line xl" id="h1" style="top:400px">ثمنتاشر فيديو.<br><span class="amber">شكل واحد.</span></div>
-          <div class="grid" id="h2"></div>
-        </div>
+      <section id="board" class="scene clip" data-start="0" data-duration="18" data-track-index="0">
+        <div class="ring" id="r1"></div><div class="ring" id="r2"></div><div class="ring" id="r3"></div>
+        <div class="lab" id="l1">الحلقة <b>١</b></div>
+        <div class="lab" id="l2">الحلقة <b>٢</b></div>
+        <div class="lab" id="l3">الحلقة <b>٣</b></div>
+
+        <div class="cap" id="k1"><div class="t">نفس القالب، <span class="x">تلات حلقات.</span></div></div>
+        <div class="cap" id="k2"><div class="t">أداة بتعمل الفيديو، وبتطلّع الحلقات كلها <span class="x">من قالب واحد.</span></div></div>
+        <div class="cap" id="k3"><div class="t"><span class="x">الشكل والتوقيت</span> ثابتين،</div></div>
+        <div class="cap" id="k4"><div class="t">و<span class="x">المحتوى بس</span> اللي بيتغيّر،</div></div>
+        <div class="cap" id="k5"><div class="t">فالحلقة الجديدة <span class="x">بتاخد دقايق.</span></div></div>
+        <div class="cap" id="k6"><div class="t">تابع — <span class="x">نوع جديد بكرة.</span></div>
+          <div class="tag">video-production</div></div>
       </section>
 
-      <section id="ch2" class="scene clip" data-start="3" data-duration="6" data-track-index="1">
-        <div class="pane">
-          <div class="rail" id="a0"><span class="dot"></span><span class="ttl">SERIES</span><span class="ep">03 / 18</span></div>
-          <div class="line lg" id="a1" style="top:380px">لما كل فيديو يتعمل لوحده،<br>السلسلة بتبان مفكّكة.</div>
-          <div class="eps" id="a2">
-            <div class="ep"><div class="hd"><i></i><b>SERIES</b></div>
-              <div class="bd"><u class="a"></u><u class="b"></u><u class="c"></u></div><div class="no">01</div></div>
-            <div class="ep"><div class="hd"><i></i><b>SERIES</b></div>
-              <div class="bd"><u class="b"></u><u class="a"></u><u class="c"></u></div><div class="no">02</div></div>
-            <div class="ep"><div class="hd"><i></i><b>SERIES</b></div>
-              <div class="bd"><u class="c"></u><u class="b"></u><u class="a"></u></div><div class="no">03</div></div>
-          </div>
-          <div class="line md" id="a3" style="top:1300px">القالب بيثبّت الشكل والإيقاع.</div>
-        </div>
-      </section>
-
-      <section id="ch3" class="scene clip" data-start="9" data-duration="5" data-track-index="2">
-        <div class="pane">
-          <div class="rail" id="b0"><span class="dot"></span><span class="ttl">SERIES</span><span class="ep">04 / 18</span></div>
-          <div class="line lg" id="b1" style="top:400px">المحتوى بيتغيّر.<br>الزمن والشكل لأ.</div>
-          <div class="slot" id="b2">
-            <div class="hd"><i></i><b>SERIES</b></div>
-            <div class="swap" id="b3"><u style="width:86%"></u><u class="q" style="width:58%"></u><u style="width:72%"></u></div>
-          </div>
-          <div class="line md" id="b4" style="top:1400px">فالحلقة الجديدة بتاخد دقايق.</div>
-        </div>
-      </section>
-
-      <section id="ch4" class="scene clip" data-start="14" data-duration="4" data-track-index="3">
-        <div class="pane">
-          <div class="rail" id="c0"><span class="dot"></span><span class="ttl">SERIES</span><span class="ep">05 / 18</span></div>
-          <div class="line xl" id="c1" style="top:520px">تابع —<br>الحلقة الجاية <span class="amber">بكرة</span>.</div>
-          <div class="grid" id="c2" style="top:1000px"></div>
-          <div class="name" id="c3">video-production</div>
-        </div>
-      </section>
-
-      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="18"
-             data-track-index="10" data-volume="1"></audio>
+      <!-- the series sounds the same in every episode, so one episode's mix serves all three -->
+      <audio id="mixa" src="media/ep1.mp4" data-start="0"  data-duration="6" data-track-index="10" data-volume="1"></audio>
+      <audio id="mixb" src="media/ep1.mp4" data-start="6"  data-duration="6" data-track-index="11" data-volume="1"></audio>
+      <audio id="mixc" src="media/ep1.mp4" data-start="12" data-duration="6" data-track-index="12" data-volume="1"></audio>
     </div>
 
     <script>
@@ -144,86 +109,39 @@ window.__MF = [];
 window.__MOTION = [];
 const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
 const F = (f) => f / 30;
+const END = 540;
+
+const CH = [["k1", 0, 65], ["k2", 65, 196], ["k3", 196, 262], ["k4", 262, 393],
+            ["k5", 393, 458], ["k6", 458, 540]];
+const TEXT = ["نفس القالب، تلات حلقات.", "أداة بتعمل الفيديو، وبتطلّع الحلقات كلها من قالب واحد.",
+              "الشكل والتوقيت ثابتين،", "والمحتوى بس اللي بيتغيّر،", "فالحلقة الجديدة بتاخد دقايق.",
+              "تابع — نوع جديد بكرة. video-production"];
+/* the frames light together — the point is that the three are the same */
+const DIM = "rgba(245,242,234,.22)", LIT = "#F5F2EA", ON = "#C77B0E";
+const LIGHT = [LIT, LIT, ON, ON, LIT, LIT];
 
 function build() {
-  for (const gid of ["h2", "c2"]) {
-    const g = document.getElementById(gid);
-    for (let i = 0; i < 18; i++) {
-      const d = document.createElement("div"); d.className = "cell"; g.appendChild(d);
-    }
-  }
-
-  // initial state OUTSIDE the timeline — tl.set(…,0) does not apply at frame 0
-  gsap.set(["#h1","#a0","#a1","#a2","#a3","#b0","#b1","#b2","#b4","#c0","#c1","#c2","#c3"],
-           { opacity: 0 });
-  gsap.set(["#h1","#a1","#b1","#c1"], { y: 24 });
-  gsap.set("#h2 .cell", { opacity: 0, scale: 0.7, transformOrigin: "center" });
-  gsap.set("#c2 .cell", { opacity: 0 });
-  gsap.set(".ep", { opacity: 0, y: 22 });
-  gsap.set("#b3 u", { scaleX: 0, transformOrigin: "right center" });
-
   const tl = gsap.timeline({ paused: true });
-  const rise = { opacity: 1, y: 0, ease: "power2.out" };
+  // a tl.set at 0 does not apply on frame 0; frame-0 state goes through gsap.set
+  const put = (at, sel, v) => (at === 0 ? gsap.set(sel, v) : tl.set(sel, v, F(at)));
 
-  /* ── HOOK · 0–90 — eighteen cells arriving is the claim ─────────── */
-  tl.to("#h2", { opacity: 1, duration: F(2) }, F(0));
-  tl.to("#h2 .cell", { opacity: 1, scale: 1, duration: F(5), stagger: F(1.6),
-                       ease: "back.out(1.5)" }, F(0));
-  tl.to("#h1", { ...rise, duration: F(14) }, F(4));
+  CH.forEach(([id, s, e], i) => {
+    put(s, "#" + id, { visibility: "visible" });
+    if (e < END) tl.set("#" + id, { visibility: "hidden" }, F(e));
+    ["#r1", "#r2", "#r3"].forEach((r) => put(s, r, { borderColor: LIGHT[i] }));
+  });
 
-  /* ── VALUE · 90–270 — three episodes wearing the same chrome ────── */
-  tl.to("#a0", { opacity: 1, duration: F(10) }, F(94));
-  tl.to("#a1", { ...rise, duration: F(14) }, F(96));
-  tl.to("#a2", { opacity: 1, duration: F(2) }, F(140));
-  tl.to(".ep", { opacity: 1, y: 0, duration: F(11), stagger: F(10),
-                 ease: "power2.out" }, F(140));
-  tl.to("#a3", { opacity: 1, duration: F(14) }, F(190));
-
-  /* ── VALUE · 270–420 — one frame, contents swapping inside it ───── */
-  tl.to("#b0", { opacity: 1, duration: F(10) }, F(274));
-  tl.to("#b1", { ...rise, duration: F(14) }, F(276));
-  tl.to("#b2", { opacity: 1, duration: F(10) }, F(300));
-  tl.to("#b3 u", { scaleX: 1, duration: F(9), stagger: F(8), ease: "power2.out" }, F(312));
-  tl.to("#b4", { opacity: 1, duration: F(14) }, F(352));
-
-  /* ── CTA · 420–540 ──────────────────────────────────────────────── */
-  tl.to("#c0", { opacity: 1, duration: F(10) }, F(424));
-  tl.to("#c1", { ...rise, duration: F(16) }, F(426));
-  tl.to("#c2", { opacity: 1, duration: F(2) }, F(442));
-  tl.to("#c2 .cell", { opacity: 1, duration: F(4), stagger: F(1.2) }, F(442));
-  tl.to("#c3", { opacity: 1, duration: F(12) }, F(466));
-
-  /* ── music — one continuous track, gain automation only (#26 #27) ─ */
-  tl.fromTo("#bgm", { volume: 0 }, { volume: 0.40, duration: 0.9, ease: "none",
-            immediateRender: false }, 0);
-  tl.to("#bgm", { volume: 0.29, duration: F(8), ease: "none" }, F(270));
-  tl.to("#bgm", { volume: 0.40, duration: F(18), ease: "none" }, F(310));
-  tl.to("#bgm", { volume: 0, duration: 1.3, ease: "none" }, F(501));
-
-  const t = (id, ch, fr, still, text, crit) =>
-    mf(id, { type: "text", chapter: ch, frames: fr, still_from: still, text: text,
-             critical: crit !== false, el: "#" + id });
-  const sh = (id, ch, fr, still) =>
-    mf(id, { type: "shape", chapter: ch, frames: fr, still_from: still,
-             critical: false, el: "#" + id });
-
-  t("h1","ch1",[0,90],18,"ثمنتاشر فيديو. شكل واحد.");
-  sh("h2","ch1",[0,90],34);
-
-  t("a0","ch2",[90,270],104,"",false);
-  t("a1","ch2",[90,270],110,"لما كل فيديو يتعمل لوحده، السلسلة بتبان مفكّكة.");
-  sh("a2","ch2",[90,270],171);
-  t("a3","ch2",[90,270],204,"القالب بيثبّت الشكل والإيقاع.");
-
-  t("b0","ch3",[270,420],284,"",false);
-  t("b1","ch3",[270,420],290,"المحتوى بيتغيّر. الزمن والشكل لأ.");
-  sh("b2","ch3",[270,420],337);
-  t("b4","ch3",[270,420],366,"فالحلقة الجديدة بتاخد دقايق.");
-
-  t("c0","ch4",[420,540],434,"",false);
-  t("c1","ch4",[420,540],442,"تابع — الحلقة الجاية بكرة.");
-  sh("c2","ch4",[420,540],466);
-  t("c3","ch4",[420,540],478,"",false);
+  CH.forEach(([id, s, e], i) =>
+    mf(id, { type: "text", chapter: "board", frames: [s, e], still_from: s + 2,
+             text: TEXT[i], critical: true, el: "#" + id }));
+  [1, 2, 3].forEach((n) => {
+    mf("l" + n, { type: "text", chapter: "board", frames: [0, END], still_from: 0,
+                  text: "الحلقة " + "٠١٢٣"[n], critical: true, el: "#l" + n });
+    mf("v" + n, { type: "video", chapter: "board", frames: [0, END], still_from: 0,
+                  critical: false, el: `#v${n}a` });
+    mf("r" + n, { type: "shape", chapter: "board", frames: [0, END], still_from: 0,
+                  critical: false, el: "#r" + n });
+  });
 
   window.__timelines = window.__timelines || {};
   window.__timelines["main"] = tl;
