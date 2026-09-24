@@ -38,7 +38,7 @@ inventing a style for each:
 
 | | Operation | The honest demonstration | Status |
 |---|---|---|---|
-| `11-versions` | aspect versions | the same film in 9:16, 1:1 and 16:9, each designed for its ratio | ⏳ |
+| `11-versions` | aspect versions | **06 in 9:16, 1:1 and 16:9, side by side and in sync** — one timeline and a geometry table per ratio, each version verified at its own size and safe band | ✅ |
 | `13-cutdowns` | cutdowns | the same film at full length, 15s and 6s, each with its own hook and close | ⏳ |
 | `12-localized` | localization | the same film in Arabic and English, with the re-layout the translation forced | ⏳ |
 | `04-section-series` | series | three episodes of one template, back to back | ⏳ |
@@ -56,6 +56,19 @@ supplied it.
 That is the whole loop — gate the script, measure, check the composition,
 render, normalise, verify — stopping at the first failure. A render nobody
 gated is a render nobody trusts.
+
+An **operation** demo plays other demos' renders, listed in its `media.json`.
+Build those first; `build.sh` copies them into `media/` and stops if one is
+missing:
+
+```bash
+./build.sh 06-motion-graphics && ./build.sh 11-versions/square && ./build.sh 11-versions/wide
+./build.sh 11-versions
+```
+
+The motion-graphics film and its versions are **generated**: edit
+`_src/motion-graphics/` (one timeline, one geometry table per ratio) and run
+`node _src/motion-graphics/emit.mjs` — never the emitted `index.html` files.
 
 ## Before you render
 
