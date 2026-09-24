@@ -524,6 +524,27 @@ clean frame reads 0.0%, and a missing file still fails loudly, under both. A fix
 into a pass has to show it still fails what it should — otherwise it is a threshold raised by
 another name.
 
+### 47 · A check that heard every pause as a stopped track
+
+**What happened:** the first narrated demo was a whiteboard over a soft music bed. It failed beat
+continuity with a "level dropout 0.37s". There was no dropout: the bed ran from the first frame to
+the last.
+**The cause, measured:** a dropout meant falling under a quarter of the mix's median level. Under a
+narration, the median is the voice (−21 dBFS here). Between two spoken lines the bed plays alone,
+about 15 dB lower, so every pause fell under the floor. In a music-only mix the median is the music,
+which is why the check had never met this case.
+**Rule:** **the floor is a quarter of the track's quiet level, its 25th percentile, not a quarter of
+its median.** In every music-only render the two are about 2 dB apart, and a stopped track falls far
+below either.
+**What made the fix trustworthy:** controls under the old code and the new.
+- The clean narrated film fails under the old code and passes under the new.
+- The same film with its bed cut, or ducked 20 dB, for 0.35s inside a pause fails under both.
+- Two music films with the track stopped or ducked for 0.32s fail under both.
+- All 21 existing renders still pass.
+
+The other fix was raising the bed about 6 dB to clear the old floor. That would have put the music
+about 9 dB under the voice instead of 15, which is mixing for the instrument again (#46).
+
 ---
 
 ## Recurring patterns — read these if you have no time for the whole log

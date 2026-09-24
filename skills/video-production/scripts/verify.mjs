@@ -56,6 +56,11 @@ const median = (a) => {
   return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2;
 };
 
+const quantile = (a, q) => {
+  const s = [...a].sort((x, y) => x - y);
+  return s[Math.min(s.length - 1, Math.floor(s.length * q))];
+};
+
 const pstdev = (a) => {
   const m = a.reduce((s, v) => s + v, 0) / a.length;
   return Math.sqrt(a.reduce((s, v) => s + (v - m) ** 2, 0) / a.length);
@@ -229,9 +234,14 @@ function checkBeatContinuity(video, rep) {
   // a transport stop = one big jump against an otherwise stable grid
   const isolatedJump = worst > 0.25 && baseline < 0.12;
 
-  // cross-check: a level dropout in the middle of the track
+  // cross-check: a level dropout in the middle of the track. The floor is a
+  // quarter of the track's QUIET level, its 25th percentile, not of its median
+  // (#47): under a narration the median is the voice, and every pause between
+  // two lines, where the bed plays alone, fell under a quarter of it. In a
+  // music-only mix the two are about 2 dB apart; a stopped track falls far
+  // below either.
   const mid = env.slice(Math.trunc(env.length * 0.05), Math.trunc(env.length * 0.95));
-  const thresh = median(mid) * 0.25;
+  const thresh = quantile(mid, 0.25) * 0.25;
   let longest = 0, cur = 0;
   for (const v of mid) { cur = v < thresh ? cur + 1 : 0; if (cur > longest) longest = cur; }
   const dropoutS = longest / fpsEnv;
