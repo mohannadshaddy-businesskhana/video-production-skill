@@ -210,7 +210,7 @@ rep.add("body carries value", valueBeats.length > 0 && !badForm.length && share 
     : `${valueBeats.map((b) => b.value_form).join(" + ")} · ${(share * 100).toFixed(0)}% of the video`);
 
 // the CTA — literal, late, and matching what the video was for
-const CTA_KINDS = { follow: "YOU|ME", engagement: "ME", lead: "YOU", sales: "YOU" };
+const CTA_KINDS = { follow: "teach|story", engagement: "story", lead: "teach", sales: "teach" };
 const c = S.cta || {};
 const ctaBeat = beats.find((b) => b.is_cta);
 const ctaProblems = [];
@@ -220,7 +220,7 @@ else {
   if (!ctaBeat) ctaProblems.push("no beat is marked `is_cta`");
   else if (sec(total - ctaBeat.frames[0]) > CTA_WINDOW_S + 0.01)
     ctaProblems.push(`the CTA starts ${sec(total - ctaBeat.frames[0]).toFixed(1)}s before the end (limit ${CTA_WINDOW_S}s)`);
-  // YOU content sells and captures; ME content asks for follows and replies
+  // teaching content sells and captures; story content asks for follows and replies
   const allowed = (CTA_KINDS[c.kind] || "").split("|");
   if (S.content_type && !allowed.includes(S.content_type))
     ctaProblems.push(`a "${c.kind}" CTA does not belong on ${S.content_type} content — see short-form.md §5`);
@@ -228,11 +228,11 @@ else {
 rep.add("cta", ctaProblems.length === 0,
   ctaProblems.length === 0 ? `${c.kind} — "${c.words}"` : ctaProblems.slice(0, 2).join(" · "));
 
-rep.add("content type", ["YOU", "ME"].includes(S.content_type),
-  ["YOU", "ME"].includes(S.content_type)
-    ? (S.content_type === "YOU" ? "YOU — educational, builds authority and leads"
-                                : "ME — personal, builds connection")
-    : "`content_type` must be \"YOU\" (educational) or \"ME\" (personal)");
+rep.add("content type", ["teach", "story"].includes(S.content_type),
+  ["teach", "story"].includes(S.content_type)
+    ? (S.content_type === "teach" ? "teach — educational, builds authority and demand"
+                                  : "story — personal, builds connection")
+    : "`content_type` must be \"teach\" (educational) or \"story\" (personal)");
 
 // 10–15 words a sentence. Longer lines are not read, they are skimmed.
 const longLines = [];
