@@ -435,7 +435,8 @@ function checkCoverage(manifest, rep, floor) {
     const x0 = Math.min(...live.map((b) => b[0])), y0 = Math.min(...live.map((b) => b[1]));
     const x1 = Math.max(...live.map((b) => b[2])), y1 = Math.max(...live.map((b) => b[3]));
     const cov = area([x0, y0, x1, y1]) / frameArea;
-    if (cov < worst) { worst = cov; worstCh = ch.id; }
+    // <= so a film that fills every chapter still names one, instead of "null"
+    if (cov <= worst) { worst = cov; worstCh = ch.id; }
   }
   const ok = worst >= floor;
   rep.add("content coverage", ok,
