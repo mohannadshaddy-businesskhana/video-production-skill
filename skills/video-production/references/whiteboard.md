@@ -48,6 +48,27 @@ screensaver.
 Two failure modes: a hand that lags the ink (looks like tracing someone else's drawing), and a hand
 that never lifts between strokes (reads as one impossible continuous line). Hide it during gaps.
 
+## Traps in the drawing itself
+
+None of these fails a gate. The drawing is just wrong.
+
+- **A closed circle from one arc.** An `A` command whose end sits just *beside* its start solves to
+  a different circle: one whose top or bottom is the start point, a radius away from where it was
+  meant. End it along the tangent instead: from the rightmost point, 0.1px *above* it. Every circle
+  in the first draft of the demo was off by its own radius.
+- **A path with several subpaths.** The pen jumps between them in a single frame. Use one stroke per
+  path; the pen lifts and travels between strokes.
+- **A tick is not a cross.** A V with one diagonal through it reads as a ticked box, which means
+  "done", the opposite of "crossed out". Cross out with an X.
+- **Written words.** Reveal each word with a clip on the text's own box, not on its container.
+  Run the clip past that box on every side, or a glyph's overhang stays cut after it is written.
+- **The hand is motion.** After written words, it holds still through the reading hold below. It
+  leaves only after, or it is the competing motion that #29 fails.
+
+A working example is `demos/_src/whiteboard/` in this skill's repository. It has three parts: the
+drawing table, a layout driven by the voice's measured lines, and the pen tip read from each path's
+`getPointAtLength` at the ink's leading edge.
+
 ## Timing that reads as handwriting
 
 | Element | Rate |

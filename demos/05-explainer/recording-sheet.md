@@ -28,7 +28,13 @@
 ## فين تحطهم
 
 ```
-D:\Projects\video-production-skill\demos\_assets\voice\mohannad\
+demos/_assets/voice/recorded/takes/
 ```
 
-الفولدر ده **مش بيترفع على GitHub** — صوتك ملكك، ومش هيبقى في الريبو العام.
+بعدها الأمر ده بيقيس كل جملة، ويظبط الجمل كلها على مستوى صوت واحد:
+
+```bash
+node skills/video-production/scripts/voice_timings.mjs --lines demos/05-explainer/narration.json --in demos/_assets/voice/recorded/takes --out demos/_assets/voice/recorded/measured
+```
+
+الفولدر ده **مش بيترفع على GitHub**. صوتك ملكك، ومش هيبقى في الريبو العام.
