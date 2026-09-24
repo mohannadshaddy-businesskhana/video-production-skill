@@ -1,12 +1,33 @@
 <!doctype html>
-<!-- Demo 12 — localization.  Twin columns, one per language, and a measured
-     growth bar between them. The split screen is this form's signature.
-     HOOK 0–3 · VALUE 3–14 · CTA 14–18 -->
+<!--
+  Demo 12 — localization.  v2.
+
+  v1 drew twin language columns and a growth bar — a diagram of the problem.
+  v2 plays the answer: the motion-graphics film in Arabic and in English, side
+  by side and in sync. The English was built from the SAME timeline as the
+  Arabic (demos/_src/motion-graphics) with its strings swapped and its frame
+  mirrored: the words start from the left, and the steps climb left to right.
+
+  Its strings were measured against the Arabic with scripts/localize.mjs
+  (length-check.txt): up to 38% longer, so the English is set smaller and its
+  longest line takes three lines. Then the full verifier ran on it again, with
+  the language check reversed — no Arabic word may reach the English cut.
+
+  Needs both renders in media/ — see demos/README.md.
+
+  Cold-read ledger (script.json):
+    ch1 0-65      establishes  one video in two languages
+    ch2 65-196    needs ch1 · establishes a tool translates AND re-lays it; translation alone breaks the design
+    ch3 196-262   needs ch2 · establishes the direction flips
+    ch4 262-393   needs ch3 · establishes the shapes flip too   (the steps build on screen here)
+    claim 393-458 needs ch4 · establishes it is whole in both languages
+    cta 458-540   needs claim
+-->
 <html lang="ar">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1080, height=1920" />
-    <title>الترجمة بتكسر التصميم</title>
+    <title>نفس الفيديو بلغتين</title>
     <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
@@ -19,116 +40,59 @@
       @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
         font-weight:700; font-style:normal; font-display:block; }
       :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
-              --fail:#B23A2A; --white:#FFFFFF; --amber-tx:#AC6C11; }
+              --fail:#B23A2A; --white:#FFFFFF; }
       * { margin:0; padding:0; box-sizing:border-box; }
-      html, body { width:1080px; height:1920px; overflow:hidden; background:#F5F2EA; }
+      html, body { width:1080px; height:1920px; overflow:hidden; background:#14181F; }
       #root { position:relative; width:100%; height:100%; overflow:hidden;
-              font-family:"Cairo",sans-serif; color:var(--ink); background:var(--bone); }
-      .scene { position:absolute; inset:0; overflow:hidden; background:var(--bone); }
-      .pane  { position:absolute; inset:0; direction:rtl; }
-      .line  { position:absolute; right:88px; width:904px; font-weight:600;
-               line-height:1.34; letter-spacing:-.01em; }
-      .xl { font-size:84px; } .lg { font-size:58px; } .md { font-size:44px; }
-      .amber { color:var(--amber-tx); }
-      .red   { color:var(--fail); }
+              font-family:"Cairo",sans-serif; color:var(--bone); background:var(--ink); }
+      .scene { position:absolute; inset:0; }
 
-      /* a frame with a line that outgrows it */
-      .frm { position:absolute; border:6px solid var(--ink); border-radius:10px;
-             background:rgba(20,24,31,.04); overflow:hidden; }
-      .frm .txt { position:absolute; right:22px; top:50%; transform:translateY(-50%);
-                  white-space:nowrap; font-size:46px; font-weight:700; }
-      .frm.bad { border-color:var(--fail); }
-      .spill { position:absolute; font-size:46px; font-weight:700; color:var(--fail);
-               white-space:nowrap; }
+      /* the original on the right, where Arabic starts; the English on the left */
+      .tile { position:absolute; top:470px; width:470px; height:836px; border-radius:16px;
+              object-fit:cover; background:var(--bone); }
+      #v-ar { left:570px; } #v-en { left:40px; }
+      .ring { position:absolute; top:462px; width:486px; height:852px; border-radius:22px;
+              border:6px solid rgba(245,242,234,.22); }
+      #r-ar { left:562px; } #r-en { left:32px; }
 
-      /* the twin columns — the signature of this form */
-      .cols { position:absolute; right:88px; width:904px; display:flex;
-              flex-direction:row-reverse; gap:28px; }
-      .col { flex:1; }
-      .col .hd { font-family:"Mono",monospace; font-size:26px; letter-spacing:.14em;
-                 color:rgba(20,24,31,.6); font-weight:700; margin-bottom:14px;
-                 text-align:center; }
-      .col .card { border:5px solid var(--ink); border-radius:10px; padding:20px;
-                   background:rgba(20,24,31,.04); min-height:230px; }
-      .col .card u { display:block; height:18px; border-radius:9px; margin-bottom:14px;
-                     background:rgba(20,24,31,.28); text-decoration:none; }
-      .col .card.grow { border-color:var(--fail); background:rgba(178,58,42,.09); }
-      .col .card.grow u { background:rgba(178,58,42,.45); }
+      .lab { position:absolute; top:1334px; width:470px; font-size:34px; font-weight:700;
+             color:rgba(245,242,234,.72); direction:rtl; text-align:right; line-height:1.2; }
+      .lab b { color:var(--amber); font-weight:800; }
+      #l-ar { left:570px; } #l-en { left:40px; }
 
-      /* the growth meter */
-      .meter { position:absolute; right:88px; width:904px; height:74px;
-               border:5px solid var(--ink); border-radius:37px; overflow:hidden;
-               background:rgba(20,24,31,.06); }
-      .meter b { position:absolute; right:0; top:0; bottom:0; background:var(--fail);
-                 display:block; }
-      .meterlbl { position:absolute; right:88px; width:904px; font-family:"Mono",monospace;
-                  font-size:30px; letter-spacing:.1em; color:var(--fail);
-                  direction:ltr; text-align:right; font-weight:700; }
-
-      .name { position:absolute; right:88px; top:1520px; width:904px;
-              font-family:"Mono",monospace; font-size:40px; letter-spacing:.06em;
-              color:var(--amber-tx); direction:ltr; text-align:right; font-weight:700; }
+      .cap { position:absolute; right:88px; top:250px; width:904px; height:160px;
+             display:flex; flex-direction:column; justify-content:center; visibility:hidden; }
+      .cap .t { direction:rtl; text-align:right; font-size:58px; font-weight:800; line-height:1.3;
+                letter-spacing:-.01em; text-wrap:balance; }
+      .cap .x { color:var(--amber); }
+      .cap .tag { margin-top:10px; font-family:"Mono",monospace; font-size:30px; font-weight:700;
+                  letter-spacing:.1em; color:var(--amber); direction:ltr; text-align:right; }
     </style>
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="18"
          data-fps="30" data-width="1080" data-height="1920">
+      <video id="v-ar" class="clip tile" src="media/arabic.mp4" muted playsinline
+             data-start="0" data-duration="18" data-track-index="1"></video>
+      <video id="v-en" class="clip tile" src="media/english.mp4" muted playsinline
+             data-start="0" data-duration="18" data-track-index="2"></video>
 
-      <section id="ch1" class="scene clip" data-start="0" data-duration="3" data-track-index="0">
-        <div class="pane">
-          <div class="line xl" id="h1" style="top:320px">الترجمة<br>بتكسر <span class="red">التصميم</span>.</div>
-          <div class="frm" id="h2" style="right:88px; top:900px; width:904px; height:180px">
-            <div class="txt">جرّب مجاناً</div></div>
-          <div class="frm bad" id="h3" style="right:88px; top:1180px; width:904px; height:180px">
-            <div class="txt" style="right:22px">Start your free trial today</div></div>
-          <div class="spill" id="h4" style="left:20px; top:1245px">→</div>
-        </div>
+      <section id="board" class="scene clip" data-start="0" data-duration="18" data-track-index="0">
+        <div class="ring" id="r-ar"></div><div class="ring" id="r-en"></div>
+        <div class="lab" id="l-ar">عربي · الأصل</div>
+        <div class="lab" id="l-en">إنجليزي · <b>أطول لحد ٣٨٪</b></div>
+
+        <div class="cap" id="k1"><div class="t">نفس الفيديو، <span class="x">بلغتين.</span></div></div>
+        <div class="cap" id="k2"><div class="t">أداة بتعمل الفيديو، وبتترجمه <span class="x">وتعيد ترتيبه للغة التانية.</span></div></div>
+        <div class="cap" id="k3"><div class="t">الكلام بيبدأ <span class="x">من الشمال،</span></div></div>
+        <div class="cap" id="k4"><div class="t">والدرجات بتطلع <span class="x">من الشمال لليمين،</span></div></div>
+        <div class="cap" id="k5"><div class="t">وكل سطر <span class="x">اتقاس من جديد.</span></div></div>
+        <div class="cap" id="k6"><div class="t">تابع — <span class="x">نوع جديد بكرة.</span></div>
+          <div class="tag">video-production</div></div>
       </section>
 
-      <section id="ch2" class="scene clip" data-start="3" data-duration="6" data-track-index="1">
-        <div class="pane">
-          <div class="line lg" id="a1" style="top:280px">الجملة بتكبر ٣٠٪<br>وبتخرج بره الكادر.</div>
-          <div class="cols" id="a2" style="top:620px">
-            <div class="col"><div class="hd">AR</div>
-              <div class="card"><u style="width:86%"></u><u style="width:64%"></u><u style="width:74%"></u></div></div>
-            <div class="col"><div class="hd">EN</div>
-              <div class="card grow"><u style="width:98%"></u><u style="width:92%"></u><u style="width:96%"></u><u style="width:70%"></u></div></div>
-          </div>
-          <div class="meter" id="a3" style="top:1150px"><b id="a4" style="width:0%"></b></div>
-          <div class="meterlbl" id="a5" style="top:1260px">+31% LENGTH</div>
-          <div class="line md" id="a6" style="top:1360px">الأداة بتقيس الفرق قبل ما تبني.</div>
-        </div>
-      </section>
-
-      <section id="ch3" class="scene clip" data-start="9" data-duration="5" data-track-index="2">
-        <div class="pane">
-          <div class="line lg" id="b1" style="top:280px">اللي كبر كتير<br>بيتعلّم.</div>
-          <div class="cols" id="b2" style="top:620px">
-            <div class="col"><div class="hd">OK</div>
-              <div class="card" style="min-height:190px"><u style="width:80%"></u><u style="width:58%"></u></div></div>
-            <div class="col"><div class="hd">+38%</div>
-              <div class="card grow" style="min-height:190px"><u style="width:98%"></u><u style="width:96%"></u><u style="width:88%"></u></div></div>
-          </div>
-          <div class="frm" id="b3" style="right:88px; top:1100px; width:904px; height:160px">
-            <div class="txt">وبيتعاد تصميمه لوحده.</div></div>
-          <div class="meterlbl" id="b4" style="top:1360px; color:#2C6E52">RE-LAID OUT</div>
-        </div>
-      </section>
-
-      <section id="ch4" class="scene clip" data-start="14" data-duration="4" data-track-index="3">
-        <div class="pane">
-          <div class="line xl" id="c1" style="top:400px">علّق «<span class="amber">لغة</span>»<br>وأبعتلك القياس.</div>
-          <div class="cols" id="c2" style="top:940px">
-            <div class="col"><div class="hd">AR</div>
-              <div class="card" style="min-height:170px"><u style="width:84%"></u><u style="width:62%"></u></div></div>
-            <div class="col"><div class="hd">EN</div>
-              <div class="card" style="min-height:170px"><u style="width:88%"></u><u style="width:66%"></u></div></div>
-          </div>
-          <div class="name" id="c3">video-production</div>
-        </div>
-      </section>
-
-      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="18"
+      <!-- both cuts share one timeline, so they share one mix -->
+      <audio id="mix" src="media/arabic.mp4" data-start="0" data-duration="18"
              data-track-index="10" data-volume="1"></audio>
     </div>
 
@@ -138,78 +102,50 @@ window.__MF = [];
 window.__MOTION = [];
 const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
 const F = (f) => f / 30;
+const END = 540;
+
+const CH = [["k1", 0, 65], ["k2", 65, 196], ["k3", 196, 262], ["k4", 262, 393],
+            ["k5", 393, 458], ["k6", 458, 540]];
+const TEXT = ["نفس الفيديو، بلغتين.", "أداة بتعمل الفيديو، وبتترجمه وتعيد ترتيبه للغة التانية.",
+              "الكلام بيبدأ من الشمال،", "والدرجات بتطلع من الشمال لليمين،",
+              "وكل سطر اتقاس من جديد.", "تابع — نوع جديد بكرة. video-production"];
+/* the English lights while its changes are named; both at the claim */
+const DIM = "rgba(245,242,234,.22)", LIT = "#F5F2EA", ON = "#C77B0E";
+const LIGHT = [
+  { ar: LIT, en: LIT }, { ar: LIT, en: LIT }, { ar: DIM, en: ON },
+  { ar: DIM, en: ON },  { ar: ON, en: ON },   { ar: LIT, en: LIT },
+];
 
 function build() {
-  // initial state OUTSIDE the timeline — tl.set(…,0) does not apply at frame 0
-  gsap.set(["#h1","#h2","#h3","#h4","#a1","#a2","#a3","#a5","#a6",
-            "#b1","#b2","#b3","#b4","#c1","#c2","#c3"], { opacity: 0 });
-  gsap.set(["#h1","#a1","#b1","#c1"], { y: 24 });
-  gsap.set("#a4", { width: "0%" });
-  gsap.set(".col", { opacity: 0, y: 22 });
-
   const tl = gsap.timeline({ paused: true });
-  const rise = { opacity: 1, y: 0, ease: "power2.out" };
+  // a tl.set at 0 does not apply on frame 0; frame-0 state goes through gsap.set
+  const put = (at, sel, v) => (at === 0 ? gsap.set(sel, v) : tl.set(sel, v, F(at)));
 
-  /* ── HOOK · 0–90 — one line fits, its translation does not ──────── */
-  tl.to("#h2", { opacity: 1, duration: F(9) }, F(0));
-  tl.to("#h1", { ...rise, duration: F(14) }, F(3));
-  tl.to("#h3", { opacity: 1, duration: F(9) }, F(18));
-  tl.to("#h4", { opacity: 1, duration: F(6) }, F(28));
+  CH.forEach(([id, s, e], i) => {
+    put(s, "#" + id, { visibility: "visible" });
+    if (e < END) tl.set("#" + id, { visibility: "hidden" }, F(e));
+    ["ar", "en"].forEach((r) => put(s, "#r-" + r, { borderColor: LIGHT[i][r] }));
+  });
 
-  /* ── VALUE · 90–270 — the two columns and the measured growth ───── */
-  tl.to("#a1", { ...rise, duration: F(14) }, F(96));
-  tl.to("#a2", { opacity: 1, duration: F(2) }, F(128));
-  tl.to("#a2 .col", { opacity: 1, y: 0, duration: F(11), stagger: F(10),
-                      ease: "power2.out" }, F(128));
-  tl.to("#a3", { opacity: 1, duration: F(8) }, F(160));
-  tl.to("#a4", { width: "31%", duration: F(20), ease: "power2.out" }, F(166));
-  tl.to("#a5", { opacity: 1, duration: F(10) }, F(188));
-  tl.to("#a6", { opacity: 1, duration: F(14) }, F(200));
-
-  /* ── VALUE · 270–420 — the one that outgrew is flagged and redone ─ */
-  tl.to("#b1", { ...rise, duration: F(14) }, F(276));
-  tl.to("#b2", { opacity: 1, duration: F(2) }, F(300));
-  tl.to("#b2 .col", { opacity: 1, y: 0, duration: F(10), stagger: F(9),
-                      ease: "power2.out" }, F(300));
-  tl.to("#b3", { opacity: 1, duration: F(10) }, F(334));
-  tl.to("#b4", { opacity: 1, duration: F(10) }, F(352));
-
-  /* ── CTA · 420–540 ──────────────────────────────────────────────── */
-  tl.to("#c1", { ...rise, duration: F(16) }, F(426));
-  tl.to("#c2", { opacity: 1, duration: F(2) }, F(444));
-  tl.to("#c2 .col", { opacity: 1, y: 0, duration: F(10), stagger: F(7),
-                      ease: "power2.out" }, F(444));
-  tl.to("#c3", { opacity: 1, duration: F(12) }, F(464));
-
-  /* ── music — one continuous track, gain automation only (#26 #27) ─ */
-  tl.fromTo("#bgm", { volume: 0 }, { volume: 0.40, duration: 0.9, ease: "none",
+  /* the mix is the film's own, already normalised — a short fade at each end only */
+  tl.fromTo("#mix", { volume: 0 }, { volume: 1, duration: F(3), ease: "none",
             immediateRender: false }, 0);
-  tl.to("#bgm", { volume: 0.29, duration: F(8), ease: "none" }, F(270));
-  tl.to("#bgm", { volume: 0.40, duration: F(18), ease: "none" }, F(312));
-  tl.to("#bgm", { volume: 0, duration: 1.3, ease: "none" }, F(501));
+  tl.to("#mix", { volume: 0, duration: F(24), ease: "none" }, F(END - 24));
 
-  const t = (id, ch, fr, still, text, crit) =>
-    mf(id, { type: "text", chapter: ch, frames: fr, still_from: still, text: text,
-             critical: crit !== false, el: "#" + id });
-  const sh = (id, ch, fr, still) =>
-    mf(id, { type: "shape", chapter: ch, frames: fr, still_from: still,
-             critical: false, el: "#" + id });
-
-  t("h1","ch1",[0,90],17,"الترجمة بتكسر التصميم.");
-  sh("h2","ch1",[0,90],9); sh("h3","ch1",[0,90],27); sh("h4","ch1",[0,90],34);
-
-  t("a1","ch2",[90,270],110,"الجملة بتكبر ٣٠٪ وبتخرج بره الكادر.");
-  sh("a2","ch2",[90,270],149); sh("a3","ch2",[90,270],186);
-  t("a5","ch2",[90,270],198,"",false);
-  t("a6","ch2",[90,270],214,"الأداة بتقيس الفرق قبل ما تبني.");
-
-  t("b1","ch3",[270,420],290,"اللي كبر كتير بيتعلّم.");
-  sh("b2","ch3",[270,420],319); sh("b3","ch3",[270,420],344);
-  t("b4","ch3",[270,420],362,"",false);
-
-  t("c1","ch4",[420,540],442,"علّق «لغة» وأبعتلك القياس.");
-  sh("c2","ch4",[420,540],461);
-  t("c3","ch4",[420,540],476,"",false);
+  CH.forEach(([id, s, e], i) =>
+    mf(id, { type: "text", chapter: "board", frames: [s, e], still_from: s + 2,
+             text: TEXT[i], critical: true, el: "#" + id }));
+  [["l-ar", "عربي · الأصل"], ["l-en", "إنجليزي · أطول لحد ٣٨٪"]].forEach(([id, t]) =>
+    mf(id, { type: "text", chapter: "board", frames: [0, END], still_from: 0,
+             text: t, critical: true, el: "#" + id }));
+  // the English tile is a declared foreign-language region: its words are the
+  // English cut's, verified there with the language check reversed
+  ["ar", "en"].forEach((r) => {
+    mf("v-" + r, { type: "video", chapter: "board", frames: [0, END], still_from: 0,
+                   critical: false, el: "#v-" + r });
+    mf("r-" + r, { type: "shape", chapter: "board", frames: [0, END], still_from: 0,
+                   critical: false, el: "#r-" + r });
+  });
 
   window.__timelines = window.__timelines || {};
   window.__timelines["main"] = tl;

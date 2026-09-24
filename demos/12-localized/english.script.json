@@ -1,0 +1,150 @@
+{
+  "title": "12 — motion graphics, English · «One shape tells the whole idea»",
+  "fps": 30,
+  "language": "en",
+  "content_type": "teach",
+  "audience": "marketing teams and agencies that make videos for clients",
+  "category_noun": "a tool that makes the video",
+  "alternative": "a shoot day, or stock footage",
+  "mechanism": "it turns the idea into shapes that move and become one another, with no camera",
+  "claim": "explain any idea in a video without filming anything",
+  "repeat_sentence": "You don't need a camera to explain an idea in a video — the tool turns it into motion",
+  "hook": {
+    "type": "educational",
+    "line": "This video has no camera.",
+    "verbal": "—",
+    "visual": "a dot grows into a circle in the first second",
+    "written": "the line is on screen from the first frame"
+  },
+  "cta": {
+    "kind": "follow",
+    "words": "Follow — a new type tomorrow."
+  },
+  "assumed_known": [],
+  "jargon": [
+    {
+      "term": "video-production",
+      "plain": "the tool's name, inside the button in the last frame",
+      "explained_in": "cta"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ch1",
+      "frames": [
+        0,
+        82
+      ],
+      "job": "the hook — the absence is the surprise",
+      "says": [
+        "This video has no camera."
+      ],
+      "shows": "a dot grows into a circle",
+      "establishes": [
+        "this video has no filming in it"
+      ],
+      "is_hook": true,
+      "shows_subject": true
+    },
+    {
+      "id": "ch2",
+      "frames": [
+        82,
+        213
+      ],
+      "job": "the category, and the cost it removes",
+      "says": [
+        "A tool that makes video from an idea — no shoot day."
+      ],
+      "shows": "the circle stretches into a long bar — a whole day — then folds into one small block",
+      "needs": [
+        "this video has no filming in it"
+      ],
+      "establishes": [
+        "a tool makes the video from an idea",
+        "a shoot takes a day"
+      ],
+      "names_category": true,
+      "states_stakes": true,
+      "value_form": "comparison",
+      "shows_subject": true
+    },
+    {
+      "id": "ch3",
+      "frames": [
+        213,
+        311
+      ],
+      "job": "first use — a number",
+      "says": [
+        "Got a number? Watch it grow."
+      ],
+      "shows": "the block rises into a column, the number counts to 100%",
+      "needs": [
+        "a tool makes the video from an idea"
+      ],
+      "establishes": [
+        "a number can be explained by motion"
+      ],
+      "value_form": "tips",
+      "shows_subject": true
+    },
+    {
+      "id": "ch4",
+      "frames": [
+        311,
+        409
+      ],
+      "job": "second use — steps",
+      "says": [
+        "Got steps? They build in order."
+      ],
+      "shows": "the column splits into three steps, rising one after another, left to right",
+      "needs": [
+        "a number can be explained by motion"
+      ],
+      "establishes": [
+        "steps can be explained by motion"
+      ],
+      "value_form": "tips",
+      "shows_subject": true
+    },
+    {
+      "id": "ch5",
+      "frames": [
+        409,
+        475
+      ],
+      "job": "the claim",
+      "says": [
+        "All of it, no filming."
+      ],
+      "shows": "the steps become the one circle again — the shape the video started with",
+      "needs": [
+        "steps can be explained by motion"
+      ],
+      "establishes": [
+        "any idea can be explained without filming"
+      ],
+      "is_claim": true,
+      "value_form": "tips",
+      "shows_subject": true
+    },
+    {
+      "id": "cta",
+      "frames": [
+        475,
+        540
+      ],
+      "job": "the call to action",
+      "says": [
+        "Follow — a new type tomorrow."
+      ],
+      "shows": "the circle opens into a button carrying the tool's name",
+      "needs": [
+        "any idea can be explained without filming"
+      ],
+      "is_cta": true
+    }
+  ]
+}

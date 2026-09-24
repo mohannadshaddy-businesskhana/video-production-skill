@@ -1,0 +1,22 @@
+# The length each string gained in English — scripts/localize.mjs --check
+# (the English was then set at 56px, down from 76, and its longest line given three lines;
+#  the full verifier passed the English cut after that re-layout)
+==================================================================
+STRING    BASE  NEW   DELTA   
+==================================================================
+k1           25    25     +0%   ok
+k2           42    52    +24%   warn
+k3           22    28    +27%   warn
+k4           27    31    +15%   ok
+k5           18    22    +22%   warn
+k6           21    29    +38%   FAIL
+cnt           4     4     +0%   ok
+l1            1     1     +0%   ok
+l2            1     1     +0%   ok
+l3            1     1     +0%   ok
+tag          16    16     +0%   ok
+==================================================================
+
+Largest change: +38%
+1 string(s) need layout attention before this cut is built.
+Re-run the full verifier after the re-layout — safe zone, coverage and reading dwell are all length-dependent.

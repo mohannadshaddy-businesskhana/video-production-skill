@@ -1,0 +1,104 @@
+{
+  "_note": "Translate the `text` field only. Keep every id. Brand names stay in their original script.",
+  "strings": [
+    {
+      "id": "k1",
+      "chapter": "mg",
+      "zone": null,
+      "text": "This video has no camera.",
+      "chars": 25,
+      "words": 5,
+      "note": ""
+    },
+    {
+      "id": "k2",
+      "chapter": "mg",
+      "zone": null,
+      "text": "A tool that makes video from an idea — no shoot day.",
+      "chars": 52,
+      "words": 12,
+      "note": ""
+    },
+    {
+      "id": "k3",
+      "chapter": "mg",
+      "zone": null,
+      "text": "Got a number? Watch it grow.",
+      "chars": 28,
+      "words": 6,
+      "note": ""
+    },
+    {
+      "id": "k4",
+      "chapter": "mg",
+      "zone": null,
+      "text": "Got steps? They build in order.",
+      "chars": 31,
+      "words": 6,
+      "note": ""
+    },
+    {
+      "id": "k5",
+      "chapter": "mg",
+      "zone": null,
+      "text": "All of it, no filming.",
+      "chars": 22,
+      "words": 5,
+      "note": ""
+    },
+    {
+      "id": "k6",
+      "chapter": "mg",
+      "zone": null,
+      "text": "Follow — a new type tomorrow.",
+      "chars": 29,
+      "words": 6,
+      "note": ""
+    },
+    {
+      "id": "cnt",
+      "chapter": "mg",
+      "zone": null,
+      "text": "100%",
+      "chars": 4,
+      "words": 1,
+      "note": ""
+    },
+    {
+      "id": "l1",
+      "chapter": "mg",
+      "zone": null,
+      "text": "1",
+      "chars": 1,
+      "words": 1,
+      "note": ""
+    },
+    {
+      "id": "l2",
+      "chapter": "mg",
+      "zone": null,
+      "text": "2",
+      "chars": 1,
+      "words": 1,
+      "note": ""
+    },
+    {
+      "id": "l3",
+      "chapter": "mg",
+      "zone": null,
+      "text": "3",
+      "chars": 1,
+      "words": 1,
+      "note": ""
+    },
+    {
+      "id": "tag",
+      "chapter": "mg",
+      "zone": null,
+      "text": "video-production",
+      "chars": 16,
+      "words": 1,
+      "note": ""
+    }
+  ]
+}

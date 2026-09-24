@@ -1,0 +1,104 @@
+{
+  "_note": "Translate the `text` field only. Keep every id. Brand names stay in their original script.",
+  "strings": [
+    {
+      "id": "k1",
+      "chapter": "mg",
+      "zone": null,
+      "text": "الفيديو ده مفيهوش كاميرا.",
+      "chars": 25,
+      "words": 4,
+      "note": ""
+    },
+    {
+      "id": "k2",
+      "chapter": "mg",
+      "zone": null,
+      "text": "أداة بتعمل الفيديو من فكرة، بدل يوم تصوير.",
+      "chars": 42,
+      "words": 8,
+      "note": ""
+    },
+    {
+      "id": "k3",
+      "chapter": "mg",
+      "zone": null,
+      "text": "عندك رقم؟ بيكبر قدامك.",
+      "chars": 22,
+      "words": 4,
+      "note": ""
+    },
+    {
+      "id": "k4",
+      "chapter": "mg",
+      "zone": null,
+      "text": "عندك خطوات؟ بتتبني ورا بعض.",
+      "chars": 27,
+      "words": 5,
+      "note": ""
+    },
+    {
+      "id": "k5",
+      "chapter": "mg",
+      "zone": null,
+      "text": "وكله من غير تصوير.",
+      "chars": 18,
+      "words": 4,
+      "note": ""
+    },
+    {
+      "id": "k6",
+      "chapter": "mg",
+      "zone": null,
+      "text": "تابع — نوع جديد بكرة.",
+      "chars": 21,
+      "words": 5,
+      "note": ""
+    },
+    {
+      "id": "cnt",
+      "chapter": "mg",
+      "zone": null,
+      "text": "١٠٠٪",
+      "chars": 4,
+      "words": 1,
+      "note": ""
+    },
+    {
+      "id": "l1",
+      "chapter": "mg",
+      "zone": null,
+      "text": "١",
+      "chars": 1,
+      "words": 1,
+      "note": ""
+    },
+    {
+      "id": "l2",
+      "chapter": "mg",
+      "zone": null,
+      "text": "٢",
+      "chars": 1,
+      "words": 1,
+      "note": ""
+    },
+    {
+      "id": "l3",
+      "chapter": "mg",
+      "zone": null,
+      "text": "٣",
+      "chars": 1,
+      "words": 1,
+      "note": ""
+    },
+    {
+      "id": "tag",
+      "chapter": "mg",
+      "zone": null,
+      "text": "video-production",
+      "chars": 16,
+      "words": 1,
+      "note": ""
+    }
+  ]
+}
