@@ -26,7 +26,7 @@
     {
       "name": "beat continuity",
       "ok": true,
-      "detail": "55 or 110 BPM, continuous (drift 0.14/window, no dropout)",
+      "detail": "55 or 110 BPM, continuous (drift 0.16/window, no dropout)",
       "ref": "#27",
       "warn": false
     },

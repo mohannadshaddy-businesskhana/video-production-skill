@@ -1,6 +1,11 @@
 # renders are rebuilt from the compositions; they do not belong in git
 */renders/
 */layout.json
+*/*/renders/
+*/*/layout.json
+
+# an operation demo plays copies of other demos' renders — rebuilt, never stored
+*/media/
 
 # beat maps are regenerated from the music bed, which is not shipped either
 */beats/
@@ -8,6 +13,7 @@
 # each demo's assets/ is a junction to _assets/ — committing it would store
 # every font once per demo
 [0-9]*/assets/
+[0-9]*/*/assets/
 
 # The music bed is NOT redistributed: its licence has not been verified for
 # that. Drop a track you have cleared at _assets/music/bed.mp3 before rendering,
