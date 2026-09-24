@@ -39,7 +39,7 @@ inventing a style for each:
 | | Operation | The honest demonstration | Status |
 |---|---|---|---|
 | `11-versions` | aspect versions | **06 in 9:16, 1:1 and 16:9, side by side and in sync** — one timeline and a geometry table per ratio, each version verified at its own size and safe band | ✅ |
-| `13-cutdowns` | cutdowns | the same film at full length, 15s and 6s, each with its own hook and close | ⏳ |
+| `13-cutdowns` | cutdowns | **08 at 24s, 15s and a 6s bumper, side by side** — cut frame-exact from a textless master, each with its own hook, close and an unbroken music bed; the short ones loop as ads do | ✅ |
 | `12-localized` | localization | the same film in Arabic and English, with the re-layout the translation forced | ⏳ |
 | `04-section-series` | series | three episodes of one template, back to back | ⏳ |
 
@@ -64,6 +64,14 @@ missing:
 ```bash
 ./build.sh 06-motion-graphics && ./build.sh 11-versions/square && ./build.sh 11-versions/wide
 ./build.sh 11-versions
+```
+
+The cutdowns start from a **textless master** of the tour, cut by `13-cutdowns/marks.json`:
+
+```bash
+node _src/textless.mjs 08-product-tour 13-cutdowns/master     # then render it
+node ../skills/video-production/scripts/cutdown.mjs --master 13-cutdowns/master/renders/master.mp4 --marks 13-cutdowns/marks.json --out 13-cutdowns/cuts
+node _src/cutdowns/emit.mjs && ./build.sh 13-cutdowns/short && ./build.sh 13-cutdowns/bumper && ./build.sh 13-cutdowns
 ```
 
 The motion-graphics film and its versions are **generated**: edit
