@@ -66,17 +66,17 @@ const sec = (f) => f / fps;
 const total = beats.length ? Math.max(...beats.map((b) => b.frames[1])) : 0;
 const saysOf = (b) => (Array.isArray(b.says) ? b.says : b.says ? [b.says] : []);
 
-// ── 1 · the mechanism is not the claim  #40 ─────────────────────────────────
+// ── 1 · the mechanism is not the claim  #42 ─────────────────────────────────
 // Writing both down forces the "so what?" step to actually happen. A script
 // that fills these two fields with the same sentence never took the step.
 if (!S.mechanism || !S.claim) {
   rep.add("claim stated", false,
-    "both `mechanism` (what the tool does) and `claim` (what the viewer gets) are required", "#40");
+    "both `mechanism` (what the tool does) and `claim` (what the viewer gets) are required", "#42");
 } else {
   const same = S.mechanism.trim() === S.claim.trim();
   rep.add("claim stated", !same,
     same ? "`claim` repeats `mechanism` — ask \"so what?\" until the answer happens to a person"
-         : `claim: ${S.claim}`, "#40");
+         : `claim: ${S.claim}`, "#42");
 }
 
 // ── 2 · one claim  #07 ──────────────────────────────────────────────────────
@@ -121,7 +121,7 @@ rep.add("shows the subject", shower.length > 0,
   shower.length ? `${shower.map((b) => b.id).join(", ")}`
     : "no beat sets `shows_subject` — the whole script describes rather than shows");
 
-// ── 6 · the cold-read ledger, mechanically  #41 ─────────────────────────────
+// ── 6 · the cold-read ledger, mechanically  #43 ─────────────────────────────
 // Every fact a beat NEEDS must have been ESTABLISHED by an earlier beat.
 // This is the one check that catches "written for someone who was in the room".
 const gaps = [];
@@ -134,7 +134,7 @@ for (const b of beats) {
 rep.add("cold-read ledger", gaps.length === 0,
   gaps.length === 0 ? `${known.size} fact(s), each established before it is needed`
     : gaps.slice(0, 4).join(" · ") + (gaps.length > 4 ? ` · +${gaps.length - 4} more` : ""),
-  "#41");
+  "#43");
 
 // ── 7 · the jargon ledger ───────────────────────────────────────────────────
 // Every term that is not everyday language, and the beat that makes it mean
@@ -243,7 +243,7 @@ rep.add("line length", longLines.length === 0,
   longLines.length === 0 ? `every line ≤ ${MAX_WORDS_PER_LINE} words`
     : longLines.slice(0, 3).join(" · "));
 
-// ── 7c · the lexicon — words this skill has already got wrong  #43 ───────────
+// ── 7c · the lexicon — words this skill has already got wrong  #45 ───────────
 // Not a style guide: a list of scars. Each entry is a word a reviewer stopped
 // on, with the plain word that replaced it. The everyday reading of a word
 // always wins, so a word whose common meaning is not the intended one fails.
@@ -262,7 +262,7 @@ for (const b of beats)
     for (const w of LEXICON)
       if (w.re.test(l)) lexHits.push(`${b.id}: ${w.why} → ${w.use}`);
 rep.add("lexicon", lexHits.length === 0,
-  lexHits.length === 0 ? "no known-bad word" : lexHits.slice(0, 2).join(" · "), "#43");
+  lexHits.length === 0 ? "no known-bad word" : lexHits.slice(0, 2).join(" · "), "#45");
 
 // ── 8 · the repeat test ─────────────────────────────────────────────────────
 // The one sentence a viewer says to a colleague afterwards. If you cannot write

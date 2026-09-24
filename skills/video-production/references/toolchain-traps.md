@@ -98,6 +98,14 @@ The 8px bars at 42° became a solid inset block, and the same frame measured
 clean. **Do not raise the tolerance** — that hides genuine sixth colours to
 accommodate an encoding artefact you can design around.
 
+**That 2.0% was read from a scaled copy.** The check used to measure a 240-wide
+downscale, which multiplies edge artefacts four- to five-fold (failure-log #46);
+it now reads the frame at its delivered size. At full size the effect is real
+but small — 0.6–0.7% on a frame dense with amber-on-ink edges. The design advice
+above still holds where edges are thin and many: that is where the real 4:2:0
+error lives. If a palette failure sits on edges only, first measure the named
+frame at full resolution before changing the design.
+
 ---
 
 ## 3. Audio — normalising alone produces clipping
