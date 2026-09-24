@@ -22,10 +22,10 @@
 | 09 | Captions instead of a story | Language |
 | 10 | Signage language — clipped noun phrases | Language |
 | 11 | An efficiency claim instead of an elimination claim | Message |
-| 40 | Selling what the tool does instead of what the viewer gets | Message |
-| 41 | A script written for someone who watched it being built | Narrative |
-| 42 | Thirteen skins on one format | Form |
-| 43 | Words with two readings, and borrowed English | Language |
+| 42 | Selling what the tool does instead of what the viewer gets | Message |
+| 43 | A script written for someone who watched it being built | Narrative |
+| 44 | Thirteen skins on one format | Form |
+| 45 | Words with two readings, and borrowed English | Language |
 | 12 | A defensive feature answering an objection nobody raised | Message |
 | 13 | An imitated interface instead of the product's real one | Interface |
 | 14 | An onboarding bar visible in a product shot | Interface |
@@ -56,6 +56,7 @@
 | 39 | Text in another language inside a monolingual video | Language |
 | 40 | Re-layout at the block level instead of the design level | Layout |
 | 41 | The limits of automated audio checking | Process |
+| 46 | A check that graded its own resampling | Process |
 
 ---
 
@@ -172,7 +173,7 @@ doesn't hold together."
 **Rule:** **the category and the protagonist are named before second six.** The category word is
 said explicitly.
 
-### 40 · Selling what the tool does instead of what the viewer gets
+### 42 · Selling what the tool does instead of what the viewer gets
 
 **What happened:** a brand film for this very skill was built on the line "it knows how to refuse
 the video." Four cards, all about the tool's internal behaviour: it measures, it compares, it
@@ -188,7 +189,7 @@ what → **"you don't hear about the mistake from your client."** That last one 
 A useful test: if the sentence's subject is the product, it is a feature. If the subject is the
 viewer, it is a benefit.
 
-### 41 · A script written for someone who watched it being built
+### 43 · A script written for someone who watched it being built
 
 **What happened:** a demo explaining a code change opened on `feat(deps): drop Python`, then showed
 `18 renders · same`, `requirements: 4 → 3`.
@@ -204,7 +205,7 @@ it is. A term, a number and a name each arrive *after* the thing that makes them
 Recency is indistinguishable from clarity from the inside. This is why the check has to be
 mechanical — a list of what has been established, in order — and not a feeling that it reads fine.
 
-### 42 · Thirteen skins on one format
+### 44 · Thirteen skins on one format
 
 **What happened:** thirteen demos, each meant to show a different video type. Each got its own
 ground colour and its own decoration — a burst, a grid, a table, a bar field — and every one of them
@@ -217,7 +218,7 @@ palette.** Before building a type, name its defining element from `video-types.m
 screen first. If the element needs something the skill cannot make (a voice, a face, footage), say
 so and stop — do not substitute a shape for it.
 
-### 43 · Words with two readings, and borrowed English
+### 45 · Words with two readings, and borrowed English
 
 **What happened:** on-screen lines used «بيتسكّب» (skip, in Arabic letters), «بيتعلّم» for "is
 marked" (it reads first as "learns"), «قصّة» for an edit cut (it reads first as "story"), «بتضغط»
@@ -496,6 +497,25 @@ review, and the failure fires on the dropout only.
 **The broader lesson:** when the verifier produces a false positive, **fix the verifier
 immediately.** A checker that cries wolf gets ignored, and then it is worth nothing at all.
 
+### 46 · A check that graded its own resampling
+
+**What happened:** a music video that cuts the whole frame on every beat failed the palette at
+2.5% (limit 2%). The mask put every off-palette pixel on a **vertical edge** — sprocket holes,
+waveform bars, the amber strokes of the lettering — and the worst frame was one caught two frames
+into a zoom hit, when every edge sits at a sub-pixel offset.
+**Result:** that same frame measured **0.58% at full resolution**, and across 120 frames, every zoom
+hit included, the worst was 0.74%. The check had been reading a **240-wide copy**: scaling a 4:2:0
+frame rings at hard edges and slides luma against chroma, so the copy contained colours the video
+does not — up to 3.5% on one frame. Redesigning the film around that would have been designing
+for the instrument.
+**Rule:** **measure the delivered pixels, never a resampled copy.** `verify.mjs` now reads each
+sample at the video's own size. Same 12 samples, same 2% limit, same tolerance, same run time.
+**What made the fix trustworthy:** a control run through the old code and the new — synthetic clips
+with an off-palette patch of known size. 2.99% of the frame fails at 3.0%, 1.43% passes at 1.5%, a
+clean frame reads 0.0%, and a missing file still fails loudly, under both. A fix that turns a fail
+into a pass has to show it still fails what it should — otherwise it is a threshold raised by
+another name.
+
 ---
 
 ## Recurring patterns — read these if you have no time for the whole log
@@ -513,5 +533,5 @@ immediately.** A checker that cries wolf gets ignored, and then it is worth noth
    rewrite; every brand error combined cost one round.
 6. **The verifier cannot read.** It measures whether text *can* be read — dwell, contrast, stillness,
    coverage — and has nothing to say about whether it *means* anything to a stranger. Two demos
-   (#40, #41) passed all fifteen checks and failed with their first human viewer. Every gate in this
+   (#42, #43) passed all fifteen checks and failed with their first human viewer. Every gate in this
    skill sits downstream of a script nobody validated.

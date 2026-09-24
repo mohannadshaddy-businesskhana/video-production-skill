@@ -94,6 +94,13 @@ function ffprobeDuration(video) {
   return isFinite(v) ? v : null;
 }
 
+function ffprobeSize(video) {
+  const r = run("ffprobe", ["-v", "error", "-select_streams", "v:0", "-show_entries",
+                            "stream=width,height", "-of", "csv=p=0", video]);
+  const [w, h] = (r.stdout || "").trim().split(",").map(Number);
+  return w > 0 && h > 0 ? [w, h] : null;
+}
+
 // ── file / container ────────────────────────────────────────────────────────
 
 function checkIntegrity(video, rep) {
@@ -258,17 +265,24 @@ function hexToRgb(h) {
 }
 
 /* One frame as {buf,w,h}, buf a flat RGB byte string — straight from ffmpeg.
- * Decoding a PNG only to read it back needed an image library for nothing. */
-function grabRgb(video, t, width = 240) {
+ * Decoding a PNG only to read it back needed an image library for nothing.
+ *
+ * At the delivered size, never a scaled copy (#46). This used to read a
+ * 240-wide copy, and scaling a 4:2:0 frame rings at hard edges and slides
+ * luma against chroma: the copy measured 3.5% off-palette on a frame that is
+ * 0.7% off at full size. The check was grading its own resampling. */
+function grabRgb(video, t, [w, h]) {
   const r = spawnSync("ffmpeg",
     ["-y", "-v", "error", "-ss", t.toFixed(2), "-i", video,
-     "-frames:v", "1", "-vf", `scale=${width}:-1`,
-     "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+     "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
     { maxBuffer: 256 * 1024 * 1024 });
   const buf = r.stdout;
-  if (!buf || !buf.length || buf.length % (width * 3)) return null;
-  return { buf, w: width, h: buf.length / (width * 3) };
+  if (!buf || buf.length !== w * h * 3) return null;
+  return { buf, w, h };
 }
+
+// a frame with less than this much unmasked is all product UI — nothing to hold to the palette
+const MIN_UNMASKED = 0.005;
 
 function checkPalette(video, colors, manifest, rep, samples = 12, tol = 26.0) {
   /* #01 #02 — a sixth colour means a value was guessed, not read.
@@ -307,12 +321,13 @@ function checkPalette(video, colors, manifest, rep, samples = 12, tol = 26.0) {
   const [fw, fh] = manifest.frame_size;
   const ui = manifest.elements.filter((e) => ["ui", "image", "video"].includes(e.type));
   const dur = manifest.duration_frames / fps;
+  const size = ffprobeSize(video);
   let worst = 0.0, worstT = 0.0, skipped = 0, measured = 0;
 
-  for (let i = 0; i < samples; i++) {
+  for (let i = 0; i < samples && size; i++) {
     const t = dur * (i + 0.5) / samples;
     const frameNo = Math.trunc(t * fps);
-    const g = grabRgb(video, t);
+    const g = grabRgb(video, t, size);
     if (!g) continue;                 // ffmpeg gave us nothing back
     const { buf, w, h } = g;
 
@@ -334,7 +349,7 @@ function checkPalette(video, colors, manifest, rep, samples = 12, tol = 26.0) {
       const r = buf[p * 3], gg = buf[p * 3 + 1], b = buf[p * 3 + 2];
       if (offPalette((r << 16) | (gg << 8) | b, r, gg, b)) bad++;
     }
-    if (total < 500) { skipped++; continue; }
+    if (total < w * h * MIN_UNMASKED) { skipped++; continue; }
     measured++;
     const frac = bad / total;
     if (frac > worst) { worst = frac; worstT = t; }
