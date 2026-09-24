@@ -147,7 +147,7 @@ viewer could repeat.
 
 > **HOOK (0–3s) → VALUE (~70%) → CTA (last 3–5s).** Four demo scripts were rejected in a row and not
 > one of them had any of the three. `references/short-form.md` has the nine hook types, the value
-> forms, the CTA kinds, and the YOU / ME split that decides which CTA belongs.
+> forms, the CTA kinds, and the two content modes that decide which CTA belongs.
 
 > **The five fields above `beats` are questions for the user, not fields to fill in.** `audience`,
 > `category_noun`, `alternative`, `claim` and `repeat_sentence` are the ones the script template has
