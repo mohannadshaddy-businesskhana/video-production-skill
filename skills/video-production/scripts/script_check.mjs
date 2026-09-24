@@ -243,6 +243,27 @@ rep.add("line length", longLines.length === 0,
   longLines.length === 0 ? `every line ≤ ${MAX_WORDS_PER_LINE} words`
     : longLines.slice(0, 3).join(" · "));
 
+// ── 7c · the lexicon — words this skill has already got wrong  #43 ───────────
+// Not a style guide: a list of scars. Each entry is a word a reviewer stopped
+// on, with the plain word that replaced it. The everyday reading of a word
+// always wins, so a word whose common meaning is not the intended one fails.
+const LEXICON = [
+  { re: /سكّ?ب|سكيب/,        why: "English \"skip\" in Arabic letters",          use: "بيتعدّى / بيتقلّب عليه" },
+  { re: /بيتعلّ?م|بتعلّ?م|يتعلّ?م/, why: "reads first as \"learns\", not \"is marked\"", use: "بيتحدد / بيتعلّم عليه" },
+  { re: /قصّ?ة/,          why: "reads first as \"story\", not an edit cut",    use: "انتقال / قطع" },
+  { re: /بتضغط|بيضغط/,        why: "reads as \"presses\", not \"compresses\"",     use: "بتبوّظ الجودة" },
+  { re: /التركيب/,            why: "a composition — a marketer has no picture for it", use: "الفيديو نفسه" },
+  { re: /الفريمات|فريم/,       why: "production jargon for this audience",          use: "الكادرات / اللقطات" },
+  { re: /(فحص|اختبار)[^.،]*\1/, why: "the same root twice in one line",             use: "rephrase" },
+];
+const lexHits = [];
+for (const b of beats)
+  for (const l of saysOf(b))
+    for (const w of LEXICON)
+      if (w.re.test(l)) lexHits.push(`${b.id}: ${w.why} → ${w.use}`);
+rep.add("lexicon", lexHits.length === 0,
+  lexHits.length === 0 ? "no known-bad word" : lexHits.slice(0, 2).join(" · "), "#43");
+
 // ── 8 · the repeat test ─────────────────────────────────────────────────────
 // The one sentence a viewer says to a colleague afterwards. If you cannot write
 // it, they cannot say it.

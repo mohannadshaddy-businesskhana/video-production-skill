@@ -66,6 +66,7 @@ A rule without its scar gets rationalized away.
 | `references/production-rules.md` | Before writing the script; before building |
 | `references/narrative.md` | While writing copy |
 | `references/short-form.md` | **Before any script.** Hook, value, CTA — the shape every short video has |
+| `references/video-types.md` | **Before any build.** What makes each type that type — carrier, camera, voice, rhythm |
 | `references/unattended.md` | **Before any batch the user will not watch** |
 | `references/whiteboard.md` | Hand-drawn / draw-on technique, inside any route |
 

@@ -10,3 +10,7 @@
 # that. Drop a track you have cleared at _assets/music/bed.mp3 before rendering,
 # and run scripts/cue_sheet.mjs to produce its licence record.
 _assets/music/
+
+# Bundled SFX from the renderer's own asset library — used for rendering, not
+# redistributed, for the same reason as the music bed.
+_assets/sfx/
