@@ -39,6 +39,19 @@ once**, not a blind trim:
 
 Every cutdown re-runs `delivery_qc.mjs` — a trim changes duration, and duration is a spec.
 
+**Cut a textless master, never the finished film.** The long version's captions say the wrong
+thing in a short one, and its music, cut at every splice, jumps off the beat (#27). Render a
+master with picture and effects only, cut that, then give each cut **its own words and one
+unbroken music bed** — the effects travel with the picture they belong to. Put segment
+boundaries where no sound is ringing: a chime cut mid-note is audible even through the tool's
+8ms splice fades.
+
+The tool cuts by frame number and counts what it wrote: a cut that is not frame-exact exits 1.
+
+**A 6s cut is a bumper, and the script gate needs to be told.** It cannot carry a stakes beat
+or a body, so declare `"format": "bumper"` in its script: the gate then holds it to six seconds
+and fourteen words instead — and fails a "bumper" that runs longer.
+
 ## Order
 
 Never generate all ratios before the first is approved. One ratio, approved, then the rest.

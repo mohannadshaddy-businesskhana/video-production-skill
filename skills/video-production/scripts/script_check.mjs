@@ -66,6 +66,16 @@ const sec = (f) => f / fps;
 const total = beats.length ? Math.max(...beats.map((b) => b.frames[1])) : 0;
 const saysOf = (b) => (Array.isArray(b.says) ? b.says : b.says ? [b.says] : []);
 
+/* A bumper — the six-second ad before a video — is one message and a brand.
+ * It has no room for a stakes beat or a body, so the gate holds it to its own
+ * rules instead: six seconds at most, and few enough words to read in them. A
+ * cutdown route that produces 6s versions needs a gate that can pass one. */
+const FORMATS = [undefined, "bumper"];
+const BUMPER = S.format === "bumper";
+const BUMPER_MAX_S = 6, BUMPER_MAX_WORDS = 14;
+if (!FORMATS.includes(S.format))
+  rep.add("format", false, `unknown format "${S.format}" — omit it, or "bumper" for a 6s ad`);
+
 // ── 1 · the mechanism is not the claim  #42 ─────────────────────────────────
 // Writing both down forces the "so what?" step to actually happen. A script
 // that fills these two fields with the same sentence never took the step.
@@ -108,7 +118,8 @@ rep.add("audience stated", !!S.audience,
 const staker = beats.find((b) => b.states_stakes);
 const third = total / 3;
 const okStakes = staker && staker.frames[0] <= third;
-rep.add("stakes named early", !!okStakes,
+if (BUMPER) rep.add("stakes named early", true, "bumper — one message; the hook carries the claim");
+else rep.add("stakes named early", !!okStakes,
   !staker ? "no beat sets `states_stakes` — nothing is at risk, so nothing is at stake"
     : okStakes ? `${staker.id} at ${sec(staker.frames[0]).toFixed(1)}s`
     : `first stated in ${staker.id} at ${sec(staker.frames[0]).toFixed(1)}s, past the first third `
@@ -201,7 +212,15 @@ const valueBeats = beats.filter((b) => b.value_form);
 const badForm = valueBeats.filter((b) => !VALUE_FORMS.includes(b.value_form));
 const valueFrames = valueBeats.reduce((t, b) => t + (b.frames[1] - b.frames[0]), 0);
 const share = total ? valueFrames / total : 0;
-rep.add("body carries value", valueBeats.length > 0 && !badForm.length && share >= VALUE_FLOOR,
+const allWords = beats.reduce((n, b) => n + saysOf(b).reduce((m, l) => m + words(l), 0), 0);
+if (BUMPER) rep.add("bumper message",
+  sec(total) <= BUMPER_MAX_S + 0.01 && allWords <= BUMPER_MAX_WORDS && !badForm.length,
+  sec(total) > BUMPER_MAX_S + 0.01
+    ? `a bumper is ${BUMPER_MAX_S}s at most — this runs ${sec(total).toFixed(1)}s, so it needs a body`
+    : allWords > BUMPER_MAX_WORDS
+      ? `${allWords} words — a bumper reads at most ${BUMPER_MAX_WORDS} in ${BUMPER_MAX_S}s`
+      : `${sec(total).toFixed(1)}s, ${allWords} words — one message, no body`);
+else rep.add("body carries value", valueBeats.length > 0 && !badForm.length && share >= VALUE_FLOOR,
   !valueBeats.length
     ? "no beat declares a `value_form` — steps / framework / comparison / tips / numbers"
     : badForm.length ? `unknown value_form: ${badForm.map((b) => b.value_form).join(", ")}`
