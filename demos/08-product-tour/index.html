@@ -1,0 +1,232 @@
+<!doctype html>
+<!-- Demo 08 — product tour.  Browser chrome, a real page inside it, a zoom and
+     a cursor.  Neutral grey ground so the product's own colours can lead.
+     HOOK 0–3 · VALUE 3–14 · CTA 14–18 -->
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>الموقع ده بقى فيديو</title>
+    <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-arabic.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block;
+        unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0898-08E1,U+08E3-08FF,U+FB50-FDFF,U+FE70-FEFF; }
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-latin.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block; }
+      @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
+        font-weight:700; font-style:normal; font-display:block; }
+      :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
+              --fail:#B23A2A; --white:#FFFFFF; --amber-tx:#AC6C11;
+      /* the ground is ink mixed 88% toward bone — a neutral that sits ON the
+         palette ramp, so the product's own colour is the only saturated thing */
+              --grey:#DAD8D2; }
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:1080px; height:1920px; overflow:hidden; background:#DAD8D2; }
+      #root { position:relative; width:100%; height:100%; overflow:hidden;
+              font-family:"Cairo",sans-serif; color:var(--ink); background:var(--grey); }
+      .scene { position:absolute; inset:0; overflow:hidden; background:var(--grey); }
+      .pane  { position:absolute; inset:0; direction:rtl; }
+      .line  { position:absolute; right:88px; width:904px; font-weight:600;
+               line-height:1.34; letter-spacing:-.01em; }
+      .xl { font-size:88px; } .lg { font-size:62px; } .md { font-size:46px; }
+      .amber { color:var(--amber-tx); }
+
+      /* the browser — the signature of this form */
+      .win { position:absolute; border:5px solid var(--ink); border-radius:12px;
+             background:var(--white); overflow:hidden; }
+      .win .bar { height:76px; background:var(--bone);
+                  border-bottom:4px solid rgba(20,24,31,.2);
+                  display:flex; flex-direction:row-reverse; align-items:center;
+                  gap:14px; padding:0 22px; }
+      .win .bar i { width:18px; height:18px; border-radius:50%;
+                    background:rgba(20,24,31,.28); display:block; }
+      .win .bar u { flex:1; height:38px; border-radius:19px; margin-right:14px;
+                    background:rgba(20,24,31,.1); display:block; text-decoration:none; }
+      .pg { padding:30px 26px; }
+      .pg h { display:block; height:34px; width:62%; border-radius:17px;
+              background:var(--ink); margin-bottom:22px; }
+      .pg p { display:block; height:18px; border-radius:9px;
+              background:rgba(20,24,31,.22); margin-bottom:14px; }
+      .pg .btn { margin-top:26px; width:290px; height:76px; border-radius:12px;
+                 background:var(--amber); }
+      .pg .row { display:flex; flex-direction:row-reverse; gap:16px; margin-top:26px; }
+      .pg .row s { flex:1; height:120px; border-radius:10px;
+                   background:rgba(20,24,31,.12); display:block; text-decoration:none; }
+
+      /* a screenshot next to a capture — the comparison */
+      .twin { position:absolute; right:88px; width:904px; display:flex;
+              flex-direction:row-reverse; gap:24px; }
+      .twin .half { flex:1; }
+      .twin .cap { margin-top:14px; font-size:30px; font-weight:600; text-align:center;
+                   color:rgba(20,24,31,.7); }
+      .shaky { border:5px solid rgba(20,24,31,.45); border-radius:10px; height:330px;
+               background:rgba(20,24,31,.1); position:relative; overflow:hidden; }
+      .shaky::after { content:""; position:absolute; left:-8%; right:-8%; top:20%;
+                      height:64%; background:rgba(20,24,31,.16); }
+
+      .cursor { position:absolute; width:0; height:0;
+                border-left:26px solid var(--ink); border-bottom:38px solid transparent;
+                border-right:14px solid transparent; }
+      .ring { position:absolute; border:6px solid var(--amber); border-radius:16px; }
+
+      .name { position:absolute; right:88px; top:1500px; width:904px;
+              font-family:"Mono",monospace; font-size:40px; letter-spacing:.06em;
+              color:var(--amber-tx); direction:ltr; text-align:right; font-weight:700; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="18"
+         data-fps="30" data-width="1080" data-height="1920">
+
+      <section id="ch1" class="scene clip" data-start="0" data-duration="3" data-track-index="0">
+        <div class="pane">
+          <div class="line xl" id="h1" style="top:320px">الموقع ده<br>بقى <span class="amber">فيديو</span>.</div>
+          <div class="win" id="h2" style="right:88px; top:700px; width:904px; height:760px">
+            <div class="bar"><i></i><i></i><i></i><u></u></div>
+            <div class="pg"><h></h><p style="width:94%"></p><p style="width:78%"></p>
+              <div class="btn"></div>
+              <div class="row"><s></s><s></s><s></s></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="ch2" class="scene clip" data-start="3" data-duration="6" data-track-index="1">
+        <div class="pane">
+          <div class="line lg" id="a1" style="top:300px">لقطات الشاشة<br>بتطلع مهزوزة ومقصوصة.</div>
+          <div class="twin" id="a2" style="top:640px">
+            <div class="half"><div class="shaky"></div><div class="cap">لقطة شاشة</div></div>
+            <div class="half">
+              <div class="win" style="position:relative; height:330px">
+                <div class="bar"><i></i><i></i><i></i><u></u></div>
+                <div class="pg" style="padding:18px 16px"><h style="height:20px"></h>
+                  <p style="height:12px; width:90%"></p><p style="height:12px; width:70%"></p>
+                  <div class="btn" style="width:140px; height:40px; margin-top:16px"></div></div>
+              </div>
+              <div class="cap">كادر من الموقع</div>
+            </div>
+          </div>
+          <div class="line md" id="a3" style="top:1300px">الأداة بتفتح الموقع وتصوّره كادر بكادر.</div>
+        </div>
+      </section>
+
+      <section id="ch3" class="scene clip" data-start="9" data-duration="5" data-track-index="2">
+        <div class="pane">
+          <div class="line lg" id="b1" style="top:300px">تكبير على<br>الجزء المهم.</div>
+          <div class="win" id="b2" style="right:150px; top:660px; width:780px; height:560px">
+            <div class="bar"><i></i><i></i><i></i><u></u></div>
+            <div class="pg"><h></h><p style="width:92%"></p>
+              <div class="btn" id="b3"></div></div>
+          </div>
+          <div class="ring" id="b4" style="right:214px; top:1000px; width:330px; height:112px"></div>
+          <div class="cursor" id="b5" style="right:420px; top:1060px"></div>
+          <div class="line md" id="b6" style="top:1360px">وسهم بيوري مكان الضغط.</div>
+        </div>
+      </section>
+
+      <section id="ch4" class="scene clip" data-start="14" data-duration="4" data-track-index="3">
+        <div class="pane">
+          <div class="line xl" id="c1" style="top:400px">ابعت لينك موقعك<br>في <span class="amber">التعليقات</span>.</div>
+          <div class="win" id="c2" style="right:240px; top:860px; width:600px; height:440px">
+            <div class="bar"><i></i><i></i><i></i><u></u></div>
+            <div class="pg"><h></h><p style="width:90%"></p><p style="width:64%"></p>
+              <div class="btn" style="width:200px"></div></div>
+          </div>
+          <div class="name" id="c3">video-production</div>
+        </div>
+      </section>
+
+      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="18"
+             data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+window.__FMT = { id: "vertical", w: 1080, h: 1920, safeTop: 230, safeBottom: 1690, zones: {} };
+window.__MF = [];
+window.__MOTION = [];
+const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
+const F = (f) => f / 30;
+
+function build() {
+  // initial state OUTSIDE the timeline — tl.set(…,0) does not apply at frame 0
+  gsap.set(["#h1","#h2","#a1","#a2","#a3","#b1","#b2","#b4","#b5","#b6","#c1","#c2","#c3"],
+           { opacity: 0 });
+  gsap.set(["#h1","#a1","#b1","#c1"], { y: 24 });
+  gsap.set(["#h2","#c2"], { scale: 0.92, transformOrigin: "center" });
+  gsap.set("#b2", { scale: 1, transformOrigin: "50% 62%" });
+  gsap.set("#b4", { scale: 0.7, transformOrigin: "center" });
+  gsap.set("#b5", { x: 60, y: 40 });
+
+  const tl = gsap.timeline({ paused: true });
+  const rise = { opacity: 1, y: 0, ease: "power2.out" };
+
+  /* ── HOOK · 0–90 — the window opens first ───────────────────────── */
+  tl.to("#h2", { opacity: 1, scale: 1, duration: F(13), ease: "power3.out" }, F(0));
+  tl.to("#h1", { ...rise, duration: F(14) }, F(4));
+
+  /* ── VALUE · 90–270 — a screenshot beside a capture ─────────────── */
+  tl.to("#a1", { ...rise, duration: F(14) }, F(96));
+  tl.to("#a2", { opacity: 1, duration: F(14) }, F(136));
+  tl.to("#a3", { opacity: 1, duration: F(14) }, F(186));
+
+  /* ── VALUE · 270–420 — one large move: the push in ──────────────── */
+  tl.to("#b1", { ...rise, duration: F(14) }, F(276));
+  tl.to("#b2", { opacity: 1, duration: F(10) }, F(288));
+  tl.to("#b2", { scale: 1.16, duration: F(24), ease: "power2.inOut" }, F(338));
+  tl.to("#b4", { opacity: 1, scale: 1, duration: F(10), ease: "back.out(2)" }, F(360));
+  tl.to("#b5", { opacity: 1, x: 0, y: 0, duration: F(12), ease: "power2.out" }, F(364));
+  tl.to("#b6", { opacity: 1, duration: F(14) }, F(352));
+
+  /* ── CTA · 420–540 ──────────────────────────────────────────────── */
+  tl.to("#c1", { ...rise, duration: F(16) }, F(426));
+  tl.to("#c2", { opacity: 1, scale: 1, duration: F(12), ease: "power3.out" }, F(440));
+  tl.to("#c3", { opacity: 1, duration: F(12) }, F(456));
+
+  /* the push-in is the only large motion in the piece (#28) */
+  window.__MOTION = [{ id: "push-in", magnitude: "large", frames: [338, 362] }];
+
+  /* ── music — one continuous track, gain automation only (#26 #27) ─ */
+  tl.fromTo("#bgm", { volume: 0 }, { volume: 0.40, duration: 0.9, ease: "none",
+            immediateRender: false }, 0);
+  tl.to("#bgm", { volume: 0.29, duration: F(8), ease: "none" }, F(270));
+  tl.to("#bgm", { volume: 0.40, duration: F(18), ease: "none" }, F(312));
+  tl.to("#bgm", { volume: 0, duration: 1.3, ease: "none" }, F(501));
+
+  const t = (id, ch, fr, still, text, crit) =>
+    mf(id, { type: "text", chapter: ch, frames: fr, still_from: still, text: text,
+             critical: crit !== false, el: "#" + id });
+  const ui = (id, ch, fr, still) =>
+    mf(id, { type: "ui", chapter: ch, frames: fr, still_from: still,
+             critical: false, el: "#" + id });
+  const sh = (id, ch, fr, still) =>
+    mf(id, { type: "shape", chapter: ch, frames: fr, still_from: still,
+             critical: false, el: "#" + id });
+
+  t("h1","ch1",[0,90],18,"الموقع ده بقى فيديو.");
+  ui("h2","ch1",[0,90],13);
+
+  t("a1","ch2",[90,270],110,"لقطات الشاشة بتطلع مهزوزة ومقصوصة.");
+  ui("a2","ch2",[90,270],150);
+  t("a3","ch2",[90,270],200,"الأداة بتفتح الموقع وتصوّره كادر بكادر.");
+
+  t("b1","ch3",[270,420],290,"تكبير على الجزء المهم.");
+  ui("b2","ch3",[270,420],362);
+  sh("b4","ch3",[270,420],370); sh("b5","ch3",[270,420],376);
+  t("b6","ch3",[270,420],366,"وسهم بيوري مكان الضغط.");
+
+  t("c1","ch4",[420,540],442,"ابعت لينك موقعك في التعليقات.");
+  ui("c2","ch4",[420,540],452);
+  t("c3","ch4",[420,540],468,"",false);
+
+  window.__timelines = window.__timelines || {};
+  window.__timelines["main"] = tl;
+  tl.seek(0);
+}
+
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(build);
+else build();
+    </script>
+  </body>
+</html>

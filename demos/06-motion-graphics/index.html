@@ -1,0 +1,211 @@
+<!doctype html>
+<!-- Demo 06 — motion graphics.  Type only: no diagram, no window, no plate.
+     Six short beats instead of four, because the form is about cadence.
+     HOOK 0–3 · VALUE 3–15 · CTA 15–18 -->
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>من غير ولا لقطة</title>
+    <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-arabic.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block;
+        unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0898-08E1,U+08E3-08FF,U+FB50-FDFF,U+FE70-FEFF; }
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-latin.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block; }
+      @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
+        font-weight:700; font-style:normal; font-display:block; }
+      :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
+              --fail:#B23A2A; --white:#FFFFFF; }
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:1080px; height:1920px; overflow:hidden; background:#14181F; }
+      #root { position:relative; width:100%; height:100%; overflow:hidden;
+              font-family:"Cairo",sans-serif; color:var(--bone); background:var(--ink); }
+      .scene { position:absolute; inset:0; overflow:hidden; background:var(--ink); }
+      .pane  { position:absolute; inset:0; direction:rtl; }
+
+      /* everything in this piece is type. The only non-letter marks are a
+         counter rail and a single sweeping bar — both typographic devices. */
+      .big { position:absolute; right:88px; width:904px; font-weight:700;
+             line-height:1.14; letter-spacing:-.03em; }
+      .s140 { font-size:140px; } .s108 { font-size:108px; } .s80 { font-size:80px; }
+      .s52  { font-size:52px; font-weight:600; letter-spacing:-.01em; line-height:1.4; }
+      .amber { color:var(--amber); }
+      .ghost { color:rgba(245,242,234,.45); }
+      .ch { display:inline-block; }
+
+      .bar  { position:absolute; right:88px; height:16px; background:var(--amber);
+              border-radius:8px; transform-origin:right center; }
+
+      /* the rail: six marks, one per beat, filling as the piece runs */
+      .rail { position:absolute; right:88px; top:1560px; width:904px; display:flex;
+              flex-direction:row-reverse; gap:12px; }
+      .rail i { flex:1; height:10px; border-radius:5px; background:rgba(245,242,234,.18); }
+      .rail i.on { background:var(--amber); }
+      .idx { position:absolute; right:88px; top:250px; font-family:"Mono",monospace;
+             font-size:28px; letter-spacing:.2em; color:rgba(245,242,234,.55);
+             direction:ltr; text-align:right; font-weight:700; }
+
+      .name { position:absolute; right:88px; top:1400px; width:904px;
+              font-family:"Mono",monospace; font-size:40px; letter-spacing:.06em;
+              color:var(--amber); direction:ltr; text-align:right; font-weight:700; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="18"
+         data-fps="30" data-width="1080" data-height="1920">
+
+      <section id="ch1" class="scene clip" data-start="0" data-duration="3" data-track-index="0">
+        <div class="pane">
+          <div class="idx" id="i1">01 / 06</div>
+          <div class="big s140" id="h1" style="top:480px">من غير</div>
+          <div class="big s140" id="h2" style="top:720px">ولا لقطة</div>
+          <div class="big s140 amber" id="h3" style="top:960px">مصوّرة.</div>
+          <div class="bar" id="h4" style="top:1240px; width:904px"></div>
+          <div class="rail" id="r1"></div>
+        </div>
+      </section>
+
+      <section id="ch2" class="scene clip" data-start="3" data-duration="3" data-track-index="1">
+        <div class="pane">
+          <div class="idx" id="i2">02 / 06</div>
+          <div class="big s108" id="a1" style="top:480px">أداة واحدة</div>
+          <div class="big s108 ghost" id="a2" style="top:720px">بدل يوم تصوير</div>
+          <div class="big s108 ghost" id="a3" style="top:960px">وميزانية.</div>
+          <div class="bar" id="a4" style="top:1240px; width:904px"></div>
+          <div class="rail" id="r2"></div>
+        </div>
+      </section>
+
+      <section id="ch3" class="scene clip" data-start="6" data-duration="3" data-track-index="2">
+        <div class="pane">
+          <div class="idx" id="i3">03 / 06</div>
+          <div class="big s108" id="b1" style="top:480px">بتحرّك</div>
+          <div class="big s140 amber" id="b2" style="top:720px">الكلام</div>
+          <div class="big s108" id="b3" style="top:960px">بدالك.</div>
+          <div class="bar" id="b4" style="top:1240px; width:904px"></div>
+          <div class="rail" id="r3"></div>
+        </div>
+      </section>
+
+      <section id="ch4" class="scene clip" data-start="9" data-duration="3" data-track-index="3">
+        <div class="pane">
+          <div class="idx" id="i4">04 / 06</div>
+          <div class="big s140 amber" id="c1" style="top:480px">حجم واحد</div>
+          <div class="big s52 ghost" id="c2" style="top:740px">وباقي السطر صغير.</div>
+          <div class="big s52 ghost" id="c3" style="top:880px">علشان العين تعرف تبدأ منين.</div>
+          <div class="bar" id="c4" style="top:1240px; width:904px"></div>
+          <div class="rail" id="r4"></div>
+        </div>
+      </section>
+
+      <section id="ch5" class="scene clip" data-start="12" data-duration="3" data-track-index="4">
+        <div class="pane">
+          <div class="idx" id="i5">05 / 06</div>
+          <div class="big s108" id="d1" style="top:480px">حركة واحدة</div>
+          <div class="big s140 amber" id="d2" style="top:720px">كبيرة</div>
+          <div class="big s108" id="d3" style="top:960px">في المرة.</div>
+          <div class="bar" id="d4" style="top:1240px; width:904px"></div>
+          <div class="rail" id="r5"></div>
+        </div>
+      </section>
+
+      <section id="ch6" class="scene clip" data-start="15" data-duration="3" data-track-index="5">
+        <div class="pane">
+          <div class="idx" id="i6">06 / 06</div>
+          <div class="big s140" id="e1" style="top:480px">تابع —</div>
+          <div class="big s108 amber" id="e2" style="top:780px">نوع تاني بكرة.</div>
+          <div class="name" id="e3">video-production</div>
+          <div class="rail" id="r6"></div>
+        </div>
+      </section>
+
+      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="18"
+             data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+window.__FMT = { id: "vertical", w: 1080, h: 1920, safeTop: 230, safeBottom: 1690, zones: {} };
+window.__MF = [];
+window.__MOTION = [];
+const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
+const F = (f) => f / 30;
+
+function build() {
+  // the rail: six marks, filled up to the current beat
+  [1,2,3,4,5,6].forEach((n) => {
+    const r = document.getElementById("r" + n);
+    for (let i = 0; i < 6; i++) {
+      const s = document.createElement("i");
+      if (i < n) s.className = "on";
+      r.appendChild(s);
+    }
+  });
+
+  const heads = ["#h1","#h2","#h3","#a1","#a2","#a3","#b1","#b2","#b3",
+                 "#c1","#c2","#c3","#d1","#d2","#d3","#e1","#e2"];
+  // initial state OUTSIDE the timeline — tl.set(…,0) does not apply at frame 0
+  gsap.set(heads, { opacity: 0, y: 40 });
+  gsap.set(["#i1","#i2","#i3","#i4","#i5","#i6","#e3"], { opacity: 0 });
+  gsap.set(["#h4","#a4","#b4","#c4","#d4"], { scaleX: 0 });
+  gsap.set([".rail"], { opacity: 0 });
+
+  const tl = gsap.timeline({ paused: true });
+  const rise = { opacity: 1, y: 0, ease: "power3.out" };
+
+  // one beat's worth of typography: index, three lines, a sweeping bar
+  const beat = (n, at, ids, barId) => {
+    tl.to("#i" + n, { opacity: 1, duration: F(6) }, F(at + 1));
+    tl.to("#r" + n, { opacity: 1, duration: F(6) }, F(at + 1));
+    ids.forEach((id, k) => tl.to(id, { ...rise, duration: F(10) }, F(at + 2 + k * 9)));
+    if (barId) tl.to(barId, { scaleX: 1, duration: F(16), ease: "power2.inOut" }, F(at + 34));
+  };
+  beat(1, 0,   ["#h1","#h2","#h3"], "#h4");
+  beat(2, 90,  ["#a1","#a2","#a3"], "#a4");
+  beat(3, 180, ["#b1","#b2","#b3"], "#b4");
+  beat(4, 270, ["#c1","#c2","#c3"], "#c4");
+  beat(5, 360, ["#d1","#d2","#d3"], "#d4");
+  beat(6, 450, ["#e1","#e2"], null);
+  tl.to("#e3", { opacity: 1, duration: F(10) }, F(474));
+
+  /* ── music — one continuous track, gain automation only (#26 #27) ─ */
+  tl.fromTo("#bgm", { volume: 0 }, { volume: 0.40, duration: 0.9, ease: "none",
+            immediateRender: false }, 0);
+  tl.to("#bgm", { volume: 0.30, duration: F(8), ease: "none" }, F(268));
+  tl.to("#bgm", { volume: 0.40, duration: F(18), ease: "none" }, F(300));
+  tl.to("#bgm", { volume: 0, duration: 1.3, ease: "none" }, F(501));
+
+  const t = (id, ch, fr, still, text, crit) =>
+    mf(id, { type: "text", chapter: ch, frames: fr, still_from: still, text: text,
+             critical: crit !== false, el: "#" + id });
+  const sh = (id, ch, fr, still) =>
+    mf(id, { type: "shape", chapter: ch, frames: fr, still_from: still,
+             critical: false, el: "#" + id });
+
+  const reg = (n, s, e, ids, texts, barId) => {
+    t("i" + n, "ch" + n, [s, e], s + 7, "", false);
+    ids.forEach((id, k) => t(id, "ch" + n, [s, e], s + 12 + k * 9, texts[k] || "", k === 0));
+    sh("r" + n, "ch" + n, [s, e], s + 7);
+    if (barId) sh(barId, "ch" + n, [s, e], s + 50);
+  };
+  reg(1, 0,   90,  ["h1","h2","h3"], ["من غير","ولا لقطة","مصوّرة."], "h4");
+  reg(2, 90,  180, ["a1","a2","a3"], ["أداة واحدة","بدل يوم تصوير","وميزانية."], "a4");
+  reg(3, 180, 270, ["b1","b2","b3"], ["بتحرّك","الكلام","بدالك."], "b4");
+  reg(4, 270, 360, ["c1","c2","c3"], ["حجم واحد","وباقي السطر صغير.","علشان العين تعرف تبدأ منين."], "c4");
+  reg(5, 360, 450, ["d1","d2","d3"], ["حركة واحدة","كبيرة","في المرة."], "d4");
+  reg(6, 450, 540, ["e1","e2"], ["تابع —","نوع تاني بكرة."], null);
+  t("e3", "ch6", [450, 540], 484, "", false);
+
+  window.__timelines = window.__timelines || {};
+  window.__timelines["main"] = tl;
+  tl.seek(0);
+}
+
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(build);
+else build();
+    </script>
+  </body>
+</html>

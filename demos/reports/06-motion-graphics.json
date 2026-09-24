@@ -1,0 +1,119 @@
+{
+  "video": "D:/Projects/video-production-skill/demos/06-motion-graphics/renders/06-motion-graphics.mp4",
+  "passed": true,
+  "checks": [
+    {
+      "name": "file integrity",
+      "ok": true,
+      "detail": "clean",
+      "ref": "#35",
+      "warn": false
+    },
+    {
+      "name": "duration",
+      "ok": true,
+      "detail": "18.00s (expected 18.00s)",
+      "ref": "",
+      "warn": false
+    },
+    {
+      "name": "loudness",
+      "ok": true,
+      "detail": "-14.0 LUFS (target -14)",
+      "ref": "#25",
+      "warn": false
+    },
+    {
+      "name": "beat continuity",
+      "ok": true,
+      "detail": "55 or 110 BPM, continuous (drift 0.14/window, no dropout)",
+      "ref": "#27",
+      "warn": false
+    },
+    {
+      "name": "palette",
+      "ok": true,
+      "detail": "worst 0.5% off-palette at 17.2s (limit 2%) · 12/12 frames read",
+      "ref": "#01",
+      "warn": false
+    },
+    {
+      "name": "chapter continuity",
+      "ok": true,
+      "detail": "contiguous",
+      "ref": "",
+      "warn": false
+    },
+    {
+      "name": "safe zone",
+      "ok": true,
+      "detail": "all inside",
+      "ref": "#18",
+      "warn": false
+    },
+    {
+      "name": "zone containment",
+      "ok": true,
+      "detail": "all contained",
+      "ref": "#20",
+      "warn": false
+    },
+    {
+      "name": "no overlap",
+      "ok": true,
+      "detail": "clean",
+      "ref": "#20",
+      "warn": false
+    },
+    {
+      "name": "content coverage",
+      "ok": true,
+      "detail": "worst 58% in ch1 (floor 45%)",
+      "ref": "#21",
+      "warn": false
+    },
+    {
+      "name": "reading dwell",
+      "ok": true,
+      "detail": "all ≥1.5s",
+      "ref": "#31",
+      "warn": false
+    },
+    {
+      "name": "single large motion",
+      "ok": true,
+      "detail": "clean",
+      "ref": "#28",
+      "warn": false
+    },
+    {
+      "name": "text reads in stillness",
+      "ok": true,
+      "detail": "clean",
+      "ref": "#29",
+      "warn": false
+    },
+    {
+      "name": "chapter roles",
+      "ok": true,
+      "detail": "spec declares no role skeleton",
+      "ref": "",
+      "warn": true
+    },
+    {
+      "name": "relation shapes drawn",
+      "ok": true,
+      "detail": "all relations drawn",
+      "ref": "#38",
+      "warn": false
+    },
+    {
+      "name": "single language",
+      "ok": true,
+      "detail": "all arabic",
+      "ref": "#39",
+      "warn": false
+    }
+  ],
+  "failed": []
+}
