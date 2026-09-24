@@ -63,8 +63,17 @@ A composition can fake an interface convincingly — it is HTML. It cannot fake 
 face or a voice without it being obvious, and a demo that does is worse than one
 that says what it needs.
 
-**Whichever voice, generate or record it one line at a time.** Neither a TTS
-model nor a phone gives word timings, and a whiteboard hand or a caption has to
-know when each thing is said. A line recorded on its own has an exact start and
-end; both tools write the same `timings.json`, and the composition's beats come
-from it — the voice sets the timing, never an estimate.
+**Whichever voice, measure it line by line.** Neither a TTS model nor a phone
+gives word timings, and a whiteboard hand or a caption has to know when each
+thing is said. There are two ways to get each line's exact start and end:
+
+- **A take per line.**
+- **One take with a clear pause between lines.** `voice_timings.mjs` aligns it
+  to the script. It already knows the text, so it picks the pauses that cut the
+  take into pieces the lines' lengths predict.
+
+Gemini's free tier allows about ten TTS requests a day per project, so
+`tts_gemini.mjs --whole` asks for every line in one request.
+
+Both tools write the same `timings.json`, and the composition's beats come from
+it. The voice sets the timing, never an estimate.
