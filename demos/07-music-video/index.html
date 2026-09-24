@@ -1,0 +1,254 @@
+<!doctype html>
+<!-- Demo 07 — music video.  A beat grid that pulses, a waveform that becomes
+     marks, and cuts that land on them.  Five beats.
+     HOOK 0–3 · VALUE 3–15 · CTA 15–18 -->
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>كل حركة على الضربة</title>
+    <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-arabic.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block;
+        unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0898-08E1,U+08E3-08FF,U+FB50-FDFF,U+FE70-FEFF; }
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-latin.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block; }
+      @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
+        font-weight:700; font-style:normal; font-display:block; }
+      :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
+              --fail:#B23A2A; --white:#FFFFFF; --pass-lt:#5E8F78; }
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:1080px; height:1920px; overflow:hidden; background:#14181F; }
+      #root { position:relative; width:100%; height:100%; overflow:hidden;
+              font-family:"Cairo",sans-serif; color:var(--bone); background:var(--ink); }
+      .scene { position:absolute; inset:0; overflow:hidden; background:var(--ink); }
+      .pane  { position:absolute; inset:0; direction:rtl; }
+      .line  { position:absolute; right:88px; width:904px; font-weight:600;
+               line-height:1.34; letter-spacing:-.01em; }
+      .xl { font-size:88px; } .lg { font-size:62px; } .md { font-size:48px; }
+      .amber { color:var(--amber); }
+
+      /* the bar field — the signature of this form */
+      .bars { position:absolute; left:0; right:0; display:flex; align-items:flex-end;
+              justify-content:center; gap:14px; height:520px; }
+      .bars b { width:44px; background:var(--amber); border-radius:8px 8px 0 0;
+                display:block; height:60px; transform-origin:center bottom; }
+      .bars b.q { background:rgba(245,242,234,.3); }
+
+      /* a waveform strip that turns into beat marks */
+      .wave { position:absolute; right:88px; width:904px; height:150px;
+              border-top:4px solid rgba(245,242,234,.25);
+              border-bottom:4px solid rgba(245,242,234,.25);
+              display:flex; align-items:center; justify-content:center; gap:7px; }
+      .wave i { width:9px; background:rgba(245,242,234,.5); border-radius:5px; display:block; }
+      .marks { position:absolute; right:88px; width:904px; height:80px; }
+      .marks u { position:absolute; top:0; width:8px; height:80px; background:var(--amber);
+                 border-radius:4px; display:block; }
+      .marklbl { position:absolute; right:88px; width:904px; font-family:"Mono",monospace;
+                 font-size:26px; letter-spacing:.16em; color:rgba(245,242,234,.6);
+                 direction:ltr; text-align:right; font-weight:700; }
+
+      /* cuts snapping to the marks */
+      .strip { position:absolute; right:88px; width:904px; height:230px; display:flex;
+               flex-direction:row-reverse; gap:10px; }
+      .strip s { flex:1; border:4px solid rgba(245,242,234,.35); border-radius:6px;
+                 background:rgba(245,242,234,.05); display:block; text-decoration:none; }
+      .strip s.hit { border-color:var(--amber); background:rgba(199,123,14,.2); }
+
+      .name { position:absolute; right:88px; top:1520px; width:904px;
+              font-family:"Mono",monospace; font-size:40px; letter-spacing:.06em;
+              color:var(--amber); direction:ltr; text-align:right; font-weight:700; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="18"
+         data-fps="30" data-width="1080" data-height="1920">
+
+      <section id="ch1" class="scene clip" data-start="0" data-duration="3" data-track-index="0">
+        <div class="pane">
+          <div class="line xl" id="h1" style="top:340px">كل حركة هنا<br>واقعة على <span class="amber">ضربة</span>.</div>
+          <div class="bars" id="h2" style="top:900px"></div>
+        </div>
+      </section>
+
+      <section id="ch2" class="scene clip" data-start="3" data-duration="5" data-track-index="1">
+        <div class="pane">
+          <div class="line lg" id="a1" style="top:300px">لو ظبطتها بإيدك،<br>هتعدّ الفريمات.</div>
+          <div class="line md" id="a2" style="top:620px">الأداة بتقرا الأغنية وتطلّع خريطة ضربات.</div>
+          <div class="wave" id="a3" style="top:860px"></div>
+          <div class="marks" id="a4" style="top:1220px"></div>
+          <div class="marklbl" id="a5" style="top:1380px">110 BPM · 16 BEATS</div>
+        </div>
+      </section>
+
+      <section id="ch3" class="scene clip" data-start="8" data-duration="4" data-track-index="2">
+        <div class="pane">
+          <div class="line lg" id="b1" style="top:320px">كل قصّة<br>بتتثبّت على علامة.</div>
+          <div class="marks" id="b2" style="top:760px"></div>
+          <div class="strip" id="b3" style="top:950px">
+            <s></s><s></s><s></s><s></s>
+          </div>
+          <div class="marklbl" id="b4" style="top:1400px">CUT ON BEAT</div>
+        </div>
+      </section>
+
+      <section id="ch4" class="scene clip" data-start="12" data-duration="3" data-track-index="3">
+        <div class="pane">
+          <div class="line lg" id="c1" style="top:320px">تغيّر الأغنية؟<br>الحركة <span class="amber">بتتظبط تاني</span>.</div>
+          <div class="marks" id="c2" style="top:780px"></div>
+          <div class="bars" id="c3" style="top:940px"></div>
+        </div>
+      </section>
+
+      <section id="ch5" class="scene clip" data-start="15" data-duration="3" data-track-index="4">
+        <div class="pane">
+          <div class="line xl" id="d1" style="top:420px">علّق «<span class="amber">إيقاع</span>»<br>وأبعتلك الطريقة.</div>
+          <div class="bars" id="d2" style="top:900px"></div>
+          <div class="name" id="d3">video-production</div>
+        </div>
+      </section>
+
+      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="18"
+             data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+window.__FMT = { id: "vertical", w: 1080, h: 1920, safeTop: 230, safeBottom: 1690, zones: {} };
+window.__MF = [];
+window.__MOTION = [];
+const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
+const F = (f) => f / 30;
+
+/* 110 BPM at 30fps is a beat every 16.36 frames. Everything in this piece is
+ * placed on that grid, because the claim is that it is. */
+const BPM = 110, BEAT = 30 * 60 / BPM;
+
+function build() {
+  for (const id of ["h2", "c3", "d2"]) {
+    const g = document.getElementById(id);
+    for (let i = 0; i < 13; i++) {
+      const b = document.createElement("b");
+      if (id === "c3" && i % 3 === 1) b.className = "q";
+      g.appendChild(b);
+    }
+  }
+  for (const id of ["a3"]) {
+    const w = document.getElementById(id);
+    for (let i = 0; i < 58; i++) {
+      const s = document.createElement("i");
+      s.style.height = (18 + 104 * Math.abs(Math.sin(i * 0.55)) * (0.5 + 0.5 * Math.cos(i * 0.21))) + "px";
+      w.appendChild(s);
+    }
+  }
+  for (const id of ["a4", "b2", "c2"]) {
+    const m = document.getElementById(id);
+    for (let i = 0; i < 8; i++) {
+      const u = document.createElement("u");
+      u.style.right = (i * 128 + 10) + "px";
+      m.appendChild(u);
+    }
+  }
+
+  // initial state OUTSIDE the timeline — tl.set(…,0) does not apply at frame 0
+  gsap.set(["#h1","#a1","#a2","#a3","#a5","#b1","#b4","#c1","#d1","#d3"], { opacity: 0 });
+  gsap.set(["#h1","#a1","#b1","#c1","#d1"], { y: 24 });
+  gsap.set([".bars b"], { scaleY: 0.35, opacity: 0 });
+  gsap.set([".marks u"], { opacity: 0, scaleY: 0.2, transformOrigin: "center top" });
+  gsap.set([".wave i"], { scaleY: 0, transformOrigin: "center" });
+  gsap.set(".strip s", { opacity: 0 });
+  gsap.set("#b3", { opacity: 0 });
+
+  const tl = gsap.timeline({ paused: true });
+  const rise = { opacity: 1, y: 0, ease: "power2.out" };
+
+  /* a bar field that pulses ON the grid — 16.36 frames apart, not "roughly" */
+  const pulse = (sel, from, count) => {
+    for (let k = 0; k < count; k++) {
+      const at = from + k * BEAT;
+      tl.to(sel, { scaleY: 1, duration: F(3), ease: "power2.out",
+                   stagger: { each: F(0.9), from: "center" } }, F(at));
+      tl.to(sel, { scaleY: 0.4, duration: F(BEAT - 5), ease: "power1.in",
+                   stagger: { each: F(0.9), from: "center" } }, F(at + 3));
+    }
+  };
+
+  /* ── HOOK · 0–90 — the grid is running before the words ─────────── */
+  tl.to("#h2 b", { opacity: 1, duration: F(4), stagger: F(1) }, F(0));
+  pulse("#h2 b", 2, 5);
+  tl.to("#h1", { ...rise, duration: F(14) }, F(4));
+
+  /* ── VALUE · 90–240 — the waveform becomes marks ────────────────── */
+  tl.to("#a1", { ...rise, duration: F(14) }, F(96));
+  tl.to("#a2", { opacity: 1, duration: F(12) }, F(134));
+  tl.to("#a3", { opacity: 1, duration: F(2) }, F(150));
+  tl.to(".wave i", { scaleY: 1, duration: F(5), stagger: F(0.5),
+                     ease: "power2.out" }, F(150));
+  tl.to("#a4 u", { opacity: 1, scaleY: 1, duration: F(5), stagger: F(4),
+                   ease: "back.out(2)" }, F(166));
+  tl.to("#a5", { opacity: 1, duration: F(10) }, F(182));
+
+  /* ── VALUE · 240–360 — cuts snapping onto the marks ─────────────── */
+  tl.to("#b1", { ...rise, duration: F(14) }, F(246));
+  tl.to("#b2 u", { opacity: 1, scaleY: 1, duration: F(4), stagger: F(3) }, F(262));
+  tl.to("#b3", { opacity: 1, duration: F(2) }, F(280));
+  tl.to(".strip s", { opacity: 1, duration: F(4), stagger: F(BEAT),
+                      ease: "none" }, F(280));
+  tl.to("#b4", { opacity: 1, duration: F(10) }, F(296));
+
+  /* ── VALUE · 360–450 — a different grid, same rule ──────────────── */
+  tl.to("#c1", { ...rise, duration: F(14) }, F(366));
+  tl.to("#c2 u", { opacity: 1, scaleY: 1, duration: F(4), stagger: F(3) }, F(382));
+  tl.to("#c3 b", { opacity: 1, duration: F(4), stagger: F(1) }, F(396));
+  pulse("#c3 b", 400, 3);
+
+  /* ── CTA · 450–540 ──────────────────────────────────────────────── */
+  tl.to("#d1", { ...rise, duration: F(16) }, F(456));
+  tl.to("#d2 b", { opacity: 1, scaleY: 1, duration: F(6), stagger: F(1.4) }, F(462));
+  tl.to("#d3", { opacity: 1, duration: F(12) }, F(474));
+
+  /* ── music — one continuous track, gain automation only (#26 #27) ─ */
+  tl.fromTo("#bgm", { volume: 0 }, { volume: 0.44, duration: 0.8, ease: "none",
+            immediateRender: false }, 0);
+  tl.to("#bgm", { volume: 0.32, duration: F(8), ease: "none" }, F(240));
+  tl.to("#bgm", { volume: 0.44, duration: F(18), ease: "none" }, F(280));
+  tl.to("#bgm", { volume: 0, duration: 1.3, ease: "none" }, F(501));
+
+  const t = (id, ch, fr, still, text, crit) =>
+    mf(id, { type: "text", chapter: ch, frames: fr, still_from: still, text: text,
+             critical: crit !== false, el: "#" + id });
+  const sh = (id, ch, fr, still) =>
+    mf(id, { type: "shape", chapter: ch, frames: fr, still_from: still,
+             critical: false, el: "#" + id });
+
+  t("h1","ch1",[0,90],18,"كل حركة هنا واقعة على ضربة.");
+  sh("h2","ch1",[0,90],16);
+
+  t("a1","ch2",[90,240],110,"لو ظبطتها بإيدك، هتعدّ الفريمات.");
+  t("a2","ch2",[90,240],146,"الأداة بتقرا الأغنية وتطلّع خريطة ضربات.");
+  sh("a3","ch2",[90,240],182); sh("a4","ch2",[90,240],199);
+  t("a5","ch2",[90,240],192,"",false);
+
+  t("b1","ch3",[240,360],260,"كل قصّة بتتثبّت على علامة.");
+  sh("b2","ch3",[240,360],285); sh("b3","ch3",[240,360],333);
+  t("b4","ch3",[240,360],306,"",false);
+
+  t("c1","ch4",[360,450],380,"تغيّر الأغنية؟ الحركة بتتظبط تاني.");
+  sh("c2","ch4",[360,450],405); sh("c3","ch4",[360,450],413);
+
+  t("d1","ch5",[450,540],472,"علّق «إيقاع» وأبعتلك الطريقة.");
+  sh("d2","ch5",[450,540],481);
+  t("d3","ch5",[450,540],486,"",false);
+
+  window.__timelines = window.__timelines || {};
+  window.__timelines["main"] = tl;
+  tl.seek(0);
+}
+
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(build);
+else build();
+    </script>
+  </body>
+</html>

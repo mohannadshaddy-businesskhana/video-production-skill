@@ -1,0 +1,238 @@
+<!doctype html>
+<!-- Demo 10 — burned-in captions.  A plate with words lighting up one at a
+     time, which is the whole form: the caption IS the interface.
+     HOOK 0–3 · VALUE 3–14 · CTA 14–18 -->
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>اتفرّج من غير صوت</title>
+    <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-arabic.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block;
+        unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0898-08E1,U+08E3-08FF,U+FB50-FDFF,U+FE70-FEFF; }
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-latin.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block; }
+      @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
+        font-weight:700; font-style:normal; font-display:block; }
+      :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
+              --fail:#B23A2A; --white:#FFFFFF; --fail-lt:#C3685A; }
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:1080px; height:1920px; overflow:hidden; background:#14181F; }
+      #root { position:relative; width:100%; height:100%; overflow:hidden;
+              font-family:"Cairo",sans-serif; color:var(--bone); background:var(--ink); }
+      .scene { position:absolute; inset:0; overflow:hidden; background:var(--ink); }
+      .pane  { position:absolute; inset:0; direction:rtl; }
+      .line  { position:absolute; right:88px; width:904px; font-weight:600;
+               line-height:1.34; letter-spacing:-.01em; }
+      .xl { font-size:84px; } .lg { font-size:58px; } .md { font-size:44px; }
+      .amber { color:var(--amber); }
+
+      /* the muted-speaker mark */
+      .spk { position:absolute; left:50%; transform:translateX(-50%); }
+      .spk .body { width:170px; height:170px; border:14px solid var(--bone);
+                   border-radius:24px; position:relative; }
+      .spk .slash { position:absolute; left:-30px; right:-30px; top:50%;
+                    height:16px; background:var(--fail-lt); border-radius:8px; }
+
+      /* the plate + the caption band */
+      .plate { position:absolute; border-radius:12px; overflow:hidden;
+               background:linear-gradient(170deg,#2A313C 0%,#1A1F27 60%,#14181F 100%); }
+      .plate .fig { position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+                    width:56%; height:76%; border-radius:50% 50% 12px 12px;
+                    background:rgba(245,242,234,.16); }
+      .plate .head { position:absolute; left:50%; transform:translateX(-50%); top:10%;
+                     width:26%; aspect-ratio:1; border-radius:50%;
+                     background:rgba(245,242,234,.24); }
+
+      /* the caption itself — words that light as they are said */
+      .cap { position:absolute; right:88px; width:904px; text-align:center;
+             font-size:62px; font-weight:700; line-height:1.4; }
+      .cap w { display:inline-block; margin:0 10px; color:rgba(245,242,234,.42);
+               transition:none; }
+      .cap w.on { color:var(--amber); }
+      .band { position:absolute; right:88px; width:904px; border-radius:14px;
+              background:rgba(20,24,31,.82); border:4px solid rgba(245,242,234,.2); }
+
+      .safe { position:absolute; right:88px; width:904px; border:5px dashed rgba(245,242,234,.35);
+              border-radius:12px; }
+      .safelbl { position:absolute; right:88px; width:904px; font-family:"Mono",monospace;
+                 font-size:26px; letter-spacing:.14em; color:rgba(245,242,234,.6);
+                 direction:ltr; text-align:right; font-weight:700; }
+
+      .name { position:absolute; right:88px; top:1520px; width:904px;
+              font-family:"Mono",monospace; font-size:40px; letter-spacing:.06em;
+              color:var(--amber); direction:ltr; text-align:right; font-weight:700; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="18"
+         data-fps="30" data-width="1080" data-height="1920">
+
+      <section id="ch1" class="scene clip" data-start="0" data-duration="3" data-track-index="0">
+        <div class="pane">
+          <div class="spk" id="h1" style="top:320px"><div class="body"><div class="slash"></div></div></div>
+          <div class="line xl" id="h2" style="top:700px">أغلب الناس<br>بتتفرّج <span class="amber">من غير صوت</span>.</div>
+          <div class="band" id="h3" style="top:1250px; height:160px"></div>
+          <div class="cap" id="h4" style="top:1290px"></div>
+        </div>
+      </section>
+
+      <section id="ch2" class="scene clip" data-start="3" data-duration="6" data-track-index="1">
+        <div class="pane">
+          <div class="line lg" id="a1" style="top:280px">من غير ترجمة،<br>الفيديو بيتسكّب.</div>
+          <div class="plate" id="a2" style="right:88px; top:580px; width:904px; height:640px">
+            <div class="head"></div><div class="fig"></div></div>
+          <div class="band" id="a3" style="top:1040px; height:160px"></div>
+          <div class="cap" id="a4" style="top:1080px"></div>
+          <div class="line md" id="a5" style="top:1330px">الأداة بتحط الكلمة على الكادر في توقيتها.</div>
+        </div>
+      </section>
+
+      <section id="ch3" class="scene clip" data-start="9" data-duration="5" data-track-index="2">
+        <div class="pane">
+          <div class="line lg" id="b1" style="top:280px">سطرين بحد أقصى.<br>وبعيد عن حافة الشاشة.</div>
+          <div class="safe" id="b2" style="top:600px; height:760px"></div>
+          <div class="plate" id="b3" style="right:130px; top:640px; width:820px; height:560px">
+            <div class="head"></div><div class="fig"></div></div>
+          <div class="band" id="b4" style="right:130px; width:820px; top:1080px; height:150px"></div>
+          <div class="cap" id="b5" style="right:130px; width:820px; top:1116px; font-size:52px"></div>
+          <div class="safelbl" id="b6" style="top:1420px">SAFE AREA · 2 LINES MAX</div>
+        </div>
+      </section>
+
+      <section id="ch4" class="scene clip" data-start="14" data-duration="4" data-track-index="3">
+        <div class="pane">
+          <div class="line xl" id="c1" style="top:400px">تابع —<br>بنوري <span class="amber">نوع كل يوم</span>.</div>
+          <div class="band" id="c2" style="top:900px; height:170px"></div>
+          <div class="cap" id="c3" style="top:940px"></div>
+          <div class="name" id="c4">video-production</div>
+        </div>
+      </section>
+
+      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="18"
+             data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+window.__FMT = { id: "vertical", w: 1080, h: 1920, safeTop: 230, safeBottom: 1690, zones: {} };
+window.__MF = [];
+window.__MOTION = [];
+const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
+const F = (f) => f / 30;
+
+const CAPS = {
+  h4: ["الصوت", "مقفول"],
+  a4: ["الكلمة", "بتظهر", "في", "وقتها"],
+  b5: ["سطرين", "بس", "وبعيد", "عن", "الحافة"],
+  c3: ["تابع", "للباقي"],
+};
+
+function build() {
+  for (const [id, words] of Object.entries(CAPS)) {
+    const el = document.getElementById(id);
+    words.forEach((t) => {
+      const w = document.createElement("w"); w.textContent = t; el.appendChild(w);
+    });
+  }
+
+  // initial state OUTSIDE the timeline — tl.set(…,0) does not apply at frame 0
+  gsap.set(["#h1","#h2","#h3","#h4","#a1","#a2","#a3","#a4","#a5",
+            "#b1","#b2","#b3","#b4","#b5","#b6","#c1","#c2","#c3","#c4"], { opacity: 0 });
+  gsap.set(["#h2","#a1","#b1","#c1"], { y: 24 });
+  gsap.set("#h1", { scale: 0.7, transformOrigin: "center" });
+
+  const tl = gsap.timeline({ paused: true });
+  const rise = { opacity: 1, y: 0, ease: "power2.out" };
+
+  /* A caption lights word by word. tl.call is skipped on seek, so the state is
+   * driven from onUpdate over a proxy: any frame reconstructs correctly. */
+  const speak = (id, at, per) => {
+    const el = document.getElementById(id);
+    const n = el.children.length;
+    const p = { i: 0 };
+    tl.to(p, { i: n, duration: F(per * n), ease: "none",
+               onUpdate: () => {
+                 for (let k = 0; k < n; k++) el.children[k].classList.toggle("on", k < p.i);
+               } }, F(at));
+  };
+
+  /* ── HOOK · 0–90 — the muted mark, then the fact ────────────────── */
+  tl.to("#h1", { opacity: 1, scale: 1, duration: F(11), ease: "back.out(1.7)" }, F(0));
+  tl.to("#h2", { ...rise, duration: F(14) }, F(4));
+  tl.to(["#h3","#h4"], { opacity: 1, duration: F(8) }, F(16));
+  speak("h4", 20, 10);
+
+  /* ── VALUE · 90–270 — the words land on the plate ───────────────── */
+  tl.to("#a1", { ...rise, duration: F(14) }, F(96));
+  tl.to("#a2", { opacity: 1, duration: F(12) }, F(120));
+  tl.to(["#a3","#a4"], { opacity: 1, duration: F(8) }, F(140));
+  speak("a4", 146, 11);
+  tl.to("#a5", { opacity: 1, duration: F(14) }, F(196));
+
+  /* ── VALUE · 270–420 — inside the safe area, two lines ──────────── */
+  tl.to("#b1", { ...rise, duration: F(14) }, F(276));
+  tl.to("#b2", { opacity: 1, duration: F(10) }, F(292));
+  tl.to("#b3", { opacity: 1, duration: F(10) }, F(300));
+  tl.to(["#b4","#b5"], { opacity: 1, duration: F(8) }, F(318));
+  speak("b5", 322, 10);
+  tl.to("#b6", { opacity: 1, duration: F(10) }, F(356));
+
+  /* ── CTA · 420–540 ──────────────────────────────────────────────── */
+  tl.to("#c1", { ...rise, duration: F(16) }, F(426));
+  tl.to(["#c2","#c3"], { opacity: 1, duration: F(8) }, F(444));
+  speak("c3", 448, 12);
+  tl.to("#c4", { opacity: 1, duration: F(12) }, F(462));
+
+  /* ── music — one continuous track, gain automation only (#26 #27) ─ */
+  tl.fromTo("#bgm", { volume: 0 }, { volume: 0.40, duration: 0.9, ease: "none",
+            immediateRender: false }, 0);
+  tl.to("#bgm", { volume: 0.29, duration: F(8), ease: "none" }, F(270));
+  tl.to("#bgm", { volume: 0.40, duration: F(18), ease: "none" }, F(312));
+  tl.to("#bgm", { volume: 0, duration: 1.3, ease: "none" }, F(501));
+
+  const t = (id, ch, fr, still, text, crit) =>
+    mf(id, { type: "text", chapter: ch, frames: fr, still_from: still, text: text,
+             critical: crit !== false, el: "#" + id });
+  const vid = (id, ch, fr, still) =>
+    mf(id, { type: "video", chapter: ch, frames: fr, still_from: still,
+             critical: false, el: "#" + id });
+  const sh = (id, ch, fr, still) =>
+    mf(id, { type: "shape", chapter: ch, frames: fr, still_from: still,
+             critical: false, el: "#" + id });
+
+  sh("h1","ch1",[0,90],11);
+  t("h2","ch1",[0,90],18,"أغلب الناس بتتفرّج من غير صوت.");
+  sh("h3","ch1",[0,90],24);
+  t("h4","ch1",[0,90],40,"",false);
+
+  t("a1","ch2",[90,270],110,"من غير ترجمة، الفيديو بيتسكّب.");
+  vid("a2","ch2",[90,270],132);
+  sh("a3","ch2",[90,270],148);
+  t("a4","ch2",[90,270],190,"",false);
+  t("a5","ch2",[90,270],210,"الأداة بتحط الكلمة على الكادر في توقيتها.");
+
+  t("b1","ch3",[270,420],290,"سطرين بحد أقصى. وبعيد عن حافة الشاشة.");
+  sh("b2","ch3",[270,420],302); vid("b3","ch3",[270,420],310);
+  sh("b4","ch3",[270,420],326);
+  t("b5","ch3",[270,420],372,"",false);
+  t("b6","ch3",[270,420],366,"",false);
+
+  t("c1","ch4",[420,540],442,"تابع — بنوري نوع كل يوم.");
+  sh("c2","ch4",[420,540],452);
+  t("c3","ch4",[420,540],472,"",false);
+  t("c4","ch4",[420,540],474,"",false);
+
+  window.__timelines = window.__timelines || {};
+  window.__timelines["main"] = tl;
+  tl.seek(0);
+}
+
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(build);
+else build();
+    </script>
+  </body>
+</html>
