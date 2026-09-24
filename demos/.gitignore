@@ -2,6 +2,9 @@
 */renders/
 */layout.json
 
+# beat maps are regenerated from the music bed, which is not shipped either
+*/beats/
+
 # each demo's assets/ is a junction to _assets/ — committing it would store
 # every font once per demo
 [0-9]*/assets/

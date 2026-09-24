@@ -5,7 +5,7 @@ composition with its own visual language — that is the point. A single templat
 restyled thirteen times would demonstrate the opposite of what is being claimed.
 
 All of them explain the skill itself, so the **content is a constant and the
-form is the variable**. Each is 18s, 1080×1920, −14 LUFS, and passes both the
+form is the variable**. Each is 18–24s, 1080×1920, −14 LUFS, and passes both the
 script gate and the render gate.
 
 | | Type | What its form is built from | Ground |
@@ -16,7 +16,7 @@ script gate and the render gate.
 | `04-section-series` | section series | a rail that never moves, an 18-cell grid, one frame whose contents swap | ink |
 | `05-explainer` | faceless explainer | ruled paper and a diagram that draws itself | **white** |
 | `06-motion-graphics` | motion graphics | type only — no diagram, no window, no plate. Six beats, not four | ink |
-| `07-music-video` | music video | a bar field on a real 110 BPM grid, a waveform resolving to beat marks | ink |
+| `07-music-video` | music video | **the whole frame cuts on every beat** — 33 hard cuts from the track's own beat map, no fades; the claim lands on the drop | amber · bone · ink, per beat |
 | `08-product-tour` | product tour | browser chrome, a real page, one push-in and a cursor | **grey** |
 | `09-talking-head` | talking-head recut | a footage plate that never changes, with cards arriving over it | ink |
 | `10-captions` | burned-in captions | a caption band whose words light one at a time | ink |
@@ -39,6 +39,11 @@ render, normalise, verify — stopping at the first failure. A render nobody
 gated is a render nobody trusts.
 
 ## Before you render
+
+`07-music-video` is cut to **our** track: its beat length and the drop at beat 16
+were read with `hyperframes beats`. With another track, run that on it and set
+`BEAT` and `DROP` in the composition from the result — a cut that misses the beat
+is the one thing a music video cannot get away with.
 
 `_assets/` holds the fonts and the music bed, and each demo links to it.
 

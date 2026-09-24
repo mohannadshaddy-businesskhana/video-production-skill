@@ -1,12 +1,46 @@
 <!doctype html>
-<!-- Demo 07 — music video.  A beat grid that pulses, a waveform that becomes
-     marks, and cuts that land on them.  Five beats.
-     HOOK 0–3 · VALUE 3–15 · CTA 15–18 -->
+<!--
+  Demo 07 — music video.  v2.
+
+  v1 pulsed a bar field over a still frame: a visualiser, and the same
+  fade-in-a-heading grammar as every other demo. What makes a music video is
+  that THE EDIT IS THE RHYTHM, so v2 cuts the whole frame on every beat —
+  33 hard cuts in 18 seconds, a new ground and a new composition each time,
+  and not one fade.
+
+  The grid is read from the track, not typed in. `hyperframes beats` gives an
+  onset every 0.273s from t=0; every other one is a quarter note, so a beat
+  lands every 16.36 frames (110 BPM). Which beat is the "one" is read from the
+  strengths: odd quarters are the loudest (the snare on 2 and 4), and of the
+  even ones k%4==0 beats k%4==2, so the bar starts on k=0. At k=16 every
+  strength jumps from ~0.35 to ~0.73 — the track opens up there, and the
+  claim is timed to land on it.
+
+  The edit follows the track the way an editor would:
+    bars 1-4  two colours, a zoom hit on the "one" only
+    k=16      two white frames on the drop, then three colours and a hit on
+              every beat
+    bars 8-9  back to two colours for the close
+
+  Quarter-note cuts at 110 BPM are 1.8 luminance changes a second — under the
+  three-flashes-a-second limit. Cutting on the eighths would not be.
+
+  The line sits on a card that never moves while it is read: the frame is the
+  rhythm, the card is the message. A cut is a state, not a motion, so nothing
+  here is registered in __MOTION.
+
+  Cold-read ledger (script.json):
+    ch1 0-65     establishes  the picture cuts with the beat
+    ch2 65-196   needs ch1 · establishes the tool listens to the song, counting by hand costs time
+    ch3 196-262  needs ch2 · establishes every beat has a place
+    ch4 262-458  needs ch3 · establishes every move lands on the beat  (the claim, on the drop)
+    cta 458-540  needs ch4
+-->
 <html lang="ar">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1080, height=1920" />
-    <title>كل حركة على الضربة</title>
+    <title>كل انتقال على الضربة</title>
     <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
@@ -19,98 +53,118 @@
       @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
         font-weight:700; font-style:normal; font-display:block; }
       :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
-              --fail:#B23A2A; --white:#FFFFFF; --pass-lt:#5E8F78; }
+              --fail:#B23A2A; --white:#FFFFFF; }
       * { margin:0; padding:0; box-sizing:border-box; }
-      html, body { width:1080px; height:1920px; overflow:hidden; background:#14181F; }
+      html, body { width:1080px; height:1920px; overflow:hidden; background:#C77B0E; }
       #root { position:relative; width:100%; height:100%; overflow:hidden;
-              font-family:"Cairo",sans-serif; color:var(--bone); background:var(--ink); }
-      .scene { position:absolute; inset:0; overflow:hidden; background:var(--ink); }
-      .pane  { position:absolute; inset:0; direction:rtl; }
-      .line  { position:absolute; right:88px; width:904px; font-weight:600;
-               line-height:1.34; letter-spacing:-.01em; }
-      .xl { font-size:88px; } .lg { font-size:62px; } .md { font-size:48px; }
-      .amber { color:var(--amber); }
+              font-family:"Cairo",sans-serif; }
+      .scene { position:absolute; inset:0; }
+      #bg { position:absolute; inset:0; background:var(--amber); }
 
-      /* the bar field — the signature of this form */
-      .bars { position:absolute; left:0; right:0; display:flex; align-items:flex-end;
-              justify-content:center; gap:14px; height:520px; }
-      .bars b { width:44px; background:var(--amber); border-radius:8px 8px 0 0;
-                display:block; height:60px; transform-origin:center bottom; }
-      .bars b.q { background:rgba(245,242,234,.3); }
+      /* one composition per cut. Every shape is thick and axis-aligned or
+         round — thin diagonals over a saturated field break the palette
+         under 4:2:0 chroma (toolchain-traps §2.3) */
+      .shot { position:absolute; inset:0; visibility:hidden; transform-origin:540px 960px;
+              --a:#14181F; --b:#14181F; --g:#C77B0E; }
+      .shot i { position:absolute; display:block; }
+      .shot .a { background:var(--a); }
+      .shot .b { background:var(--b); }
+      .shot .g { background:var(--g); }
+      .shot .ra { background:transparent; border-style:solid; border-color:var(--a); border-radius:50%; }
+      .shot .rb { background:transparent; border-style:solid; border-color:var(--b); border-radius:50%; }
+      .shot .oa { background:transparent; border-style:solid; border-color:var(--a); }
 
-      /* a waveform strip that turns into beat marks */
-      .wave { position:absolute; right:88px; width:904px; height:150px;
-              border-top:4px solid rgba(245,242,234,.25);
-              border-bottom:4px solid rgba(245,242,234,.25);
-              display:flex; align-items:center; justify-content:center; gap:7px; }
-      .wave i { width:9px; background:rgba(245,242,234,.5); border-radius:5px; display:block; }
-      .marks { position:absolute; right:88px; width:904px; height:80px; }
-      .marks u { position:absolute; top:0; width:8px; height:80px; background:var(--amber);
-                 border-radius:4px; display:block; }
-      .marklbl { position:absolute; right:88px; width:904px; font-family:"Mono",monospace;
-                 font-size:26px; letter-spacing:.16em; color:rgba(245,242,234,.6);
-                 direction:ltr; text-align:right; font-weight:700; }
+      #metro { position:absolute; left:402px; top:262px; display:flex; direction:rtl; gap:16px;
+               padding:16px 20px; background:var(--ink); border:6px solid var(--bone);
+               border-radius:22px; }
+      #metro i { display:block; width:44px; height:44px; border-radius:10px;
+                 background:var(--bone); opacity:.22; }
 
-      /* cuts snapping to the marks */
-      .strip { position:absolute; right:88px; width:904px; height:230px; display:flex;
-               flex-direction:row-reverse; gap:10px; }
-      .strip s { flex:1; border:4px solid rgba(245,242,234,.35); border-radius:6px;
-                 background:rgba(245,242,234,.05); display:block; text-decoration:none; }
-      .strip s.hit { border-color:var(--amber); background:rgba(199,123,14,.2); }
-
-      .name { position:absolute; right:88px; top:1520px; width:904px;
-              font-family:"Mono",monospace; font-size:40px; letter-spacing:.06em;
-              color:var(--amber); direction:ltr; text-align:right; font-weight:700; }
+      .slot { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+      .card { width:904px; background:var(--ink); border:8px solid var(--bone); border-radius:28px;
+              padding:48px 56px 54px; visibility:hidden; }
+      .card .ln { font-size:76px; font-weight:800; line-height:1.3; color:var(--bone);
+                  direction:rtl; text-align:right; letter-spacing:-.015em; }
+      .card .ln .x { color:var(--amber); }
+      .card .tag { margin-top:22px; font-family:"Mono",monospace; font-size:30px; font-weight:700;
+                   letter-spacing:.12em; color:var(--amber); direction:ltr; text-align:right; }
     </style>
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="18"
          data-fps="30" data-width="1080" data-height="1920">
+      <section id="cut" class="scene clip" data-start="0" data-duration="18" data-track-index="0">
+        <div id="bg"></div>
 
-      <section id="ch1" class="scene clip" data-start="0" data-duration="3" data-track-index="0">
-        <div class="pane">
-          <div class="line xl" id="h1" style="top:340px">كل حركة هنا<br>واقعة على <span class="amber">ضربة</span>.</div>
-          <div class="bars" id="h2" style="top:900px"></div>
+        <div class="shot" id="sh-sun">
+          <i class="a h" style="left:160px;top:0;width:760px;height:760px;border-radius:50%"></i>
+          <i class="b" style="left:0;top:1400px;width:1080px;height:520px"></i>
         </div>
-      </section>
-
-      <section id="ch2" class="scene clip" data-start="3" data-duration="5" data-track-index="1">
-        <div class="pane">
-          <div class="line lg" id="a1" style="top:300px">لو ظبطتها بإيدك،<br>هتعدّ الفريمات.</div>
-          <div class="line md" id="a2" style="top:620px">الأداة بتقرا الأغنية وتطلّع خريطة ضربات.</div>
-          <div class="wave" id="a3" style="top:860px"></div>
-          <div class="marks" id="a4" style="top:1220px"></div>
-          <div class="marklbl" id="a5" style="top:1380px">110 BPM · 16 BEATS</div>
+        <div class="shot" id="sh-wave">
+          <i class="a" style="left:70px;top:650px;width:76px;height:620px;border-radius:38px"></i>
+          <i class="b" style="left:178px;top:510px;width:76px;height:900px;border-radius:38px"></i>
+          <i class="a" style="left:286px;top:340px;width:76px;height:1240px;border-radius:38px"></i>
+          <i class="a" style="left:394px;top:580px;width:76px;height:760px;border-radius:38px"></i>
+          <i class="b h" style="left:502px;top:260px;width:76px;height:1400px;border-radius:38px"></i>
+          <i class="a" style="left:610px;top:470px;width:76px;height:980px;border-radius:38px"></i>
+          <i class="a" style="left:718px;top:370px;width:76px;height:1180px;border-radius:38px"></i>
+          <i class="b" style="left:826px;top:610px;width:76px;height:700px;border-radius:38px"></i>
+          <i class="a" style="left:934px;top:530px;width:76px;height:860px;border-radius:38px"></i>
         </div>
-      </section>
-
-      <section id="ch3" class="scene clip" data-start="8" data-duration="4" data-track-index="2">
-        <div class="pane">
-          <div class="line lg" id="b1" style="top:320px">كل قصّة<br>بتتثبّت على علامة.</div>
-          <div class="marks" id="b2" style="top:760px"></div>
-          <div class="strip" id="b3" style="top:950px">
-            <s></s><s></s><s></s><s></s>
-          </div>
-          <div class="marklbl" id="b4" style="top:1400px">CUT ON BEAT</div>
+        <div class="shot" id="sh-disc">
+          <i class="ra h" style="left:-110px;top:310px;width:1300px;height:1300px;border-width:150px"></i>
+          <i class="rb" style="left:180px;top:600px;width:720px;height:720px;border-width:96px"></i>
         </div>
-      </section>
-
-      <section id="ch4" class="scene clip" data-start="12" data-duration="3" data-track-index="3">
-        <div class="pane">
-          <div class="line lg" id="c1" style="top:320px">تغيّر الأغنية؟<br>الحركة <span class="amber">بتتظبط تاني</span>.</div>
-          <div class="marks" id="c2" style="top:780px"></div>
-          <div class="bars" id="c3" style="top:940px"></div>
+        <div class="shot" id="sh-split">
+          <i class="a h" style="left:0;top:1300px;width:1080px;height:620px"></i>
+          <i class="b" style="left:590px;top:1070px;width:460px;height:460px;border-radius:50%"></i>
+          <i class="a" style="left:0;top:0;width:420px;height:560px"></i>
         </div>
-      </section>
-
-      <section id="ch5" class="scene clip" data-start="15" data-duration="3" data-track-index="4">
-        <div class="pane">
-          <div class="line xl" id="d1" style="top:420px">علّق «<span class="amber">إيقاع</span>»<br>وأبعتلك الطريقة.</div>
-          <div class="bars" id="d2" style="top:900px"></div>
-          <div class="name" id="d3">video-production</div>
+        <div class="shot" id="sh-film">
+          <i class="a h" id="fl" style="left:0;top:0;width:180px;height:1920px"></i>
+          <i class="a" id="fr" style="left:900px;top:0;width:180px;height:1920px"></i>
+          <i class="b" style="left:250px;top:250px;width:580px;height:430px;border-radius:16px"></i>
+          <i class="b" style="left:250px;top:1190px;width:580px;height:430px;border-radius:16px"></i>
         </div>
-      </section>
+        <div class="shot" id="sh-phone">
+          <i class="oa h" style="left:190px;top:260px;width:700px;height:1400px;border-width:48px;border-radius:96px"></i>
+          <i class="a" style="left:450px;top:300px;width:180px;height:36px;border-radius:18px"></i>
+          <i class="b" style="left:495px;top:1495px;width:90px;height:90px;border-radius:50%"></i>
+        </div>
+        <div class="shot" id="sh-steps">
+          <i class="a h" style="left:0;top:1540px;width:1080px;height:380px"></i>
+          <i class="a" style="left:360px;top:1260px;width:720px;height:280px"></i>
+          <i class="a" style="left:720px;top:980px;width:360px;height:280px"></i>
+          <i class="b" style="left:0;top:0;width:480px;height:620px"></i>
+        </div>
+        <div class="shot" id="sh-line">
+          <i class="a h" style="left:88px;top:260px;width:472px;height:150px;border-radius:20px"></i>
+          <i class="b" style="left:590px;top:260px;width:402px;height:150px;border-radius:20px"></i>
+          <i class="b" style="left:88px;top:450px;width:212px;height:150px;border-radius:20px"></i>
+          <i class="a" style="left:330px;top:450px;width:662px;height:150px;border-radius:20px"></i>
+          <i class="a" style="left:88px;top:1200px;width:612px;height:150px;border-radius:20px"></i>
+          <i class="b" style="left:730px;top:1200px;width:262px;height:150px;border-radius:20px"></i>
+          <i class="b" style="left:88px;top:1390px;width:332px;height:150px;border-radius:20px"></i>
+          <i class="a" style="left:450px;top:1390px;width:542px;height:150px;border-radius:20px"></i>
+          <i class="a" style="left:88px;top:1580px;width:552px;height:150px;border-radius:20px"></i>
+          <i class="b" style="left:670px;top:1580px;width:322px;height:150px;border-radius:20px"></i>
+          <i class="b" style="left:700px;top:0;width:24px;height:1920px"></i>
+        </div>
 
+        <div id="metro"><i id="m0"></i><i id="m1"></i><i id="m2"></i><i id="m3"></i></div>
+
+        <div class="slot"><div class="card" id="k1">
+          <div class="ln">كل انتقال —<br><span class="x">على الضربة.</span></div></div></div>
+        <div class="slot"><div class="card" id="k2">
+          <div class="ln">الأداة بتسمع الأغنية<br><span class="x">بدل ما تعدّها بإيدك.</span></div></div></div>
+        <div class="slot"><div class="card" id="k3">
+          <div class="ln">وبتحدد مكان<br><span class="x">كل ضربة فيها.</span></div></div></div>
+        <div class="slot"><div class="card" id="k4">
+          <div class="ln">وكل حركة<br><span class="x">بتقع في مكانها.</span></div></div></div>
+        <div class="slot"><div class="card" id="k5">
+          <div class="ln">تابع —<br><span class="x">نوع جديد بكرة.</span></div>
+          <div class="tag">video-production</div></div></div>
+      </section>
       <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="18"
              data-track-index="10" data-volume="1"></audio>
     </div>
@@ -122,125 +176,92 @@ window.__MOTION = [];
 const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
 const F = (f) => f / 30;
 
-/* 110 BPM at 30fps is a beat every 16.36 frames. Everything in this piece is
- * placed on that grid, because the claim is that it is. */
-const BPM = 110, BEAT = 30 * 60 / BPM;
+const BEAT = 30 * 0.54545;                 // frames per quarter note, from the beat map
+const beat = (k) => Math.round(k * BEAT);
+const END = 540, DROP = 16, CLOSE = 28;
+const INK = "#14181F", BONE = "#F5F2EA", AMBER = "#C77B0E", WHITE = "#FFFFFF";
+
+/* the edit: [composition, ground, fill a, fill b] for each of the 33 beats.
+   Written out rather than generated — an edit is a sequence of choices, and
+   no two neighbours share a ground or a composition, so every cut reads. */
+const CUTS = [
+  ["sun", AMBER, INK, INK],     ["wave", BONE, INK, INK],     ["disc", AMBER, INK, INK],    ["split", BONE, INK, INK],
+  ["film", INK, AMBER, AMBER],  ["phone", BONE, INK, INK],    ["steps", AMBER, INK, INK],   ["wave", BONE, AMBER, AMBER],
+  ["disc", INK, AMBER, AMBER],  ["line", BONE, INK, INK],     ["sun", AMBER, BONE, BONE],   ["split", BONE, AMBER, AMBER],
+  ["wave", INK, BONE, BONE],    ["film", AMBER, INK, INK],    ["phone", BONE, AMBER, AMBER],["steps", AMBER, INK, INK],
+  // the drop — three colours from here
+  ["sun", INK, AMBER, BONE],    ["disc", AMBER, INK, BONE],   ["wave", BONE, INK, AMBER],   ["line", INK, AMBER, BONE],
+  ["split", AMBER, INK, BONE],  ["film", BONE, INK, AMBER],   ["phone", INK, AMBER, BONE],  ["steps", BONE, AMBER, INK],
+  ["disc", INK, BONE, AMBER],   ["wave", AMBER, INK, BONE],   ["sun", BONE, INK, AMBER],    ["line", AMBER, BONE, INK],
+  // the close — back to two
+  ["phone", INK, AMBER, AMBER], ["split", BONE, INK, INK],    ["disc", AMBER, INK, INK],    ["wave", BONE, INK, INK],
+  ["sun", INK, AMBER, BONE],
+];
+const hitOn = (k) => (k >= DROP && k < CLOSE) || k % 4 === 0;
+
+const CARDS = [["k1", 0, beat(4)], ["k2", beat(4), beat(12)], ["k3", beat(12), beat(DROP)],
+               ["k4", beat(DROP), beat(CLOSE)], ["k5", beat(CLOSE), END]];
+const LINES = ["كل انتقال — على الضربة.", "الأداة بتسمع الأغنية بدل ما تعدّها بإيدك.",
+               "وبتحدد مكان كل ضربة فيها.", "وكل حركة بتقع في مكانها.",
+               "تابع — نوع جديد بكرة. video-production"];
+
+function drawFilm() {
+  for (const id of ["fl", "fr"]) {
+    const strip = document.getElementById(id);
+    for (let y = 40; y < 1920; y += 150) {
+      const hole = document.createElement("i");
+      hole.className = "g";
+      hole.style.cssText = `left:58px;top:${y}px;width:64px;height:84px;border-radius:12px`;
+      strip.appendChild(hole);
+    }
+  }
+}
 
 function build() {
-  for (const id of ["h2", "c3", "d2"]) {
-    const g = document.getElementById(id);
-    for (let i = 0; i < 13; i++) {
-      const b = document.createElement("b");
-      if (id === "c3" && i % 3 === 1) b.className = "q";
-      g.appendChild(b);
-    }
-  }
-  for (const id of ["a3"]) {
-    const w = document.getElementById(id);
-    for (let i = 0; i < 58; i++) {
-      const s = document.createElement("i");
-      s.style.height = (18 + 104 * Math.abs(Math.sin(i * 0.55)) * (0.5 + 0.5 * Math.cos(i * 0.21))) + "px";
-      w.appendChild(s);
-    }
-  }
-  for (const id of ["a4", "b2", "c2"]) {
-    const m = document.getElementById(id);
-    for (let i = 0; i < 8; i++) {
-      const u = document.createElement("u");
-      u.style.right = (i * 128 + 10) + "px";
-      m.appendChild(u);
-    }
-  }
-
-  // initial state OUTSIDE the timeline — tl.set(…,0) does not apply at frame 0
-  gsap.set(["#h1","#a1","#a2","#a3","#a5","#b1","#b4","#c1","#d1","#d3"], { opacity: 0 });
-  gsap.set(["#h1","#a1","#b1","#c1","#d1"], { y: 24 });
-  gsap.set([".bars b"], { scaleY: 0.35, opacity: 0 });
-  gsap.set([".marks u"], { opacity: 0, scaleY: 0.2, transformOrigin: "center top" });
-  gsap.set([".wave i"], { scaleY: 0, transformOrigin: "center" });
-  gsap.set(".strip s", { opacity: 0 });
-  gsap.set("#b3", { opacity: 0 });
-
+  drawFilm();
   const tl = gsap.timeline({ paused: true });
-  const rise = { opacity: 1, y: 0, ease: "power2.out" };
-
-  /* a bar field that pulses ON the grid — 16.36 frames apart, not "roughly" */
-  const pulse = (sel, from, count) => {
-    for (let k = 0; k < count; k++) {
-      const at = from + k * BEAT;
-      tl.to(sel, { scaleY: 1, duration: F(3), ease: "power2.out",
-                   stagger: { each: F(0.9), from: "center" } }, F(at));
-      tl.to(sel, { scaleY: 0.4, duration: F(BEAT - 5), ease: "power1.in",
-                   stagger: { each: F(0.9), from: "center" } }, F(at + 3));
-    }
+  // a tl.set at 0 does not apply on frame 0; frame-0 state goes through gsap.set
+  const put = (at, sel, v) => (at === 0 ? gsap.set(sel, v) : tl.set(sel, v, F(at)));
+  // a hit is three stepped states, not a tween — it seeks the same both ways
+  const hit = (at, sel, s) => {
+    put(at, sel, { scale: s });
+    tl.set(sel, { scale: 1 + (s - 1) * 0.4 }, F(at + 2));
+    tl.set(sel, { scale: 1 }, F(at + 4));
   };
 
-  /* ── HOOK · 0–90 — the grid is running before the words ─────────── */
-  tl.to("#h2 b", { opacity: 1, duration: F(4), stagger: F(1) }, F(0));
-  pulse("#h2 b", 2, 5);
-  tl.to("#h1", { ...rise, duration: F(14) }, F(4));
+  CUTS.forEach(([shot, g, a, b], k) => {
+    const f = beat(k), sel = "#sh-" + shot;
+    if (k) put(f, "#sh-" + CUTS[k - 1][0], { visibility: "hidden" });
+    let at = f;
+    if (k === DROP) { put(f, "#bg", { backgroundColor: WHITE }); at = f + 2; }
+    put(at, "#bg", { backgroundColor: g });
+    put(at, sel, { visibility: "visible", "--a": a, "--b": b, "--g": g });
+    if (hitOn(k)) hit(at, sel, 1.1);
+    for (let i = 0; i < 4; i++)
+      put(f, "#m" + i, i === k % 4 ? { backgroundColor: i ? BONE : AMBER, opacity: 1 }
+                                   : { backgroundColor: BONE, opacity: 0.22 });
+  });
 
-  /* ── VALUE · 90–240 — the waveform becomes marks ────────────────── */
-  tl.to("#a1", { ...rise, duration: F(14) }, F(96));
-  tl.to("#a2", { opacity: 1, duration: F(12) }, F(134));
-  tl.to("#a3", { opacity: 1, duration: F(2) }, F(150));
-  tl.to(".wave i", { scaleY: 1, duration: F(5), stagger: F(0.5),
-                     ease: "power2.out" }, F(150));
-  tl.to("#a4 u", { opacity: 1, scaleY: 1, duration: F(5), stagger: F(4),
-                   ease: "back.out(2)" }, F(166));
-  tl.to("#a5", { opacity: 1, duration: F(10) }, F(182));
+  CARDS.forEach(([id, s, e]) => {
+    put(s, "#" + id, { visibility: "visible" });
+    hit(s, "#" + id, 1.04);
+    if (e < END) tl.set("#" + id, { visibility: "hidden" }, F(e));
+  });
 
-  /* ── VALUE · 240–360 — cuts snapping onto the marks ─────────────── */
-  tl.to("#b1", { ...rise, duration: F(14) }, F(246));
-  tl.to("#b2 u", { opacity: 1, scaleY: 1, duration: F(4), stagger: F(3) }, F(262));
-  tl.to("#b3", { opacity: 1, duration: F(2) }, F(280));
-  tl.to(".strip s", { opacity: 1, duration: F(4), stagger: F(BEAT),
-                      ease: "none" }, F(280));
-  tl.to("#b4", { opacity: 1, duration: F(10) }, F(296));
-
-  /* ── VALUE · 360–450 — a different grid, same rule ──────────────── */
-  tl.to("#c1", { ...rise, duration: F(14) }, F(366));
-  tl.to("#c2 u", { opacity: 1, scaleY: 1, duration: F(4), stagger: F(3) }, F(382));
-  tl.to("#c3 b", { opacity: 1, duration: F(4), stagger: F(1) }, F(396));
-  pulse("#c3 b", 400, 3);
-
-  /* ── CTA · 450–540 ──────────────────────────────────────────────── */
-  tl.to("#d1", { ...rise, duration: F(16) }, F(456));
-  tl.to("#d2 b", { opacity: 1, scaleY: 1, duration: F(6), stagger: F(1.4) }, F(462));
-  tl.to("#d3", { opacity: 1, duration: F(12) }, F(474));
-
-  /* ── music — one continuous track, gain automation only (#26 #27) ─ */
-  tl.fromTo("#bgm", { volume: 0 }, { volume: 0.44, duration: 0.8, ease: "none",
+  /* music — one continuous track, gain automation only (#26 #27) */
+  tl.fromTo("#bgm", { volume: 0 }, { volume: 0.5, duration: F(3), ease: "none",
             immediateRender: false }, 0);
-  tl.to("#bgm", { volume: 0.32, duration: F(8), ease: "none" }, F(240));
-  tl.to("#bgm", { volume: 0.44, duration: F(18), ease: "none" }, F(280));
-  tl.to("#bgm", { volume: 0, duration: 1.3, ease: "none" }, F(501));
+  tl.to("#bgm", { volume: 0, duration: F(END - 504), ease: "none" }, F(504));
 
-  const t = (id, ch, fr, still, text, crit) =>
-    mf(id, { type: "text", chapter: ch, frames: fr, still_from: still, text: text,
-             critical: crit !== false, el: "#" + id });
-  const sh = (id, ch, fr, still) =>
-    mf(id, { type: "shape", chapter: ch, frames: fr, still_from: still,
-             critical: false, el: "#" + id });
-
-  t("h1","ch1",[0,90],18,"كل حركة هنا واقعة على ضربة.");
-  sh("h2","ch1",[0,90],16);
-
-  t("a1","ch2",[90,240],110,"لو ظبطتها بإيدك، هتعدّ الفريمات.");
-  t("a2","ch2",[90,240],146,"الأداة بتقرا الأغنية وتطلّع خريطة ضربات.");
-  sh("a3","ch2",[90,240],182); sh("a4","ch2",[90,240],199);
-  t("a5","ch2",[90,240],192,"",false);
-
-  t("b1","ch3",[240,360],260,"كل قصّة بتتثبّت على علامة.");
-  sh("b2","ch3",[240,360],285); sh("b3","ch3",[240,360],333);
-  t("b4","ch3",[240,360],306,"",false);
-
-  t("c1","ch4",[360,450],380,"تغيّر الأغنية؟ الحركة بتتظبط تاني.");
-  sh("c2","ch4",[360,450],405); sh("c3","ch4",[360,450],413);
-
-  t("d1","ch5",[450,540],472,"علّق «إيقاع» وأبعتلك الطريقة.");
-  sh("d2","ch5",[450,540],481);
-  t("d3","ch5",[450,540],486,"",false);
+  CARDS.forEach(([id, s, e], i) =>
+    mf(id, { type: "text", chapter: "cut", frames: [s, e], still_from: s + 6,
+             text: LINES[i], critical: true, el: "#" + id }));
+  CUTS.forEach(([shot], k) =>
+    mf("cut" + String(k).padStart(2, "0"), { type: "shape", chapter: "cut",
+       frames: [beat(k), k + 1 < CUTS.length ? beat(k + 1) : END], still_from: beat(k),
+       critical: false, el: "#sh-" + shot + " .h" }));
+  mf("metro", { type: "shape", chapter: "cut", frames: [0, END], still_from: 0,
+                critical: false, el: "#metro" });
 
   window.__timelines = window.__timelines || {};
   window.__timelines["main"] = tl;
