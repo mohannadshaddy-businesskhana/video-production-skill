@@ -1,0 +1,46 @@
+{
+  "title": "13 — نسخة ٦ ثواني من جولة المنتج · «أداة بتعمل الفيديو من سطر واحد»",
+  "fps": 30,
+  "format": "bumper",
+  "content_type": "teach",
+
+  "audience": "فرق ماركتنج ووكالات بتطلّع فيديوهات لعملاء",
+  "category_noun": "أداة بتعمل الفيديو",
+  "alternative": "أسبوع مع مونتير",
+
+  "mechanism": "بتحوّل الطلب لفيديو جاهز",
+  "claim": "سطر واحد بيطلع فيديو جاهز",
+  "repeat_sentence": "في أداة بتعمل الفيديو كله من سطر واحد",
+
+  "hook": {
+    "type": "transformation",
+    "line": "أداة بتعمل الفيديو من سطر واحد.",
+    "verbal": "—",
+    "visual": "شاشة المنتج بتظهر والمؤشر داخل عليها",
+    "written": "الجملة في الشريط اللي فوق"
+  },
+
+  "cta": { "kind": "lead", "words": "جرّبه — اللينك في البايو." },
+
+  "assumed_known": [],
+  "jargon": [
+    { "term": "video-production", "plain": "اسم الأداة، تحت الدعوة", "explained_in": "cta" }
+  ],
+
+  "beats": [
+    {
+      "id": "ch1", "frames": [0, 90], "job": "الخطّاف والادعاء في جملة واحدة",
+      "says": ["أداة بتعمل الفيديو من سطر واحد."],
+      "shows": "شاشة المنتج بتظهر",
+      "establishes": ["في أداة بتعمل الفيديو من سطر"],
+      "is_hook": true, "names_category": true, "is_claim": true, "shows_subject": true
+    },
+    {
+      "id": "cta", "frames": [90, 180], "job": "الدعوة واسم الأداة",
+      "says": ["جرّبه — اللينك في البايو."],
+      "shows": "التلات مقاسات جاهزين، واسم الأداة",
+      "needs": ["في أداة بتعمل الفيديو من سطر"],
+      "is_cta": true, "shows_subject": true
+    }
+  ]
+}

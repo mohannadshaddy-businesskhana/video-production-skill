@@ -6,6 +6,7 @@
 
 # an operation demo plays copies of other demos' renders — rebuilt, never stored
 */media/
+*/cuts/
 
 # beat maps are regenerated from the music bed, which is not shipped either
 */beats/

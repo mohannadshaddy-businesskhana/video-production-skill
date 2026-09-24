@@ -1,5 +1,5 @@
 {
-  "video": "D:/Projects/video-production-skill/demos/13-cutdowns/renders/13-cutdowns.mp4",
+  "video": "D:/Projects/video-production-skill/demos/13-cutdowns/short/renders/13-cutdowns-short.mp4",
   "passed": true,
   "checks": [
     {
@@ -12,28 +12,28 @@
     {
       "name": "duration",
       "ok": true,
-      "detail": "24.00s (expected 24.00s)",
+      "detail": "15.00s (expected 15.00s)",
       "ref": "",
       "warn": false
     },
     {
       "name": "loudness",
       "ok": true,
-      "detail": "-14.1 LUFS (target -14)",
+      "detail": "-14.0 LUFS (target -14)",
       "ref": "#25",
       "warn": false
     },
     {
       "name": "beat continuity",
       "ok": true,
-      "detail": "55 or 110 BPM, continuous (drift 0.14/window, no dropout)",
+      "detail": "55 or 110 BPM, continuous (drift 0.19/window, no dropout)",
       "ref": "#27",
       "warn": false
     },
     {
       "name": "palette",
       "ok": true,
-      "detail": "worst 0.7% off-palette at 21.0s (limit 2%) · 12/12 frames read",
+      "detail": "worst 0.5% off-palette at 4.4s (limit 2%) · 12/12 frames read",
       "ref": "#01",
       "warn": false
     },
@@ -68,7 +68,7 @@
     {
       "name": "content coverage",
       "ok": true,
-      "detail": "worst 55% in board (floor 45%)",
+      "detail": "worst 58% in words (floor 45%)",
       "ref": "#21",
       "warn": false
     },
