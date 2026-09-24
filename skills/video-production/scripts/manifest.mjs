@@ -116,7 +116,16 @@ const report = await page.evaluate(({ FW, FH, FPS, ROLES }) => {
     const at = Math.min(f1 - 1, Math.max(f0, (d.still_from ?? f0) + 10));
     tl.seek(at / fps, false);          // suppressEvents:false or onUpdate never fires
     showAt(at);
-    const e = { ...d, bbox: boxOf(node) };
+    // what the element actually contains, one entry per text node — the
+    // declared `text` is what the author meant to put there, and a label
+    // declared as "" once carried English through the language check (#39)
+    const texts = [];
+    const walk = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+    for (let t = walk.nextNode(); t; t = walk.nextNode()) {
+      const v = t.nodeValue.replace(/\s+/g, " ").trim();
+      if (v) texts.push(v);
+    }
+    const e = { ...d, bbox: boxOf(node), text_nodes: texts };
     if (d.zoneEl) {
       const zn = document.querySelector(d.zoneEl);
       if (zn) { const k = "z-" + d.id; extraZones[k] = boxOf(zn); e.zone = k; }
