@@ -188,8 +188,9 @@ if (!h.type || !h.line) {
 }
 
 // stacking: a silent video still has the visual and the written hook, and must
-// use both; with voice, all three are available
-const stacked = ["verbal", "visual", "written"].filter((k) => h[k]);
+// use both; with voice, all three are available. "—" is how a script says a
+// channel is unused, so a channel counts only if it holds a word.
+const stacked = ["verbal", "visual", "written"].filter((k) => /[\p{L}\p{N}]/u.test(h[k] || ""));
 rep.add("hook stacking", stacked.length >= 2,
   stacked.length >= 2 ? stacked.join(" + ")
     : `only ${stacked.length || 0} hook channel(s) — set at least two of verbal / visual / written`);
