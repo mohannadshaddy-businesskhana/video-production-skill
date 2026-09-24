@@ -75,6 +75,29 @@ await p.evaluate((n) => { tl.seek(n / 30, false); }, f); // ✓
 
 And Node variables do not exist inside `page.evaluate` — they must be passed as an argument.
 
+### 2.3 A saturated field plus thin diagonals = colours that are on nobody's ramp
+
+The palette check failed at exactly 2.0% on a launch film built on a full-frame
+saturated amber with near-black graphics over it. The offending pixels measured as
+dark red-browns with **blue at zero** — and the two colours in the frame were
+`#C77B0E` (blue 14) and `#14181F` (blue 31). No blend of them can reach zero blue,
+so these were not blends.
+
+They were **4:2:0 chroma subsampling**. Colour is stored at half resolution, so a
+thin high-contrast edge between a saturated hue and a near-black reconstructs to
+a colour on neither side's line. Diagonal strokes are the worst case, because
+every scanline crosses the edge at a different sub-pixel offset.
+
+| | |
+|---|---|
+| Symptom | palette fails by a hair, and the offending colours are impossible blends |
+| Confirm | pull the named frame and print the top offenders quantised — if blue or red sits outside the range of **every** palette colour, it is the encoder, not the design |
+| Fix | remove thin diagonals over the saturated field; thicken strokes; or drop the field to a band instead of the whole frame |
+
+The 8px bars at 42° became a solid inset block, and the same frame measured
+clean. **Do not raise the tolerance** — that hides genuine sixth colours to
+accommodate an encoding artefact you can design around.
+
 ---
 
 ## 3. Audio — normalising alone produces clipping
