@@ -1,140 +1,188 @@
 <!doctype html>
 <!--
-  Demo 02 — a code change as a video
-
-  Script v2. The first version was a changelog for a project nobody watching
-  had been following: it opened on `feat(deps): drop Python` and showed
-  "18 renders · same" with no answer to "compared against what?".
-  See failure-log #41.
-
-  The subject is now one bug, chosen because it needs no prior context and is
-  interesting within three seconds: a check reported the video was clean, and
-  the file did not exist.
-
-  Cold-read ledger (#41):
-    ch1  needs nothing — a check ran and said the video is clean
-    ch2  needs ch1 — that same file turns out not to exist
-    ch3  needs ch1+ch2 — WHY both print the same number, then the fix
-    ch4  needs ch1 — the same line, now carrying a denominator
+  Demo 02 — step-by-step tutorial.  Built from script.json; gate it first.
+  HOOK 0–3s · STEP 1 3–8s · STEP 2 8–11s · STEP 3 + claim 11–16s · CTA 16–18s
 -->
 <html lang="ar">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1080, height=1920" />
-    <title>فحص نجح على ملف مش موجود</title>
+    <title>تلات مقاسات في وقت واحد</title>
 
-    <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
 
     <style>
-      @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
-        font-weight:700; font-style:normal; font-display:block; }
       @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-arabic.woff2") format("woff2");
         font-weight:200 1000; font-style:normal; font-display:block;
         unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0898-08E1,U+08E3-08FF,U+FB50-FDFF,U+FE70-FEFF; }
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-latin.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block; }
+      @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
+        font-weight:700; font-style:normal; font-display:block; }
 
       :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
-              --fail:#B23A2A; --white:#FFFFFF;
-      /* the brand green and red measure under 3:1 on this ground; these are
-         those two mixed 25% toward the bone, which stays ON the palette ramp */
-              --pass-lt:#5E8F78; --fail-lt:#C3685A; }
+              --fail:#B23A2A; --white:#FFFFFF; --pass-lt:#5E8F78; --fail-lt:#C3685A;
+      /* the amber measures 2.99:1 on this bone ground — one hundredth under the
+         3:1 floor. This is that amber mixed 15% toward the ink: 3.7:1, and still
+         on the line between two palette colours, so the palette check sees five. */
+              --amber-tx:#AC6C11; }
 
       * { margin:0; padding:0; box-sizing:border-box; }
-      html, body { width:1080px; height:1920px; overflow:hidden; background:#14181F; }
+      html, body { width:1080px; height:1920px; overflow:hidden; background:#F5F2EA; }
       #root { position:relative; width:100%; height:100%; overflow:hidden;
-              font-family:"Mono",monospace; color:var(--bone); font-weight:700; }
-      .scene { position:absolute; inset:0; overflow:hidden; }
+              font-family:"Cairo",sans-serif; color:var(--ink); background:var(--bone); }
+      .scene { position:absolute; inset:0; overflow:hidden; background:var(--bone); }
+      .pane  { position:absolute; inset:0; direction:rtl; }
 
-      .term { position:absolute; left:56px; top:300px; width:968px; height:840px;
-              border:3px solid rgba(245,242,234,.16); border-radius:10px;
-              background:rgba(245,242,234,.03); }
-      .bar  { position:absolute; left:0; top:0; width:100%; height:78px;
-              border-bottom:3px solid rgba(245,242,234,.16);
-              display:flex; align-items:center; padding:0 28px; gap:14px; }
-      .dot  { width:18px; height:18px; border-radius:50%; background:rgba(245,242,234,.22); }
-      .bar .t { margin-left:16px; font-size:26px; color:rgba(245,242,234,.6);
-                letter-spacing:.04em; font-family:"Cairo",sans-serif; }
-      .body { position:absolute; left:0; top:78px; right:0; bottom:0; padding:44px 34px; }
+      /* the step number is the spine of a how-to — same place every time */
+      .num  { position:absolute; right:88px; top:250px; font-family:"Mono",monospace;
+              font-size:120px; line-height:1; font-weight:700; color:var(--amber-tx);
+              direction:ltr; text-align:right; }
+      .of   { position:absolute; right:88px; top:386px; font-family:"Mono",monospace;
+              font-size:26px; letter-spacing:.16em; color:rgba(20,24,31,.5);
+              direction:ltr; text-align:right; font-weight:700; }
+      .line { position:absolute; right:88px; width:904px; font-weight:600;
+              line-height:1.36; letter-spacing:-.01em; }
+      .xl   { font-size:92px; } .lg { font-size:66px; } .md { font-size:50px; }
+      .amber { color:var(--amber-tx); }
+      .warn  { color:var(--fail); }
 
-      .ln   { font-size:38px; line-height:1.8; white-space:nowrap; }
-      .hero { font-size:46px; line-height:1.7; white-space:nowrap; }
-      .dim  { color:rgba(245,242,234,.58); }
-      .amb  { color:var(--amber); }
-      .good { color:var(--pass-lt); }
-      .bad  { color:var(--fail-lt); }
+      /* ch1 — three frames opening together */
+      .row { position:absolute; left:0; right:0; top:1040px; height:420px;
+             display:flex; align-items:center; justify-content:center; gap:36px; }
+      .fr  { border:5px solid var(--ink); border-radius:6px; position:relative;
+             background:rgba(20,24,31,.05); }
+      .fr::after { content:attr(data-k); position:absolute; left:0; right:0; bottom:-48px;
+                   text-align:center; font-family:"Mono",monospace; font-size:24px;
+                   color:rgba(20,24,31,.55); font-weight:700; }
+      .fr i { position:absolute; left:13%; right:13%; background:var(--amber);
+              height:11px; border-radius:6px; }
+      .fr i.a { top:24%; } .fr i.b { top:45%; right:42%; } .fr i.c { top:66%; right:30%; }
+      .r916 { width:176px; height:313px; } .r11 { width:258px; height:258px; }
+      .r169 { width:404px; height:227px; }
 
-      /* the Arabic voice — one sentence per chapter, always in the same place */
-      .cap  { position:absolute; left:56px; top:1240px; width:968px;
-              font-family:"Cairo",sans-serif; font-weight:600; font-size:58px;
-              line-height:1.45; direction:rtl; text-align:right; color:var(--bone); }
-      .cap .q { color:var(--amber); }
-      .cap.warn .q { color:var(--fail-lt); }
+      /* ch2 — the script, reviewed */
+      .doc { position:absolute; right:88px; top:900px; width:904px;
+             border:4px solid rgba(20,24,31,.22); border-radius:8px;
+             padding:40px 34px 96px; background:rgba(20,24,31,.03); }
+      .dl  { height:24px; border-radius:12px; background:rgba(20,24,31,.20); margin-bottom:26px; }
+      .dl.s { width:58%; } .dl.m { width:82%; } .dl.l { width:96%; }
+      .stamp { position:absolute; left:34px; bottom:30px; font-family:"Mono",monospace;
+               font-size:30px; font-weight:700; color:var(--pass); direction:ltr; }
+
+      /* ch3 — designed, not cropped */
+      .cmp { position:absolute; left:0; right:0; top:820px; height:600px;
+             display:flex; align-items:center; justify-content:center; gap:70px; }
+      .cell { position:relative; }
+      .cell .cap { position:absolute; left:0; right:0; bottom:-52px; text-align:center;
+                   font-family:"Cairo",sans-serif; font-size:30px; font-weight:600;
+                   color:rgba(20,24,31,.6); }
+      .box { border:5px solid var(--ink); border-radius:6px; position:relative;
+             background:rgba(20,24,31,.05); }
+      .box b { position:absolute; background:var(--amber); border-radius:6px; display:block; }
+      .tall { width:230px; height:409px; }
+      .wide { width:470px; height:264px; }
+
+      /* ch4 — three files out */
+      .outs { position:absolute; left:0; right:0; top:1000px; height:340px;
+              display:flex; align-items:center; justify-content:center; gap:40px; }
+      .out  { width:210px; height:250px; border:5px solid var(--pass); border-radius:8px;
+              background:rgba(44,110,82,.08); position:relative; }
+      .out span { position:absolute; left:0; right:0; top:50%; transform:translateY(-50%);
+                  text-align:center; font-family:"Mono",monospace; font-size:28px;
+                  font-weight:700; color:var(--pass); }
+
+      /* the CTA names a word, so it shows the word */
+      .bubble { position:absolute; right:88px; top:920px; width:904px; height:200px;
+                border:5px solid var(--ink); border-radius:16px; background:var(--white);
+                display:flex; align-items:center; padding:0 44px; }
+      .bubble span { font-family:"Cairo",sans-serif; font-weight:700; font-size:72px;
+                     color:var(--amber-tx); }
+      .bubble::after { content:""; position:absolute; right:70px; bottom:-26px;
+                       width:0; height:0; border-left:26px solid transparent;
+                       border-right:26px solid transparent; border-top:26px solid var(--ink); }
+
+      .name { position:absolute; right:88px; top:1520px; width:904px;
+              font-family:"Mono",monospace; font-size:40px; letter-spacing:.06em;
+              color:var(--amber-tx); direction:ltr; text-align:right; font-weight:700; }
     </style>
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="18"
          data-fps="30" data-width="1080" data-height="1920">
 
-      <!-- 1 — a check passes -->
-      <section id="ch1" class="scene clip" data-start="0" data-duration="4" data-track-index="0">
-        <div class="term" id="a-term">
-          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            <span class="t">فحص الفيديو</span></div>
-          <div class="body">
-            <div class="ln dim" id="a-0">checking out.mp4 …</div>
-            <div class="hero" id="a-1" style="margin-top:36px">
-              palette&nbsp;&nbsp;&nbsp;<span class="good">ok</span>&nbsp;&nbsp;&nbsp;0.0% off-palette
+      <!-- HOOK · 0–3s -->
+      <section id="ch1" class="scene clip" data-start="0" data-duration="3" data-track-index="0">
+        <div class="pane">
+          <div class="line xl" id="h1" style="top:480px">إزاي تطلّع<br><span class="amber">تلات مقاسات</span><br>في وقت واحد.</div>
+          <div class="row" id="h2">
+            <div class="fr r169" data-k="16:9"><i class="a"></i><i class="b"></i><i class="c"></i></div>
+            <div class="fr r11"  data-k="1:1"><i class="a"></i><i class="b"></i><i class="c"></i></div>
+            <div class="fr r916" data-k="9:16"><i class="a"></i><i class="b"></i><i class="c"></i></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 1 · 3–8s -->
+      <section id="ch2" class="scene clip" data-start="3" data-duration="5" data-track-index="1">
+        <div class="pane">
+          <div class="num" id="a0">1</div><div class="of" id="a1">OF 3</div>
+          <div class="line lg" id="a2" style="top:470px">اكتب السكريبت.<br>الأداة بتفحصه قبل أي بناء.</div>
+          <div class="line md warn" id="a3" style="top:740px">أغلب الفيديوهات بتترمي لإن دي بتتخطى.</div>
+          <div class="doc" id="a4">
+            <div class="dl l"></div><div class="dl m"></div><div class="dl l"></div>
+            <div class="dl m"></div><div class="dl l"></div><div class="dl m"></div>
+            <div class="dl s" style="margin-bottom:0"></div>
+            <div class="stamp">CHECKED</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 2 · 8–11s -->
+      <section id="ch3" class="scene clip" data-start="8" data-duration="3" data-track-index="2">
+        <div class="pane">
+          <div class="num" id="b0">2</div><div class="of" id="b1">OF 3</div>
+          <div class="line lg" id="b2" style="top:470px">صمّم لكل مقاس.<br><span class="amber">متقصّش</span> من الجناب.</div>
+          <div class="cmp" id="b3">
+            <div class="cell">
+              <div class="box tall"><b style="left:10%;right:10%;top:12%;height:16px"></b>
+                <b style="left:10%;right:34%;top:24%;height:16px"></b>
+                <b style="left:10%;right:10%;top:58%;height:90px"></b></div>
+              <div class="cap">9:16</div>
             </div>
-            <div class="ln dim" id="a-2" style="margin-top:28px">PASSED</div>
-          </div>
-        </div>
-        <div class="cap" id="a-cap">الفحص قال: <span class="q">الفيديو نضيف</span>.</div>
-      </section>
-
-      <!-- 2 — the file is not there -->
-      <section id="ch2" class="scene clip" data-start="4" data-duration="5" data-track-index="1">
-        <div class="term" id="b-term">
-          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            <span class="t">نفس الملف</span></div>
-          <div class="body">
-            <div class="ln" id="b-1"><span class="amb">$</span> ls out.mp4</div>
-            <div class="hero bad" id="b-2" style="margin-top:34px">No such file</div>
-            <div class="ln dim" id="b-3" style="margin-top:30px">never rendered · 0 bytes</div>
-          </div>
-        </div>
-        <div class="cap warn" id="b-cap">بس الملف ده <span class="q">مش موجود</span> أصلاً.</div>
-      </section>
-
-      <!-- 3 — why, then the fix -->
-      <section id="ch3" class="scene clip" data-start="9" data-duration="5" data-track-index="2">
-        <div class="term" id="c-term">
-          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            <span class="t">الإصلاح</span></div>
-          <div class="body">
-            <div class="ln good" id="c-1">+ measured++</div>
-            <div class="ln good" id="c-2" style="margin-top:20px">+ if (measured === 0)</div>
-            <div class="ln good" id="c-3">+&nbsp;&nbsp;&nbsp;fail("no frame was read")</div>
-            <div class="ln dim" id="c-4" style="margin-top:26px">count what you looked at</div>
-          </div>
-        </div>
-        <div class="cap" id="c-cap">صفر مشكلة، وصفر كادر اتفحص —<br><span class="q">بيطلّعوا نفس الرقم</span>.</div>
-      </section>
-
-      <!-- 4 — the same line, with a denominator -->
-      <section id="ch4" class="scene clip" data-start="14" data-duration="4" data-track-index="3">
-        <div class="term" id="d-term">
-          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            <span class="t">بعد الإصلاح</span></div>
-          <div class="body">
-            <div class="ln dim" id="d-0">checking out.mp4 …</div>
-            <div class="hero" id="d-1" style="margin-top:36px">
-              palette&nbsp;&nbsp;&nbsp;<span class="good">ok</span>&nbsp;&nbsp;&nbsp;0.4% off-palette
+            <div class="cell">
+              <div class="box wide"><b style="left:6%;right:46%;top:20%;height:16px"></b>
+                <b style="left:6%;right:62%;top:36%;height:16px"></b>
+                <b style="left:56%;right:6%;top:18%;height:120px"></b></div>
+              <div class="cap">16:9</div>
             </div>
-            <div class="hero amb" id="d-2" style="margin-top:12px">12 / 12 frames read</div>
           </div>
         </div>
-        <div class="cap" id="d-cap">دلوقتي بيقولك <span class="q">بصّ في كام كادر</span>.</div>
+      </section>
+
+      <!-- STEP 3 + the claim · 11–16s -->
+      <section id="ch4" class="scene clip" data-start="11" data-duration="4" data-track-index="3">
+        <div class="pane">
+          <div class="num" id="c0">3</div><div class="of" id="c1">OF 3</div>
+          <div class="line lg" id="c2" style="top:470px">شغّل الفحص<br>قبل ما تسلّم.</div>
+          <div class="line md" id="c3" style="top:760px">تلات مقاسات <span class="amber">من غير إعادة شغل</span>.</div>
+          <div class="outs" id="c4">
+            <div class="out"><span>9:16</span></div>
+            <div class="out"><span>1:1</span></div>
+            <div class="out"><span>16:9</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA · 16–18s -->
+      <section id="ch5" class="scene clip" data-start="15" data-duration="3" data-track-index="4">
+        <div class="pane">
+          <div class="line lg" id="d1" style="top:420px">علّق «<span class="amber">مقاسات</span>»<br>وأبعتلك الدليل.</div>
+          <div class="bubble" id="d3"><span>مقاسات</span></div>
+          <div class="name" id="d2">video-production</div>
+        </div>
       </section>
 
       <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="18"
@@ -149,79 +197,89 @@ const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
 const F = (f) => f / 30;
 
 function build() {
-  const all = ["#a-0","#a-1","#a-2","#a-cap","#b-1","#b-2","#b-3","#b-cap",
-               "#c-1","#c-2","#c-3","#c-4","#c-cap","#d-0","#d-1","#d-2","#d-cap"];
-  // initial state outside the timeline — tl.set(…,0) does not apply at frame 0
-  gsap.set(all, { opacity: 0 });
-  gsap.set(["#b-2","#d-2"], { y: 16 });
-  gsap.set(["#c-1","#c-2","#c-3"], { x: -20 });
+  const fade = ["#h1","#h2","#a0","#a1","#a2","#a3","#a4","#b0","#b1","#b2","#b3",
+                "#c0","#c1","#c2","#c3","#c4","#d1","#d2"];
+  // initial state OUTSIDE the timeline — tl.set(…,0) does not apply at frame 0
+  gsap.set(fade, { opacity: 0 });
+  gsap.set(["#h1","#a2","#b2","#c2","#d1"], { y: 22 });
+  gsap.set("#d3", { opacity: 0, y: 20 });
+  gsap.set([".fr", ".out"], { scale: 0.82, transformOrigin: "center" });
+  gsap.set(["#a0","#b0","#c0"], { y: -18 });
 
   const tl = gsap.timeline({ paused: true });
+  const rise = { opacity: 1, y: 0, ease: "power2.out" };
 
-  /* ── 1 · 0–120 — the pass ─────────────────────────────────────────── */
-  tl.to("#a-0",   { opacity: 1, duration: F(8) }, F(4));
-  tl.to("#a-1",   { opacity: 1, duration: F(12) }, F(16));
-  tl.to("#a-2",   { opacity: 1, duration: F(8) }, F(32));
-  tl.to("#a-cap", { opacity: 1, duration: F(12) }, F(42));
+  /* ── HOOK · 0–90 — the result appears first, then the promise ───── */
+  tl.to("#h2", { opacity: 1, duration: F(2) }, F(0));
+  tl.to(".fr", { opacity: 1, scale: 1, duration: F(10), stagger: F(3),
+                 ease: "back.out(1.5)" }, F(0));
+  tl.to("#h1", { ...rise, duration: F(14) }, F(4));
 
-  /* ── 2 · 120–270 — the contradiction ──────────────────────────────── */
-  tl.to("#b-1",   { opacity: 1, duration: F(10) }, F(126));
-  tl.to("#b-2",   { opacity: 1, y: 0, duration: F(12), ease: "power3.out" }, F(146));
-  tl.to("#b-3",   { opacity: 1, duration: F(10) }, F(168));
-  tl.to("#b-cap", { opacity: 1, duration: F(12) }, F(182));
+  /* ── STEP 1 · 90–240 ────────────────────────────────────────────── */
+  tl.to("#a0", { opacity: 1, y: 0, duration: F(10), ease: "power2.out" }, F(94));
+  tl.to("#a1", { opacity: 1, duration: F(8) }, F(100));
+  tl.to("#a2", { ...rise, duration: F(14) }, F(98));
+  tl.to("#a3", { opacity: 1, duration: F(14) }, F(142));
+  tl.to("#a4", { opacity: 1, duration: F(12) }, F(160));
 
-  /* ── 3 · 270–420 — why, then the fix ──────────────────────────────── */
-  tl.to("#c-cap", { opacity: 1, duration: F(12) }, F(276));
-  tl.to(["#c-1","#c-2","#c-3"], { opacity: 1, x: 0, duration: F(9), stagger: F(12),
-                                  ease: "power2.out" }, F(300));
-  tl.to("#c-4",   { opacity: 1, duration: F(10) }, F(348));
+  /* ── STEP 2 · 240–330 ───────────────────────────────────────────── */
+  tl.to("#b0", { opacity: 1, y: 0, duration: F(9), ease: "power2.out" }, F(244));
+  tl.to("#b1", { opacity: 1, duration: F(8) }, F(248));
+  tl.to("#b2", { ...rise, duration: F(12) }, F(246));
+  tl.to("#b3", { opacity: 1, duration: F(10) }, F(262));
 
-  /* ── 4 · 420–540 — the same line, with a denominator ──────────────── */
-  tl.to("#d-0",   { opacity: 1, duration: F(8) }, F(424));
-  tl.to("#d-1",   { opacity: 1, duration: F(10) }, F(432));
-  tl.to("#d-2",   { opacity: 1, y: 0, duration: F(12), ease: "power2.out" }, F(450));
-  tl.to("#d-cap", { opacity: 1, duration: F(12) }, F(468));
+  /* ── STEP 3 + claim · 330–480 ───────────────────────────────────── */
+  tl.to("#c0", { opacity: 1, y: 0, duration: F(10), ease: "power2.out" }, F(334));
+  tl.to("#c1", { opacity: 1, duration: F(8) }, F(338));
+  tl.to("#c2", { ...rise, duration: F(14) }, F(336));
+  tl.to("#c3", { opacity: 1, duration: F(14) }, F(378));
+  tl.to("#c4", { opacity: 1, duration: F(2) }, F(396));
+  tl.to(".out", { opacity: 1, scale: 1, duration: F(9), stagger: F(4),
+                  ease: "back.out(1.4)" }, F(396));
 
-  /* ── music — one continuous track, gain automation only (#26 #27) ─── */
+  /* ── CTA · 450–540 ──────────────────────────────────────────────── */
+  tl.to("#d1", { ...rise, duration: F(14) }, F(456));
+  tl.to("#d3", { opacity: 1, y: 0, duration: F(12), ease: "power2.out" }, F(462));
+  tl.to("#d2", { opacity: 1, duration: F(12) }, F(470));
+
+  /* ── music — one continuous track, gain automation only (#26 #27) ─ */
   tl.fromTo("#bgm", { volume: 0 }, { volume: 0.38, duration: 0.9, ease: "none",
             immediateRender: false }, 0);
-  tl.to("#bgm", { volume: 0.28, duration: F(8), ease: "none" }, F(120));
-  tl.to("#bgm", { volume: 0.38, duration: F(18), ease: "none" }, F(160));
+  tl.to("#bgm", { volume: 0.28, duration: F(8), ease: "none" }, F(330));
+  tl.to("#bgm", { volume: 0.38, duration: F(18), ease: "none" }, F(360));
   tl.to("#bgm", { volume: 0, duration: 1.3, ease: "none" }, F(501));
 
-  /* ── the manifest: still_from is where each tween actually ends ───── */
+  /* ── the manifest ───────────────────────────────────────────────── */
   const t = (id, ch, fr, still, text, crit) =>
     mf(id, { type: "text", chapter: ch, frames: fr, still_from: still, text: text,
              critical: crit !== false, el: "#" + id });
-
-  const box = (id, ch, fr) =>
-    mf(id, { type: "shape", chapter: ch, frames: fr, still_from: fr[0],
+  const sh = (id, ch, fr, still) =>
+    mf(id, { type: "shape", chapter: ch, frames: fr, still_from: still,
              critical: false, el: "#" + id });
-  box("a-term", "ch1", [0, 120]);
-  box("b-term", "ch2", [120, 270]);
-  box("c-term", "ch3", [270, 420]);
-  box("d-term", "ch4", [420, 540]);
 
-  t("a-0",   "ch1", [0, 120],  12, "checking out.mp4", false);
-  t("a-1",   "ch1", [0, 120],  28, "palette ok 0.0 off-palette");
-  t("a-2",   "ch1", [0, 120],  40, "PASSED", false);
-  t("a-cap", "ch1", [0, 120],  54, "الفحص قال: الفيديو نضيف.");
+  t("h1", "ch1", [0, 90], 18, "إزاي تطلّع تلات مقاسات في وقت واحد.");
+  sh("h2", "ch1", [0, 90], 16);
 
-  t("b-1",   "ch2", [120, 270], 136, "ls out.mp4", false);
-  t("b-2",   "ch2", [120, 270], 158, "No such file");
-  t("b-3",   "ch2", [120, 270], 178, "never rendered 0 bytes", false);
-  t("b-cap", "ch2", [120, 270], 194, "بس الملف ده مش موجود أصلاً.");
+  t("a0", "ch2", [90, 240], 104, "", false);
+  t("a1", "ch2", [90, 240], 108, "", false);
+  t("a2", "ch2", [90, 240], 112, "اكتب السكريبت. الأداة بتفحصه قبل أي بناء.");
+  t("a3", "ch2", [90, 240], 156, "أغلب الفيديوهات بتترمي لإن دي بتتخطى.");
+  sh("a4", "ch2", [90, 240], 172);
 
-  t("c-cap", "ch3", [270, 420], 288, "صفر مشكلة، وصفر كادر اتفحص — بيطلّعوا نفس الرقم.");
-  t("c-1",   "ch3", [270, 420], 309, "measured", false);
-  t("c-2",   "ch3", [270, 420], 321, "if measured is 0", false);
-  t("c-3",   "ch3", [270, 420], 333, "fail no frame was read", false);
-  t("c-4",   "ch3", [270, 420], 358, "count what you looked at", false);
+  t("b0", "ch3", [240, 330], 253, "", false);
+  t("b1", "ch3", [240, 330], 256, "", false);
+  t("b2", "ch3", [240, 330], 258, "صمّم لكل مقاس. متقصّش من الجناب.");
+  sh("b3", "ch3", [240, 330], 272);
 
-  t("d-0",   "ch4", [420, 540], 432, "checking out.mp4", false);
-  t("d-1",   "ch4", [420, 540], 442, "palette ok 0.4 off-palette");
-  t("d-2",   "ch4", [420, 540], 462, "12 12 frames read");
-  t("d-cap", "ch4", [420, 540], 480, "دلوقتي بيقولك بصّ في كام كادر.");
+  t("c0", "ch4", [330, 450], 344, "", false);
+  t("c1", "ch4", [330, 450], 346, "", false);
+  t("c2", "ch4", [330, 450], 350, "شغّل الفحص قبل ما تسلّم.");
+  t("c3", "ch4", [330, 450], 392, "تلات مقاسات من غير إعادة شغل.");
+  sh("c4", "ch4", [330, 450], 413);
+
+  t("d1", "ch5", [450, 540], 470, "علّق «مقاسات» وأبعتلك الدليل.");
+  sh("d3", "ch5", [450, 540], 474);
+  t("d2", "ch5", [450, 540], 482, "", false);
 
   window.__timelines = window.__timelines || {};
   window.__timelines["main"] = tl;
