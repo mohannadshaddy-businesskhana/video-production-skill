@@ -40,7 +40,7 @@ inventing a style for each:
 |---|---|---|---|
 | `11-versions` | aspect versions | **06 in 9:16, 1:1 and 16:9, side by side and in sync** — one timeline and a geometry table per ratio, each version verified at its own size and safe band | ✅ |
 | `13-cutdowns` | cutdowns | **08 at 24s, 15s and a 6s bumper, side by side** — cut frame-exact from a textless master, each with its own hook, close and an unbroken music bed; the short ones loop as ads do | ✅ |
-| `12-localized` | localization | the same film in Arabic and English, with the re-layout the translation forced | ⏳ |
+| `12-localized` | localization | **06 in Arabic and English, side by side** — the same timeline, the frame mirrored so the steps climb the other way, the English measured (+38% at worst) and re-set; verified with the language check reversed | ✅ |
 | `04-section-series` | series | three episodes of one template, back to back | ⏳ |
 
 Every composition's header comment carries its **cold-read ledger**: what the
@@ -74,8 +74,9 @@ node ../skills/video-production/scripts/cutdown.mjs --master 13-cutdowns/master/
 node _src/cutdowns/emit.mjs && ./build.sh 13-cutdowns/short && ./build.sh 13-cutdowns/bumper && ./build.sh 13-cutdowns
 ```
 
-The motion-graphics film and its versions are **generated**: edit
-`_src/motion-graphics/` (one timeline, one geometry table per ratio) and run
+The motion-graphics film, its ratio versions and its English version are
+**generated**: edit `_src/motion-graphics/` (one timeline, a geometry table per
+ratio, a string table per language) and run
 `node _src/motion-graphics/emit.mjs` — never the emitted `index.html` files.
 
 ## Before you render
