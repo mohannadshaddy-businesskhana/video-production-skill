@@ -26,14 +26,14 @@
     {
       "name": "beat continuity",
       "ok": true,
-      "detail": "55 or 110 BPM, continuous (drift 0.14/window, no dropout)",
+      "detail": "55 or 110 BPM, continuous (drift 0.12/window, no dropout)",
       "ref": "#27",
       "warn": false
     },
     {
       "name": "palette",
       "ok": true,
-      "detail": "worst 0.6% off-palette at 7.0s (limit 2%) · 12/12 frames read",
+      "detail": "worst 0.2% off-palette at 5.0s (limit 2%) · 12/12 frames read",
       "ref": "#01",
       "warn": false
     },

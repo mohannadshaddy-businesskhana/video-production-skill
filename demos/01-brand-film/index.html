@@ -66,12 +66,12 @@
 
       /* ch3 — the checks counting through */
       .cnt  { position:absolute; right:88px; top:1080px; width:904px;
-              font-family:"Mono",monospace; font-size:210px; font-weight:700;
-              color:var(--pass-lt); direction:ltr; text-align:right; line-height:1; }
-      .cntl { position:absolute; right:88px; top:1330px; width:904px;
-              font-family:"Mono",monospace; font-size:30px; letter-spacing:.14em;
-              color:rgba(245,242,234,.6); direction:ltr; text-align:right; font-weight:700; }
-      .ticks { position:absolute; right:88px; top:1420px; width:904px; display:flex;
+              font-size:210px; font-weight:800;
+              color:var(--pass-lt); direction:rtl; text-align:right; line-height:1; }
+      .cntl { position:absolute; right:88px; top:1392px; width:904px;
+              font-size:36px; color:rgba(245,242,234,.6);
+              direction:rtl; text-align:right; font-weight:700; }
+      .ticks { position:absolute; right:88px; top:1476px; width:904px; display:flex;
                flex-direction:row-reverse; flex-wrap:wrap; gap:14px; }
       .tk { width:46px; height:46px; border:4px solid var(--pass-lt); border-radius:4px; }
 
@@ -113,9 +113,9 @@
         <div class="pane">
           <div class="tag" id="n0">02</div>
           <div class="line xl" id="n1" style="top:420px">من غير <span class="amber">مونتير</span>.</div>
-          <div class="line md" id="n2" style="top:700px">وبيتفحص قبل ما يخرج.</div>
-          <div class="cnt"  id="n3">0</div>
-          <div class="cntl" id="n4">CHECKS PASSED</div>
+          <div class="line md" id="n2" style="top:700px">وبيعدّي على ١٥ اختبار قبل ما يخرج.</div>
+          <div class="cnt"  id="n3">٠</div>
+          <div class="cntl" id="n4">اختبار عدّوا</div>
           <div class="ticks" id="n5"></div>
         </div>
       </section>
@@ -139,6 +139,7 @@ window.__MF = [];
 window.__MOTION = [];
 const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
 const F = (f) => f / 30;
+const arabic = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
 
 function build() {
   // fifteen tick boxes, one per check
@@ -183,7 +184,7 @@ function build() {
   // the counter is driven by onUpdate over an object — tl.call is skipped on seek
   const c = { v: 0 };
   tl.to(c, { v: 15, duration: F(70), ease: "power1.out",
-             onUpdate: () => { document.getElementById("n3").textContent = Math.round(c.v); } }, F(316));
+             onUpdate: () => { document.getElementById("n3").textContent = arabic(Math.round(c.v)); } }, F(316));
   tl.to(".tk", { opacity: 1, scale: 1, backgroundColor: "rgba(94,143,120,.55)",
                  duration: F(6), stagger: F(4.4), ease: "power2.out" }, F(316));
 
@@ -218,9 +219,9 @@ function build() {
 
   t("n0", "ch3", [300, 450], 312, "", false);
   t("n1", "ch3", [300, 450], 318, "من غير مونتير.");
-  t("n2", "ch3", [300, 450], 364, "وبيتفحص قبل ما يخرج.");
-  t("n3", "ch3", [300, 450], 386, "", false);
-  t("n4", "ch3", [300, 450], 320, "", false);
+  t("n2", "ch3", [300, 450], 364, "وبيعدّي على ١٥ اختبار قبل ما يخرج.");
+  t("n3", "ch3", [300, 450], 386, "١٥", false);
+  t("n4", "ch3", [300, 450], 320, "اختبار عدّوا", false);
   sh("n5", "ch3", [300, 450], 386);
 
   t("c0", "ch4", [450, 540], 462, "", false);

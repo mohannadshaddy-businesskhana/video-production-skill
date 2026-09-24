@@ -48,7 +48,7 @@
          span can never be split off into its own line the way v2's were */
       .cap { position:absolute; right:88px; top:250px; width:904px; height:180px;
              display:flex; align-items:center; }
-      .cap > span { display:block; width:100%; direction:rtl; text-align:right;
+      .cap > span { display:block; width:100%; direction:rtl; text-align:right; text-wrap:balance;
                     font-size:60px; font-weight:700; line-height:1.32; letter-spacing:-.01em; }
       .cap .a { color:var(--amber); }
 
@@ -69,9 +69,9 @@
       .panel { position:absolute; left:40px; right:40px; background:var(--app-card);
                border:2px solid var(--app-line); border-radius:24px; padding:44px 46px; }
       .ph { font-size:46px; font-weight:700; display:flex; align-items:center; gap:18px; }
-      .badge { margin-right:auto; font-family:"Mono",monospace; font-size:24px; font-weight:700;
-               color:var(--app-ok); background:var(--app-okbg); padding:10px 20px;
-               border-radius:999px; direction:ltr; }
+      .badge { margin-right:auto; font-size:27px; font-weight:800;
+               color:var(--app-ok); background:var(--app-okbg); padding:8px 22px;
+               border-radius:999px; direction:rtl; }
       .lbl { font-size:30px; font-weight:600; color:var(--app-dim); margin-top:34px; }
 
       /* P1 — composer */
@@ -179,7 +179,7 @@
 
             <!-- P2 · the script, written and reviewed -->
             <div class="panel" id="p2" style="top:1190px; height:1040px">
-              <div class="ph">السكريبت <span class="badge" id="sb">SCRIPT PASSED</span></div>
+              <div class="ph">السكريبت <span class="badge" id="sb">اتراجع</span></div>
               <div id="beats" style="margin-top:20px">
                 <div class="beat"><span class="tm">0:00</span><span class="rl">خطّاف</span><span class="ln">منتجك الجديد نزل النهاردة.</span></div>
                 <div class="beat"><span class="tm">0:03</span><span class="rl">المشكلة</span><span class="ln">الإطلاق بينزل ببوست ومحدش بيشوفه.</span></div>
@@ -187,20 +187,20 @@
                 <div class="beat"><span class="tm">0:10</span><span class="rl">الدليل</span><span class="ln">تلات مقاسات، ومتراجع.</span></div>
                 <div class="beat"><span class="tm">0:15</span><span class="rl">دعوة</span><span class="ln">جرّبه — اللينك في البايو.</span></div>
               </div>
-              <div class="count"><b id="sn">0</b><span>من ١٧ فحص للسكريبت</span></div>
+              <div class="count"><b id="sn">0</b><span>من 17 فحص للسكريبت</span></div>
               <div class="dots" id="sdots"></div>
             </div>
 
             <!-- P3 · render, with the video appearing as it is built -->
             <div class="panel" id="p3" style="top:2290px; height:1040px">
-              <div class="ph">رندر <span class="badge" id="rb">PASSED</span></div>
+              <div class="ph">رندر <span class="badge" id="rb">عدّى</span></div>
               <div class="preview">
                 <div class="mini"><div class="t1"></div><div class="t2"></div><div class="o"></div></div>
                 <div class="veil" id="veil"></div>
                 <div class="pct" id="pct">0%</div>
               </div>
               <div class="bar"><b id="rbar"></b></div>
-              <div class="count"><b id="tn">0</b><span>من ١٥ اختبار</span></div>
+              <div class="count"><b id="tn">0</b><span>من 15 اختبار</span></div>
             </div>
 
             <!-- P4 · three versions, designed not cropped -->
