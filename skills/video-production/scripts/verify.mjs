@@ -588,7 +588,14 @@ function checkLanguage(manifest, structure, rep) {
   // #39 — Latin strings leaked into an Arabic video.
   const allow = new Set((structure || {}).brand_names || []);
   const lang = (structure || {}).text_language;
-  if (!lang || lang === "latin") return;
+  if (!lang) return;
+  // an Arabic cut admits no Latin word but a brand; a Latin-script cut (an
+  // English version) admits no Arabic one — routes/localization.md
+  const ARABIC_SCRIPT = /[؀-ۿݐ-ݿࡰ-ࣿﭐ-﷿ﹰ-﻿]/;
+  const foreign = lang === "latin"
+    ? (w) => ARABIC_SCRIPT.test(w)
+    // every char ASCII and at least one a letter — Python's isascii/isalpha
+    : (w) => /^[\x00-\x7F]+$/.test(w) && /[A-Za-z]/.test(w);
   const STRIP = ".,:·—-";
   const strip = (w) => {
     let a = 0, b = w.length;
@@ -601,10 +608,9 @@ function checkLanguage(manifest, structure, rep) {
     // the declared text AND the text the page actually holds: a label declared
     // as "" carried "CHECKS PASSED" through this check in four demos
     const pieces = [...(e.text_nodes || []), e.type === "text" ? (e.text || "") : ""];
-    const latin = new Set(pieces.flatMap((p) => p.trim().split(/\s+/)).map(strip)
-      // every char ASCII and at least one a letter — Python's isascii/isalpha
-      .filter((w) => w && /^[\x00-\x7F]+$/.test(w) && /[A-Za-z]/.test(w) && !allow.has(w)));
-    if (latin.size) offenders.push(`${e.id}:${[...latin].slice(0, 3).join(" ")}`);
+    const stray = new Set(pieces.flatMap((p) => p.trim().split(/\s+/)).map(strip)
+      .filter((w) => w && foreign(w) && !allow.has(w)));
+    if (stray.size) offenders.push(`${e.id}:${[...stray].slice(0, 3).join(" ")}`);
   }
   rep.add("single language", !offenders.length,
           !offenders.length ? `all ${lang}` : offenders.slice(0, 3).join("; "), "#39");

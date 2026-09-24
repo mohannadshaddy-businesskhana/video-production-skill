@@ -70,6 +70,13 @@ const saysOf = (b) => (Array.isArray(b.says) ? b.says : b.says ? [b.says] : []);
  * It has no room for a stakes beat or a body, so the gate holds it to its own
  * rules instead: six seconds at most, and few enough words to read in them. A
  * cutdown route that produces 6s versions needs a gate that can pass one. */
+/* The script's language. The lexicon and the jargon heuristic are written for
+ * Arabic scripts; a localized English script declares "language": "en". */
+const LANGS = ["ar", "en"];
+const ARABIC = (S.language || "ar") === "ar";
+if (!LANGS.includes(S.language || "ar"))
+  rep.add("language", false, `unknown language "${S.language}" — "ar" (default) or "en"`);
+
 const FORMATS = [undefined, "bumper"];
 const BUMPER = S.format === "bumper";
 const BUMPER_MAX_S = 6, BUMPER_MAX_WORDS = 14;
@@ -163,7 +170,8 @@ for (const j of S.jargon || []) {
     jargonProblems.push(`"${j.term}" appears in ${beats[firstUse].id} but is explained in ${j.explained_in}`);
 }
 // a script with technical words on screen and an empty ledger has not looked
-const anyLatin = beats.some((b) => saysOf(b).some((l) => /[A-Za-z]{3,}/.test(l)));
+// (in an Arabic script a Latin word is a term; in an English one it is the language)
+const anyLatin = ARABIC && beats.some((b) => saysOf(b).some((l) => /[A-Za-z]{3,}/.test(l)));
 if (!(S.jargon || []).length && anyLatin)
   jargonProblems.push("Latin technical words appear on screen and `jargon` is empty — list them or cut them");
 rep.add("jargon ledger", jargonProblems.length === 0,
@@ -281,7 +289,8 @@ for (const b of beats)
   for (const l of saysOf(b))
     for (const w of LEXICON)
       if (w.re.test(l)) lexHits.push(`${b.id}: ${w.why} → ${w.use}`);
-rep.add("lexicon", lexHits.length === 0,
+if (!ARABIC) rep.add("lexicon", true, "the lexicon is Arabic — not applied to an English script", "#45");
+else rep.add("lexicon", lexHits.length === 0,
   lexHits.length === 0 ? "no known-bad word" : lexHits.slice(0, 2).join(" · "), "#45");
 
 // ── 8 · the repeat test ─────────────────────────────────────────────────────

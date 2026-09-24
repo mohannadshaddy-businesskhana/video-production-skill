@@ -22,6 +22,20 @@ node <SKILL_DIR>/scripts/localize.mjs --strings strings.ar.json --check --base s
 The first call extracts every `text` field from the manifest into a translatable table. The second
 reports the **length delta per string**, so the re-layout is a measurement before it is a surprise.
 
+**Translation changes reading time, not only length.** On the same timeline a longer line gets no
+more time on screen. Give the translated script its own `script.json` with `"language": "en"` and
+run the gate on it: the reading-load check is what catches a line that no longer fits its beat —
+an English line of 13 words needed 4.5s where the beat has 4.4s. The fix is shorter copy, never a
+longer beat, because the beat is shared with every other language.
+
+**A left-to-right language mirrors the frame, not only the text.** Whatever reads in order — steps,
+a sequence of cards, an arrow's direction — flips with the words, corners included; a shape
+table mirrored once (`x → width − x − w`) does it for every box.
+
+In the shipped demos (`demos/12-localized`) the English strings measured +15% to +38% against the
+Arabic; they were set at 56px instead of 76px, the longest given a third line, and the full verifier
+re-ran with the language check reversed — in a Latin-script cut it is Arabic that may not appear.
+
 ## Subtitles vs re-cut vs dubbing
 
 | | When it is right | Cost |
