@@ -55,10 +55,16 @@ Be honest about these before promising them:
 
 | Needs | For | Where it comes from |
 |---|---|---|
-| **A voice** | whiteboard, explainer, captions-led, talking head, most brand films | a TTS engine that speaks the language, or the client's own recording. The local engine has **no Arabic** |
+| **A voice** | whiteboard, explainer, captions-led, talking head, most brand films | the client's own recording (`voice_timings.mjs`), or a TTS engine that speaks the language — Gemini TTS speaks Egyptian Arabic on the API's free tier (`tts_gemini.mjs`); HeyGen's API has been paid-only since Feb 2026. The local engine has **no Arabic** |
 | **A person** | talking head | client footage, or an avatar service |
 | **Footage or photography** | brand film, launch, music video at their best | the client's library, or licensed stock |
 
 A composition can fake an interface convincingly — it is HTML. It cannot fake a
 face or a voice without it being obvious, and a demo that does is worse than one
 that says what it needs.
+
+**Whichever voice, generate or record it one line at a time.** Neither a TTS
+model nor a phone gives word timings, and a whiteboard hand or a caption has to
+know when each thing is said. A line recorded on its own has an exact start and
+end; both tools write the same `timings.json`, and the composition's beats come
+from it — the voice sets the timing, never an estimate.

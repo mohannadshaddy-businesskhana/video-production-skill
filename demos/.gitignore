@@ -24,3 +24,7 @@ _assets/music/
 # Bundled SFX from the renderer's own asset library — used for rendering, not
 # redistributed, for the same reason as the music bed.
 _assets/sfx/
+
+# Voice takes — a recorded voice is a person's, and TTS output is regenerated;
+# neither is stored in a public repository
+_assets/voice/
