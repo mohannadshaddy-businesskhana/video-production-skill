@@ -12,7 +12,7 @@ script gate and the render gate.
 |---|---|---|---|
 | `01-brand-film` | brand film | one claim at a time, a bracketed frame, air | ink |
 | `02-pr-to-video` | step-by-step tutorial | a numbered spine, document blocks | bone |
-| `03-launch-video` | launch video | a burst, a week crossed down to a day, hard edges | **amber field** |
+| `03-launch-video` | launch video | **the product, fast** — close-ups of the workspace cut on the beats, whips between chapters, a speed ramp into the drop, a sound on every hit | the product over an ink band |
 | `04-section-series` | section series | a rail that never moves, an 18-cell grid, one frame whose contents swap | ink |
 | `05-explainer` | faceless explainer | ruled paper and a diagram that draws itself | **white** |
 | `06-motion-graphics` | motion graphics | **one amber shape for the whole film** — a circle, a day, a block, a chart, three steps, the circle again, a button. Nothing cuts, nothing fades | bone |
