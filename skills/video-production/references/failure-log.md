@@ -24,6 +24,8 @@
 | 11 | An efficiency claim instead of an elimination claim | Message |
 | 40 | Selling what the tool does instead of what the viewer gets | Message |
 | 41 | A script written for someone who watched it being built | Narrative |
+| 42 | Thirteen skins on one format | Form |
+| 43 | Words with two readings, and borrowed English | Language |
 | 12 | A defensive feature answering an objection nobody raised | Message |
 | 13 | An imitated interface instead of the product's real one | Interface |
 | 14 | An onboarding bar visible in a product shot | Interface |
@@ -201,6 +203,31 @@ it is. A term, a number and a name each arrive *after* the thing that makes them
 **The trap underneath it:** the author has just finished the work, so every reference feels obvious.
 Recency is indistinguishable from clarity from the inside. This is why the check has to be
 mechanical — a list of what has been established, in order — and not a feeling that it reads fine.
+
+### 42 · Thirteen skins on one format
+
+**What happened:** thirteen demos, each meant to show a different video type. Each got its own
+ground colour and its own decoration — a burst, a grid, a table, a bar field — and every one of them
+was the same thing underneath: a heading top right, abstract shapes fading in, a closing line.
+**Result:** "they are all the same style — animation with text, or text with animation." The
+whiteboard had no hand. The product tour had two seconds of movement. The captions video had no
+speech to caption. The music video's picture never cut.
+**Rule:** **a type is its production grammar — carrier, camera, voice, edit rhythm — not its
+palette.** Before building a type, name its defining element from `video-types.md` and put that on
+screen first. If the element needs something the skill cannot make (a voice, a face, footage), say
+so and stop — do not substitute a shape for it.
+
+### 43 · Words with two readings, and borrowed English
+
+**What happened:** on-screen lines used «بيتسكّب» (skip, in Arabic letters), «بيتعلّم» for "is
+marked" (it reads first as "learns"), «قصّة» for an edit cut (it reads first as "story"), «بتضغط»
+for compresses (it reads as "presses"), and «التركيب» for a composition — a word a marketer has no
+picture for.
+**Result:** the reviewer stopped on the words instead of the message.
+**Rule:** **the everyday reading of a word wins, every time.** If a word has a more common meaning
+than the one you intend, the viewer takes the common one. Use the plain verb (بيتحدد، بيتقلّب عليه،
+انتقال، بيبوّظ الجودة). No English in Arabic letters unless the audience genuinely says it that way.
+`script_check.mjs` carries a lexicon of the ones already caught.
 
 ### 09 · Captions instead of a story
 

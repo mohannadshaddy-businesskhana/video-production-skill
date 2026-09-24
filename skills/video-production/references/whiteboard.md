@@ -30,12 +30,20 @@ tl.fromTo(path, { strokeDashoffset: len },
 
 `ease: "none"` matters. A hand moves at roughly constant speed; an eased stroke reads as a machine.
 
-## The hand
+## The hand — this is the type, not a decoration
 
-Optional, and usually better without. If you want one, it is an image element whose position follows
-the path — `MotionPath` in GSAP, or a pre-sampled point list written at build time. Keep the pen tip
-at the stroke's leading edge, which means the hand's anchor offset is part of the asset, not a
-tweak.
+**A whiteboard video is a hand drawing on a board while a voice explains.** An earlier version of
+this file called the hand "optional, and usually better without" — and the demo built from that
+advice was rejected as "just animation with text", because without the hand it is not a whiteboard
+video at all. It is the defining element; see `video-types.md`.
+
+The hand is an image element whose position follows the path — `MotionPath` in GSAP, or a
+pre-sampled point list written at build time. Keep the pen tip at the stroke's leading edge, which
+means the hand's anchor offset is part of the asset, not a tweak.
+
+**And the narration drives it.** The drawing is paced to the voice: each stroke lands on the word
+that names it. Without a voice, the pacing has nothing to follow and the drawing reads as a
+screensaver.
 
 Two failure modes: a hand that lags the ink (looks like tracing someone else's drawing), and a hand
 that never lifts between strokes (reads as one impossible continuous line). Hide it during gaps.
