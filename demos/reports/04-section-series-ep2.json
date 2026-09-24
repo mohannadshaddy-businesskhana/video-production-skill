@@ -1,5 +1,5 @@
 {
-  "video": "D:/Projects/video-production-skill/demos/04-section-series/renders/04-section-series.mp4",
+  "video": "D:/Projects/video-production-skill/demos/04-section-series/ep2/renders/04-section-series-ep2.mp4",
   "passed": true,
   "checks": [
     {
@@ -12,28 +12,28 @@
     {
       "name": "duration",
       "ok": true,
-      "detail": "18.00s (expected 18.00s)",
+      "detail": "6.00s (expected 6.00s)",
       "ref": "",
       "warn": false
     },
     {
       "name": "loudness",
       "ok": true,
-      "detail": "-14.1 LUFS (target -14)",
+      "detail": "-14.4 LUFS (target -14)",
       "ref": "#25",
       "warn": false
     },
     {
       "name": "beat continuity",
       "ok": true,
-      "detail": "55 or 110 BPM, no dropout — but phase shifts 0.39 beat at 2.5s; listen there (usually a section change in the track, not a fault)",
+      "detail": "track too short to test",
       "ref": "#27",
       "warn": true
     },
     {
       "name": "palette",
       "ok": true,
-      "detail": "worst 0.7% off-palette at 8.2s (limit 2%) · 12/12 frames read",
+      "detail": "worst 0.7% off-palette at 2.2s (limit 2%) · 12/12 frames read",
       "ref": "#01",
       "warn": false
     },
@@ -68,7 +68,7 @@
     {
       "name": "content coverage",
       "ok": true,
-      "detail": "worst 50% in board (floor 45%)",
+      "detail": "worst 55% in ep (floor 45%)",
       "ref": "#21",
       "warn": false
     },

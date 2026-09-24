@@ -41,7 +41,7 @@ inventing a style for each:
 | `11-versions` | aspect versions | **06 in 9:16, 1:1 and 16:9, side by side and in sync** — one timeline and a geometry table per ratio, each version verified at its own size and safe band | ✅ |
 | `13-cutdowns` | cutdowns | **08 at 24s, 15s and a 6s bumper, side by side** — cut frame-exact from a textless master, each with its own hook, close and an unbroken music bed; the short ones loop as ads do | ✅ |
 | `12-localized` | localization | **06 in Arabic and English, side by side** — the same timeline, the frame mirrored so the steps climb the other way, the English measured (+38% at worst) and re-set; verified with the language check reversed | ✅ |
-| `04-section-series` | series | three episodes of one template, back to back | ⏳ |
+| `04-section-series` | series | **three real episodes of «نوع النهارده», side by side** — one template and one row of data each, every episode a 6s bumper with a real excerpt of its type; in step, so the template shows | ✅ |
 
 Every composition's header comment carries its **cold-read ledger**: what the
 viewer must already know at each chapter boundary, and which earlier beat
