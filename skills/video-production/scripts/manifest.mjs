@@ -148,6 +148,12 @@ const report = await page.evaluate(({ FW, FH, FPS, ROLES }) => {
       : undefined,
     zones, chapters,
     motion_events: window.__MOTION || [],
+    // when the narration is speaking, from the clips marked data-role="voice":
+    // the render gate needs it to tell a pause in the voice from dead air (#49)
+    voice: [...document.querySelectorAll('audio[data-role="voice"]')].map((a) => {
+      const s = parseFloat(a.dataset.start), d = parseFloat(a.dataset.duration);
+      return [Math.round(s * fps), Math.round((s + d) * fps)];
+    }),
     elements: out,
   };
 }, { FW: +W, FH: +H, FPS, ROLES });

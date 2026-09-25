@@ -70,10 +70,19 @@ thing is said. There are two ways to get each line's exact start and end:
 - **A take per line.**
 - **One take with a clear pause between lines.** `voice_timings.mjs` aligns it
   to the script. It already knows the text, so it picks the pauses that cut the
-  take into pieces the lines' lengths predict.
+  take into pieces the lines' lengths and punctuation predict.
 
 Gemini's free tier allows about ten TTS requests a day per project, so
 `tts_gemini.mjs --whole` asks for every line in one request.
+
+A split can look sure and still be wrong (#51), so check it:
+
+- `tts_gemini.mjs --check <dir>` listens to every piece.
+- `--only l3,l4` regenerates the lines that moved.
+
+A phone recording gets `voice_timings.mjs --clean`. Each line is cut down to its
+words, and the room between them is pushed down (#52). Nothing removes a
+television *under* the words, so record in a quiet room.
 
 Both tools write the same `timings.json`, and the composition's beats come from
 it. The voice sets the timing, never an estimate.

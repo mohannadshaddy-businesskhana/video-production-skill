@@ -567,6 +567,80 @@ Getting an Egyptian Arabic narration from Gemini TTS's free tier went wrong four
 **Rule:** measure a voice, then place it. Assume nothing about it from the documentation, the
 punctuation or a target number.
 
+### 49 · Dead air: the voice paused, and so did the hand
+
+**What happened:** the whiteboard's hand finished each drawing, then waited for the next line.
+Every pause in the voice was a pause in the picture too: nothing said, nothing drawn. The four
+names were also frozen for 1.6s each, to be "read in stillness", while the voice went quiet.
+**Result:** the reviewer's words: there are moments with no drawing and no speech. **There must
+always be something happening, and that is a general rule.**
+**Rule:** **at every moment the viewer hears a word, watches something move, or is still reading
+text that has not had its reading time.** A moment with none of the three is dead air.
+- In a whiteboard, **a pause in the voice is where the hand is busiest.** Each line draws until
+  the next begins. Its main strokes land on their words, then finishing details (a filament,
+  collars, a clock's ticks) are added group by group while they fit. One hand speed is then solved
+  so the drawing ends as the next line starts.
+- **A word the voice says as it is written is heard, not read.** It needs its time on screen (#31),
+  not a frozen frame. Only a word the voice does not say gets the still hold (#29), and that hold
+  goes where the voice is still talking.
+- **A spoken line takes the time the voice takes.** The script gate held beats to 0.35s a word,
+  an estimate for text to read, and failed a line the voice says in 2.4s. A beat now carries
+  `spoken_s`, its line's measured duration, and is held to that.
+**The gate:** `verify.mjs` "no dead air" fails any stretch over 0.3s with no voice, no declared
+motion, no playing video and no text within its reading time. The manifest records the voice from
+clips marked `data-role="voice"`.
+- **Controls.** The finished film passes. The same manifest with one line's details removed fails
+  on exactly the pause the reviewer heard (12.0–12.5s). A spoken word marked unspoken fails the
+  stillness check.
+- **Scope.** It is enforced on narrated films only. A music-led film's cuts on the beat are not yet
+  declared as motion, so there it would cry wolf (#41). The rule applies there too; the gate is
+  still to come.
+
+### 50 · A number before «ناس»
+
+**What happened:** a narration line said «الفيديو العادي بيعدّي على أربع ناس».
+**Result:** the reviewer's words: it isn't correct Arabic, and it shows a misunderstanding of the
+language and its grammar.
+**Rule:** **«ناس» is a collective noun and takes no number.** Count with a countable noun:
+«أربعة أفراد»، «أربعة أشخاص»، «أربعة موظفين». From three to ten the number takes the opposite
+gender to its noun's singular (فرد → أربعة).
+- Once the four are persons, «الأداة بتعمل الأربعة» says the tool does *the persons*. The line
+  became «بتعمل شغل الأربعة».
+
+`script_check.mjs`'s lexicon now fails any number before «ناس» and still passes «الناس كلها».
+**Caution:** a TTS voice may still say «أربع» where the script says «أربعة». One voice did, twice.
+Listen to that line.
+
+### 51 · A split that looked sure and was wrong
+
+**What happened:** a whole-narration TTS take was split into lines at its pauses, and
+`voice_timings.mjs` reported a clear margin. Listening said otherwise: «كاتب», the first of four
+names, had been cut into the end of the line before it. Doubling the model's pause tag, meant to
+make the line breaks unmistakable, made its pauses erratic instead: one 5.6s silence, and a line
+break shorter than a comma.
+**Rule:** **only hearing a piece proves where a line starts.**
+- `tts_gemini.mjs --check <dir>` has Gemini transcribe every piece. A word that moved between
+  neighbouring lines fails (✗); a word that merely sounds different is flagged for a listen (✎).
+- `--only l3,l4` regenerates just the lines that moved, one request each.
+- The split now also reads each line's punctuation: a list of four names holds three pauses, a
+  plain sentence none.
+- The margin report says "margin", never "correct".
+- A person's recording is never sent to a transcriber without asking them.
+
+### 52 · The room rode along at the end of every line
+
+**What happened:** a phone recording's lines were trimmed at a fixed −45 dB. Whatever was not
+silent was kept, and in that room that meant a television or voices behind the speaker: 0.6s at
+−51 dB at the end of a line, lifted 10 dB by the final loudness pass. The speaker heard it at once.
+**Rule:** **cut a line down to its words, measured against its own level, not a fixed number.**
+- Words are runs of at least 60ms within 24 dB of the line's loud level. The room's bursts reached
+  21 dB below the voice, but never for three windows running.
+- `--clean` adds a rumble cut, a mild hiss reduction and an expander that pushes the room between
+  words 24 dB down.
+- Measured on four lines: 3.4s of room-level audio became 2.0s, and the pauses became silence.
+- What sits *under* a word stays. Separating a voice from a television behind it takes a
+  source-separation model, and a quieter room is the free one.
+
 ---
 
 ## Recurring patterns — read these if you have no time for the whole log

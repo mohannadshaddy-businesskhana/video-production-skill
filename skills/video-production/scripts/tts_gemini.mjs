@@ -114,7 +114,56 @@ function wav({ channels, rate, bits }, pcm) {
 const key = readKey();
 const headers = { "x-goog-api-key": key, "Content-Type": "application/json" };
 
-if (argv.includes("--voices")) {
+/* --check <measured dir>: what each line piece actually SAYS, transcribed by
+ * Gemini, against its line's first and last words. A take split at its pauses
+ * put «كاتب» — the first of four names — at the end of the line before it,
+ * while the pause lengths looked unambiguous: only hearing the pieces settles
+ * where a line starts (#51). For a synthetic voice only — a person's
+ * recording is not sent anywhere without asking them. */
+const bare = (s) => s.replace(/[ً-ْـ]/g, "").replace(/[أإآ]/g, "ا").replace(/ة/g, "ه")
+  .replace(/ى/g, "ي").replace(/[^\p{L}\p{N} ]/gu, " ").split(/\s+/).filter(Boolean);
+const sameWord = (a, b) => !!a && !!b && (a === b || a.includes(b) || b.includes(a));
+async function check(dir) {
+  const T = JSON.parse(readFileSync(join(dir, "timings.json"), "utf8"));
+  const parts = [{ text: `These are ${T.lines.length} short audio clips of Arabic speech, in order. Transcribe `
+    + "each clip exactly as spoken, word for word — do not correct, complete or guess. Return a JSON array of "
+    + `${T.lines.length} strings, one per clip.` }];
+  for (const l of T.lines)
+    parts.push({ inline_data: { mime_type: "audio/wav", data: readFileSync(join(dir, l.file)).toString("base64") } });
+  const body = JSON.stringify({ contents: [{ role: "user", parts }],
+                                generationConfig: { responseMimeType: "application/json", temperature: 0 } });
+  let res = null;
+  // the listening model is often overloaded; a second one is as good for this
+  for (const model of [flag("check-model", "gemini-flash-latest"), "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash"]) {
+    try { res = await call(`/models/${model}:generateContent`, { method: "POST", headers, body }); break; }
+    catch (e) { const m = String(e.message).match(/"message":\s*"([^"]{0,140})/); console.error(`${model}: ${m ? m[1] : String(e.message).slice(0, 80)} — trying the next`); }
+  }
+  if (!res) { console.error("no listening model answered — nothing was checked"); process.exitCode = 2; return; }
+  const heard = JSON.parse(res.candidates[0].content.parts.map((p) => p.text).join(""));
+  const words = T.lines.map((l) => bare(l.text)), got = heard.map((h) => bare(h || ""));
+  const has = (i, w) => i >= 0 && i < got.length && got[i].some((g) => sameWord(g, w));
+  let moved = 0, differ = 0;
+  T.lines.forEach((l, i) => {
+    const want = words[i], g = got[i];
+    // a word MOVED when a neighbouring piece holds the one this piece is missing
+    const lostFirst = !sameWord(want[0], g[0]) && has(i - 1, want[0]);
+    const lostLast = !sameWord(want.at(-1), g.at(-1)) && has(i + 1, want.at(-1));
+    const tookNext = i + 1 < words.length && sameWord(g.at(-1), words[i + 1][0]) && !sameWord(g.at(-1), want.at(-1));
+    const tookPrev = i > 0 && sameWord(g[0], words[i - 1].at(-1)) && !sameWord(g[0], want[0]);
+    const isMoved = lostFirst || lostLast || tookNext || tookPrev;
+    const same = want.join("") === g.join("");
+    if (isMoved) moved++; else if (!same) differ++;
+    console.log(`${isMoved ? "✗" : same ? "✓" : "✎"} ${l.id}  heard: ${heard[i]}`
+      + (isMoved || !same ? `\n      wanted: ${l.text}` : ""));
+  });
+  console.log(moved ? `\n${moved} line(s) start or end in the wrong place — regenerate them with --only`
+    : "\nevery line starts and ends where its text does");
+  if (differ) console.log(`${differ} line(s) heard differently (✎) — the voice or the listener; listen before trusting`);
+  process.exitCode = moved ? 1 : 0;
+}
+
+if (argv.includes("--check")) await check(flag("check"));
+else if (argv.includes("--voices")) {
   const lang = flag("voices") || "ar-EG";
   const res = await call(`/voices?language_code=${encodeURIComponent(lang)}`, { headers });
   const list = res.voices || res.items || [];
@@ -130,7 +179,9 @@ async function synthesize() {
 const linesPath = flag("lines"), out = flag("out");
 if (!linesPath || !out) {
   console.error("usage: tts_gemini.mjs --lines narration.json --out <dir> [--voice Kore] [--style ...] "
-    + "[--model gemini-3.8-flash-tts] [--gap 0.35] [--key-file <path>]\n       tts_gemini.mjs --voices ar-EG");
+    + "[--model gemini-3.8-flash-tts] [--whole | --only l3,l4] [--gap 0.35] [--key-file <path>]\n"
+    + "       tts_gemini.mjs --check <measured dir>     what each line actually says\n"
+    + "       tts_gemini.mjs --voices ar-EG");
   process.exit(2);
 }
 const N = JSON.parse(readFileSync(linesPath, "utf8"));
@@ -144,6 +195,9 @@ mkdirSync(out, { recursive: true });
  * tag, and writes one take; voice_timings.mjs then splits it at those pauses
  * into the same per-line timings. */
 if (argv.includes("--whole")) {
+  // ONE pause tag. Two were tried to make the breaks unmistakable, and the
+  // model's pauses went erratic — a 5.6s silence in one take, a break shorter
+  // than a comma in the other. voice_timings.mjs reads the punctuation instead
   const content = { type: "text", text: N.lines.map((l) => l.text).join(" <long pause> ") };
   if (style) content.annotations = [{ type: "speech_metadata", style }];
   const res = await call("/interactions", {
@@ -162,9 +216,13 @@ if (argv.includes("--whole")) {
   return;
 }
 
+// --only l3,l4: just those lines, one request each — to replace the lines a
+// split put in the wrong place without spending a whole narration's quota
+const only = flag("only") ? new Set(flag("only").split(",")) : null;
 let format = null, t = 0;
 const pcms = [], rows = [];
 for (const [i, line] of N.lines.entries()) {
+  if (only && !only.has(line.id)) continue;
   const content = { type: "text", text: line.text };
   if (style) content.annotations = [{ type: "speech_metadata", style }];
   const res = await call("/interactions", {
@@ -191,6 +249,10 @@ for (const [i, line] of N.lines.entries()) {
   }
   console.log(`${line.id}  ${dur.toFixed(2)}s  ${line.text}`);
   await sleep(1200);                      // stay inside the free tier's per-minute limit
+}
+if (only) {
+  console.log(`\n${rows.length} line(s) → ${out} — put them beside the other lines' takes and measure the folder`);
+  return;
 }
 writeFileSync(join(out, "narration.wav"), wav(format, Buffer.concat(pcms)));
 writeFileSync(join(out, "timings.json"), JSON.stringify({
