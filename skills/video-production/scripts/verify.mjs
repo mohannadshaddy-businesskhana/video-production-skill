@@ -494,22 +494,60 @@ function checkMotion(manifest, rep) {
           (!busy.length ? "clean" : `competing motion: ${busy.slice(0, 3).join(", ")}`) + spokenNote, "#29");
 }
 
-function checkDeadAir(manifest, rep, maxS = 0.3) {
+/* Which frames of the render differ from the one before — measured, not
+ * declared. A half-size luma copy is enough to see change (#46 is about
+ * colour, not motion). Two kinds of change, two measures:
+ *   something small moving — a cursor, a thin line drawing — changes a few
+ *   pixels a lot: 20 or more pixels by more than 32 levels;
+ *   something large changing slowly — a pulse, a fade — changes many pixels
+ *   a little: a mean difference of 0.01 or more over the frame.
+ * A frozen frame re-encoded measured 0 pixels past 32 and a mean of at most
+ * 0.002; the gentlest real moves in the demos, 26 pixels and 0.04. One pixel's
+ * maximum was the first measure tried, and a dark frozen frame's compression
+ * noise reached 26 levels with it — a freeze read as motion. */
+const CHANGE_LEVEL = 32, CHANGE_PIXELS = 20, CHANGE_MEAN = 0.01;
+function pictureChanges(video) {
+  const probe = (tail) => {
+    const r = spawnSync("ffmpeg", ["-v", "error", "-i", video, "-vf",
+      `scale=iw/2:ih/2:flags=area,format=gray,tblend=all_mode=difference,${tail}signalstats,metadata=mode=print:file=-`,
+      "-f", "null", "-"], { encoding: "utf8", maxBuffer: 1 << 28 });
+    return [...(r.stdout || "").matchAll(/YAVG=([\d.]+(?:e[-+]?\d+)?)/g)].map((m) => +m[1]);
+  };
+  const size = ffprobeSize(video);
+  if (!size) return [];
+  const pixels = Math.floor(size[0] / 2) * Math.floor(size[1] / 2);
+  const mean = probe("");
+  const share = probe(`lutyuv=y='if(gt(val\\,${CHANGE_LEVEL})\\,255\\,0)',`);   // 255 × the share past the level
+  // tblend emits one frame fewer: frame k of its output is frame k+1 against frame k
+  return [true, ...mean.map((m, k) => m >= CHANGE_MEAN || (share[k] / 255) * pixels >= CHANGE_PIXELS)];
+}
+
+/* How long a frame may sit still, by what leads the film. Under a narration
+ * the voice is the pulse: a pause in it over a still frame read as a stall at
+ * 0.35s. Under music the beat is: a film that cuts on every beat holds each
+ * shot for one beat, and at the beds' tempos one beat is about 0.55s — rhythm,
+ * not a stall. Longer than a beat, nothing is happening on the beat. */
+const STILL_MAX = { voice: 0.3, music: 0.6 };
+function checkDeadAir(video, manifest, rep) {
+  const maxS = (manifest.voice || []).length ? STILL_MAX.voice : STILL_MAX.music;
   /* #49 — nothing is ever just sitting there. At every moment the viewer is
-   * hearing a word, watching something move or play, or still reading text
-   * that has not had its reading time. A pause in the voice while the hand
-   * waits was the viewer's own word for it: dead air.
+   * hearing a word, watching something change, or still reading text that has
+   * not had its reading time. A pause in the voice while the hand waited was
+   * the viewer's own word for it: dead air — and the rule is for every film.
    *
-   * Enforced where a narration is declared: a narrated film's activity is fully
-   * in its manifest. A music-led film's cuts on the beat are not declared as
-   * motion yet, so there it would cry wolf (#41). */
-  const voice = manifest.voice || [];
-  if (!voice.length) { rep.add("no dead air", true, "no narration declared — not checked", "#49", true); return; }
-  const fps = manifest.fps, N = manifest.duration_frames, live = new Uint8Array(N);
+   * The picture is measured from the render, not taken from the manifest's
+   * declared motion: a music video's cuts on the beat were never declared,
+   * and a declared move that renders as nothing must not count. The voice and
+   * the reading windows come from the manifest. */
+  const changed = pictureChanges(video);
+  if (changed.length < 2) { rep.add("no dead air", false, "no frame could be read — the picture was never checked", "#49"); return; }
+  const fps = manifest.fps, N = Math.min(manifest.duration_frames, changed.length), live = new Uint8Array(N);
   const mark = ([a, b]) => { for (let f = Math.max(0, a); f < Math.min(N, b); f++) live[f] = 1; };
-  voice.forEach(mark);
-  for (const m of manifest.motion_events || []) mark(m.frames);
+  for (let f = 0; f < N; f++) if (changed[f]) live[f] = 1;
+  (manifest.voice || []).forEach(mark);
   for (const e of manifest.elements) {
+    // a film shown inside this one (a comparison board) is watched, and read:
+    // its text is in its own manifest and its stills in its own report
     if (e.type === "video") mark(e.frames);
     if (e.type === "text" && !e.spoken) {
       const words = String(e.text || "").trim().split(/\s+/).filter(Boolean).length;
@@ -523,10 +561,11 @@ function checkDeadAir(manifest, rep, maxS = 0.3) {
     if (idle && a < 0) a = f;
     if (!idle && a >= 0) { if ((f - a) / fps > maxS) dead.push([a, f]); a = -1; }
   }
-  const s = (x) => f(x / fps, 1);
+  const s = (x) => f(x / fps, 1), lead = maxS === STILL_MAX.voice ? "voice-led" : "music-led";
   rep.add("no dead air", !dead.length,
-    !dead.length ? `something is said, drawn or read at every moment (gaps ≤${maxS}s)`
-      : `${dead.length} dead stretch(es): ${dead.slice(0, 3).map(([a, b]) => `${s(a)}–${s(b)}s`).join(", ")}`, "#49");
+    !dead.length ? `something is heard, moving or being read at every moment (${lead}: stills ≤${maxS}s)`
+      : `${dead.length} dead stretch(es), ${lead} limit ${maxS}s: `
+        + dead.slice(0, 4).map(([a, b]) => `${s(a)}–${s(b)}s`).join(", "), "#49");
 }
 
 function checkChapters(manifest, rep) {
@@ -717,7 +756,7 @@ checkOverlap(manifest, rep);
 checkCoverage(manifest, rep, structure?.coverage_floor ?? 0.45);
 checkDwell(manifest, rep);
 checkMotion(manifest, rep);
-checkDeadAir(manifest, rep);
+checkDeadAir(video, manifest, rep);
 // narrative structure
 checkStructure(manifest, structure, rep);
 checkHeroIntro(manifest, structure, rep);
