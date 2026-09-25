@@ -586,15 +586,39 @@ text that has not had its reading time.** A moment with none of the three is dea
 - **A spoken line takes the time the voice takes.** The script gate held beats to 0.35s a word,
   an estimate for text to read, and failed a line the voice says in 2.4s. A beat now carries
   `spoken_s`, its line's measured duration, and is held to that.
-**The gate:** `verify.mjs` "no dead air" fails any stretch over 0.3s with no voice, no declared
-motion, no playing video and no text within its reading time. The manifest records the voice from
-clips marked `data-role="voice"`.
-- **Controls.** The finished film passes. The same manifest with one line's details removed fails
-  on exactly the pause the reviewer heard (12.0–12.5s). A spoken word marked unspoken fails the
-  stillness check.
-- **Scope.** It is enforced on narrated films only. A music-led film's cuts on the beat are not yet
-  declared as motion, so there it would cry wolf (#41). The rule applies there too; the gate is
-  still to come.
+**The gate:** `verify.mjs` "no dead air", on every film. It fails a still stretch when nothing is
+heard, nothing on screen changes, and no text is within its reading time.
+- **The picture is measured from the render, frame against frame, not taken from declared motion.**
+  A music video's cuts on the beat were never declared, and a declared move that renders as
+  nothing must not count.
+- **A frame counts as changed on either of two measures.** Something small moving changes a few
+  pixels a lot: 20 or more pixels by more than 32 levels. Something large changing slowly changes
+  many pixels a little: a mean difference of 0.01 or more.
+- **The first measure was wrong.** It was the one largest pixel difference, and a dark frozen frame's
+  compression noise reached 26 levels with it. A freeze read as motion, and only the control
+  showed it.
+- **The limit follows what leads.** Under a narration, a still frame over 0.3s fails: a pause in
+  the voice read as a stall at 0.35s. Under music, it fails over 0.6s. A film that cuts on every
+  beat holds each shot for one beat, about 0.55s at the beds' tempos, and that is rhythm.
+- **A film shown inside another (a comparison board)** counts as activity while it is on screen.
+  Its own stills are checked in its own report.
+- The voice comes from clips marked `data-role="voice"`.
+
+**Controls.**
+- A 1.4s freeze put into the brand film fails (8.6–9.8s), and so does a freeze put into the
+  whiteboard's breath (12.0–12.6s).
+- A slow pulse passes.
+- An unreadable file fails.
+- A spoken word marked unspoken fails the stillness check.
+
+**What it found.** Three films froze for about 0.7s after their last line had been read. Each got
+movement that says something, never a decorative wobble:
+- **The brand film:** its three frames lay their own content out.
+- **The tutorial:** a check line runs down the script.
+- **The motion-graphics film:** the steps chapter starts one beat earlier, and the steps pulse
+  one, two, three.
+
+All 21 renders pass.
 
 ### 50 · A number before «ناس»
 
