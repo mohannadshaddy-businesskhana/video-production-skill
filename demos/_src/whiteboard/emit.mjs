@@ -32,7 +32,13 @@ const VOICES = [
 
 /* ── the drawings ─────────────────────────────────────────────────────────
    One stroke per path: a path with several subpaths would make the pen jump
-   between them, so every lift of the pen is a separate stroke. */
+   between them, so every lift of the pen is a separate stroke.
+
+   A stroke is [class, path] — drawn as its line begins — or [class, path,
+   group]: a finishing detail. Details are what keep the hand moving while the
+   voice pauses (#49); each line takes whole groups of them, in order, for as
+   long as they fit before the next line begins, so a clock gets all four of
+   its ticks or none. */
 
 // a closed circle or ellipse starting at its rightmost point. The arc's end
 // sits just ABOVE the start — an end offset sideways solves to a different
@@ -54,28 +60,52 @@ const DRAW = {
     // tick in a box — "done", the opposite of what is meant
     ["ink a b", "M 800 400 L 960 560"], ["ink a b", "M 960 400 L 800 560"],
     ["ink a b", "M 690 395 V 560"],                        // ١
+    ["ink a", "M 664 588 H 716", "underline"],
   ],
   l2: [                                   // the idea
     ["ink", "M 162 528 A 100 100 0 1 1 298 528"],
     ["ink", "M 290 548 H 170"], ["ink", "M 182 582 H 278"], ["ink", "M 260 614 H 200"],
     ["ink a", "M 76 428 H 40"], ["ink a", "M 118 326 L 90 302"], ["ink a", "M 230 278 V 240"],
     ["ink a", "M 342 326 L 370 302"], ["ink a", "M 384 428 H 420"],
+    ["ink t", "M 206 512 L 214 482 L 222 512 L 230 482 L 238 512 L 246 482 L 254 512", "filament"],
+    ["ink t", "M 164 431 A 70 70 0 0 1 195 394", "shine"],
   ],
-  l3: PEOPLE.flatMap((x) => [             // four people in a row
-    ["ink", ring(x, HEAD.y, HEAD.r)],
-    ["ink", `M ${x + 70} 1145 Q ${x + 70} 1005 ${x} 1005 Q ${x - 70} 1005 ${x - 70} 1145`],
+  l3: [                                   // four people in a row
+    ...PEOPLE.flatMap((x) => [
+      ["ink", ring(x, HEAD.y, HEAD.r)],
+      ["ink", `M ${x + 70} 1145 Q ${x + 70} 1005 ${x} 1005 Q ${x - 70} 1005 ${x - 70} 1145`],
+    ]),
+    ...PEOPLE.map((x) => ["ink t", `M ${x - 16} 1012 L ${x} 1032 L ${x + 16} 1012`, "collars"]),
+  ],
+  // after the names: who hands the work to whom. Drawn from the left, where the
+  // last name ends — starting at the far arrow cost a hop that did not fit
+  l4: PEOPLE.slice(0, 3).reverse().flatMap((x) => [
+    ["ink", `M ${x - 82} 1080 H ${x - 158}`, "arrows"],
+    ["ink", `M ${x - 142} 1064 L ${x - 160} 1080 L ${x - 142} 1096`, "arrows"],
   ]),
-  l5: PEOPLE.slice(0, 3).flatMap((x) => [ // each waits for the one before: a clock between them
-    ["ink a", ring(x - 120, HEAD.y, 32)],
-    ["ink a", `M ${x - 120} 914 V ${HEAD.y} H ${x - 102}`],
-  ]),
-  l6: [["ink a b", ring(540, 1065, 520, 335)]],          // the tool does the four at once
+  l5: [                                   // each waits for the one before: a clock between them
+    ...PEOPLE.slice(0, 3).flatMap((x) => [
+      ["ink a", ring(x - 120, HEAD.y, 32)],
+      ["ink a", `M ${x - 120} 914 V ${HEAD.y} H ${x - 102}`],
+    ]),
+    // a clock face's ticks, all three clocks' twelve first, then their six…
+    ...[["t12", 0, -29, 0, -25], ["t6", 0, 29, 0, 25], ["t3", 29, 0, 25, 0], ["t9", -29, 0, -25, 0]]
+      .flatMap(([g, x1, y1, x2, y2]) => PEOPLE.slice(0, 3).map((x) =>
+        ["ink a t", `M ${x - 120 + x1} ${HEAD.y + y1} L ${x - 120 + x2} ${HEAD.y + y2}`, g])),
+  ],
+  l6: [                                   // the tool does the four at once
+    ["ink a b", ring(540, 1065, 520, 335)],
+    ["ink a b", "M 1066 1065 A 526 341 0 0 1 540 1406", "again"],
+  ],
   l7: [                                   // delivered in three sizes — 9:16, 1:1, 16:9
     ["ink", box(775, 1430, 854, 1570, 10)],
     ["ink", box(555, 1430, 695, 1570, 10)],
     ["ink", box(226, 1430, 475, 1570, 10)],
+    ["ink t", "M 806 1486 L 828 1500 L 806 1514 Z", "play"],
+    ["ink t", "M 614 1484 L 640 1500 L 614 1516 Z", "play"],
+    ["ink t", "M 340 1484 L 366 1500 L 340 1516 Z", "play"],
   ],
-  l8: [["ink a b", "M 800 1633 L 842 1673 L 930 1591"]], // try it
+  l8: [["ink a b", "M 800 1633 L 842 1673 L 930 1591"]], // try it — after the name has been read
 };
 const WORDS = {
   l4: ["كاتب", "مصمم", "مونتير", "مراجع"].map((text, i) =>
@@ -83,23 +113,28 @@ const WORDS = {
   l8: [{ id: "w5", text: "video-production", latin: true, x: 120, y: 1602, w: 620, size: 52 }],
 };
 
+// strokes come after their line's words (a list is written, then connected);
+// the order within a line is the table's
 const board = () => Object.entries(DRAW).map(([id, strokes]) =>
   `          <g id="g-${id}" data-line="${id}">\n`
-  + strokes.map(([cls, d]) => `            <path class="${cls}" d="${d}"/>`).join("\n")
+  + strokes.map(([cls, d, group], k) => `            <path class="${cls}" d="${d}" data-seq="${100 + k}"`
+    + `${group ? ` data-group="${group}"` : ""}/>`).join("\n")
   + "\n          </g>").join("\n");
-const words = () => Object.entries(WORDS).flatMap(([line, ws]) => ws.map((w) =>
-  `        <div class="word${w.latin ? " latin" : ""}" id="${w.id}" data-line="${line}" `
+const words = () => Object.entries(WORDS).flatMap(([line, ws]) => ws.map((w, k) =>
+  `        <div class="word${w.latin ? " latin" : ""}" id="${w.id}" data-line="${line}" data-seq="${k}" `
   + `style="left:${w.x}px; top:${w.y}px; width:${w.w}px; font-size:${w.size}px"><span>${w.text}</span></div>`))
   .join("\n");
 
 /* ── the timing ───────────────────────────────────────────────────────────
-   Lines follow each other with the pause they were measured with. After the
-   four names the voice waits longer: the names are read in stillness before
-   the hand moves on, and a pause after a list is how anyone would say it. */
+   Lines follow each other with the pause they were measured with; after the
+   list of four names the voice breathes a little longer, as anyone would.
+   The drawing fills every pause (board.html), so a pause is never dead air. */
 const LEAD = 0.15;                      // s before the first word: the pen is already on the board
 const GAP = 0.35;
-const BREATH = { l4: 0.7 };
-const TAIL = 3.9;                       // after the last line starts: tick, name, 1.6s held, hand gone
+const BREATH = { l4: 0.6 };
+// after the last line starts: the name written (1.0s) and held to be read
+// (1.6s), the tick, the hand gone — and the film ends with it
+const TAIL = 3.25;
 const FPS = 30;
 const BED_AT_19 = 0.09;                 // the bed's gain under a voice at -19 LUFS
 
@@ -123,7 +158,8 @@ function scriptFor(base, v, { lines, dur }) {
     title: `${base.title} · ${v.label}`,
     note: `Frames from the measured narration (${v.label}): each beat is its line's spoken `
       + "duration and the pause after it — emitted by demos/_src/whiteboard/emit.mjs.",
-    beats: base.beats.map((b, i) => ({ ...b, frames: [edges[i], edges[i + 1]] })),
+    // spoken_s: the line is heard, so its beat is held to the voice's own time
+    beats: base.beats.map((b, i) => ({ ...b, frames: [edges[i], edges[i + 1]], spoken_s: lines[i].duration })),
   };
 }
 
@@ -132,8 +168,9 @@ function writeDemo(dir, v, T, lay, base) {
   const level = T.lines.reduce((s, l) => s + (l.lufs ?? -19), 0) / T.lines.length;
   const bed = BED_AT_19 * 10 ** ((level + 19) / 20);
   const audio = lay.lines.map((l, i) =>
-    `      <audio id="vo-${l.id}" src="assets/voice/${v.dir}/measured/${l.file}" data-start="${l.start}" `
-    + `data-duration="${l.duration}" data-track-index="${11 + i}" data-volume="1"></audio>`).join("\n");
+    `      <audio id="vo-${l.id}" src="assets/voice/${v.dir}/measured/${l.file}" data-role="voice" `
+    + `data-start="${l.start}" data-duration="${l.duration}" data-track-index="${11 + i}" data-volume="1"></audio>`)
+    .join("\n");
   const html = readFileSync(join(HERE, "board.html"), "utf8")
     .replace("@@VOICE@@", v.label).replace("@@TITLE@@", `سبورة — ${v.label}`)
     .replaceAll("@@DUR@@", String(+lay.dur.toFixed(3))).replace("@@BED@@", bed.toFixed(3))
