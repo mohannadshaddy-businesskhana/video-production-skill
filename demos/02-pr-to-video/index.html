@@ -69,6 +69,8 @@
              padding:40px 34px 96px; background:rgba(20,24,31,.03); }
       .dl  { height:24px; border-radius:12px; background:rgba(20,24,31,.20); margin-bottom:26px; }
       .dl.s { width:58%; } .dl.m { width:82%; } .dl.l { width:96%; }
+      .scan { position:absolute; left:34px; right:34px; top:37px; height:6px; border-radius:3px;
+              background:var(--pass); opacity:0; }
       .stamp { position:absolute; left:34px; bottom:30px;
                font-size:34px; font-weight:800; color:var(--pass); direction:rtl; }
 
@@ -136,6 +138,7 @@
             <div class="dl m"></div><div class="dl l"></div><div class="dl m"></div>
             <div class="dl s" style="margin-bottom:0"></div>
             <div class="stamp">اتراجع</div>
+            <div class="scan" id="a5"></div>
           </div>
         </div>
       </section>
@@ -221,6 +224,12 @@ function build() {
   tl.to("#a2", { ...rise, duration: F(14) }, F(98));
   tl.to("#a3", { opacity: 1, duration: F(14) }, F(142));
   tl.to("#a4", { opacity: 1, duration: F(12) }, F(160));
+  // once the last line has been read, the check runs down the script — the
+  // frame had sat still for 0.7s before step 2 (dead air, #49)
+  tl.to("#a5", { opacity: 1, duration: F(2) }, F(219));
+  tl.to("#a5", { y: 318, duration: F(18), ease: "none" }, F(219));
+  tl.to("#a5", { opacity: 0, duration: F(3) }, F(236));
+  window.__MOTION.push({ id: "review", frames: [219, 239], magnitude: "small" });
 
   /* ── STEP 2 · 240–330 ───────────────────────────────────────────── */
   tl.to("#b0", { opacity: 1, y: 0, duration: F(9), ease: "power2.out" }, F(244));
