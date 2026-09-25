@@ -10,15 +10,18 @@
   starts on its first words, and every time comes from the voice's own
   measured takes — never an estimate.
 
+  Nothing is ever just sitting there (#49). Each line draws until the next one
+  begins: its main strokes land on the words that name them, then finishing
+  details — a filament, collars, a clock's ticks — are added while they fit,
+  and one hand speed is solved so the drawing ends as the next line starts.
+  A pause in the voice is where the hand is busiest.
+
   One clock drives the ink and the hand: a stroke reveals by its dash offset
   and the pen tip sits at the ink's leading edge, read from the same path at
-  the same length, so the hand never lags the line. Between strokes the pen
-  lifts and travels. Words are written under the pen from the right, as
-  Arabic is; the tool's name from the left.
-
-  After written words the board holds still for 1.6s before the hand moves
-  again, so they are read in stillness (#29): whiteboards fail that check more
-  than any other style, because drawing time feels like reading time.
+  the same length, so the hand never lags the line. Words are written under
+  the pen from the right, as Arabic is; the tool's name from the left. A word
+  the voice says as it is written is heard, not read, and the hand moves on;
+  a word it does not say is held still for 1.6s, while the voice talks on.
 -->
 <html lang="ar">
   <head>
@@ -49,6 +52,7 @@
       .ink { fill:none; stroke:var(--ink); stroke-width:10; stroke-linecap:round; stroke-linejoin:round; }
       .ink.a { stroke:var(--amber); stroke-width:12; }
       .ink.b { stroke-width:15; }
+      .ink.t { stroke-width:6; }
 
       /* words, written under the pen. The clip runs past the text's own box on
          every side so a glyph's overhang is never cut once it is written */
@@ -66,23 +70,31 @@
 @@BOARD@@
         </svg>
 @@WORDS@@
-        <!-- the hand: the marker's tip at (0,0), the arm off to the lower right -->
+        <!-- the hand, seen from its back: the marker's tip at (0,0), the index
+             finger along the barrel, the thumb under it, the arm off to the lower
+             right. Drawn flat pointing left, then turned so the tip leads -->
         <svg class="layer" id="handlayer" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
           <g id="hand" transform="translate(1250 2150)">
-            <g transform="rotate(-28)" stroke="#14181F" stroke-width="4" stroke-linejoin="round">
-              <rect x="30" y="300" width="150" height="330" rx="24" fill="#14181F"/>
-              <path d="M 30 330 H 180" stroke="#F5F2EA" stroke-width="6"/>
-              <path d="M 40 250 Q 36 330 60 330 H 170 Q 190 320 180 240 Q 170 180 120 170 L 60 180 Q 40 200 40 250 Z" fill="#E3C292"/>
-              <polygon points="0,0 -8,22 8,22" fill="#14181F"/>
-              <rect x="-16" y="20" width="32" height="200" rx="6" fill="#C77B0E"/>
-              <rect x="-16" y="194" width="32" height="26" rx="5" fill="#14181F"/>
-              <!-- fingers first, so the back of the hand covers where they join it -->
-              <rect x="-50" y="66" width="32" height="110" rx="16" fill="#E3C292" transform="rotate(-10 -34 114)"/>
-              <rect x="52" y="140" width="32" height="80" rx="16" fill="#E3C292"/>
-              <rect x="28" y="112" width="34" height="92" rx="17" fill="#E9D4B3"/>
-              <rect x="6" y="46" width="32" height="118" rx="16" fill="#E9D4B3"/>
-              <path d="M -30 160 Q -46 216 12 262 Q 80 298 150 262 Q 190 232 178 176 Q 164 132 110 128 Q 70 128 44 150 Q 20 170 -4 150 Q -22 140 -30 160 Z" fill="#E9D4B3"/>
-              <path d="M 70 168 Q 92 160 112 170" fill="none" stroke-width="3"/>
+            <g transform="rotate(50) scale(0.78)" stroke="#14181F" stroke-width="5"
+               stroke-linejoin="round" stroke-linecap="round">
+              <path d="M 344 -96 L 900 -128 L 900 150 L 362 84 Z" fill="#14181F"/>
+              <path d="M 334 -90 Q 352 -96 370 -94 L 388 84 Q 368 90 350 86 Z" fill="#F5F2EA"/>
+              <path d="M 0 -3 L 24 -11 L 24 11 L 0 3 Z" fill="#14181F"/>
+              <rect x="22" y="-13" width="14" height="26" rx="3" fill="#14181F"/>
+              <rect x="34" y="-15" width="230" height="30" rx="7" fill="#C77B0E"/>
+              <path d="M 162 -15 L 58 -15 Q 38 -15 36 -31 Q 36 -47 56 -48 L 116 -49
+                       Q 140 -50 156 -64 L 174 -86 Q 184 -100 204 -102 Q 238 -112 272 -106
+                       Q 312 -100 340 -84 Q 352 -30 356 30 L 360 82
+                       Q 322 92 282 84 Q 250 78 230 62 Q 206 42 186 22 Q 176 8 162 -15 Z" fill="#E9D4B3"/>
+              <path d="M 40 -34 Q 42 -44 54 -45 L 70 -45 Q 70 -36 62 -32 Q 50 -29 40 -34 Z"
+                    fill="#F5F2EA" stroke-width="3"/>
+              <path d="M 70 16 Q 54 22 58 38 Q 64 52 86 54 L 186 72 Q 222 80 244 64 Q 250 54 236 46
+                       Q 204 34 168 26 L 112 18 Q 90 14 70 16 Z" fill="#E3C292"/>
+              <path d="M 62 36 Q 66 26 80 24" fill="none" stroke-width="3"/>
+              <path d="M 194 -84 Q 204 -78 214 -86" fill="none" stroke-width="3"/>
+              <path d="M 238 -94 Q 248 -88 258 -95" fill="none" stroke-width="3"/>
+              <path d="M 280 -88 Q 290 -83 298 -89" fill="none" stroke-width="3"/>
+              <path d="M 124 -46 Q 131 -34 128 -22" fill="none" stroke-width="3"/>
             </g>
           </g>
         </svg>
@@ -102,24 +114,25 @@ window.__MOTION = [];
 const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
 const fr = (s) => Math.round(s * 30);
 
-const SPEED = 1500;          // px of ink a second — one hand, one speed
+const SPEED = 1500;          // px of ink a second: the pace details are chosen at
+const MIN_SPEED = 1000;      // slower than this drags
 const MAX_SPEED = 3200;      // faster than this reads as a machine, not a hand
 const LETTERS = 16;          // handwriting: letters a second
-const HOLD = 1.6;            // s of stillness after written words (#29)
-const SPILL = 0.25;          // a drawing may run this far into the next line's first word
+const HOLD = 1.6;            // s of stillness after words the voice does not say (#29)
+const EXIT = 0.3;
 const OFF = { x: 1250, y: 2150 };
 
 function build() {
   const tl = gsap.timeline({ paused: true });
   const hand = document.getElementById("hand");
-  let pos = { ...OFF };
   const place = (x, y) => hand.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)})`);
   // pen lifted: a short hop is quick, a long one takes longer, never more than 0.3s
   const hopTime = (a, b) => Math.min(0.3, Math.max(0.08, Math.hypot(b.x - a.x, b.y - a.y) / 2600));
 
   /* every item the hand draws: a stroke, measured once here before any frame,
      or a word, measured from its text's own box */
-  const item = (el) => {
+  const item = (el, ln) => {
+    const seq = Number(el.dataset.seq), group = el.dataset.group || null;
     if (el.tagName.toLowerCase() === "path") {
       const len = Math.ceil(el.getTotalLength());
       // the gap is long enough that no dash's round cap sits on either end of
@@ -127,23 +140,44 @@ function build() {
       el.style.strokeDasharray = `${len} ${2 * len + 40}`;
       el.style.strokeDashoffset = `${len + 20}`;
       const p = el.getPointAtLength(0), q = el.getPointAtLength(len);
-      return { el, kind: "path", len, start: { x: p.x, y: p.y }, end: { x: q.x, y: q.y } };
+      return { el, kind: "path", len, seq, group, start: { x: p.x, y: p.y }, end: { x: q.x, y: q.y } };
     }
     const span = el.firstElementChild, rtl = !el.classList.contains("latin");
     const left = el.offsetLeft + span.offsetLeft, w = span.offsetWidth;
     const y = el.offsetTop + span.offsetTop + span.offsetHeight * 0.62;
-    const letters = [...span.textContent].length;
-    return { el, span, kind: "word", rtl, left, w, y, dur: Math.min(1.1, Math.max(0.3, letters / LETTERS)),
+    const text = span.textContent, at = ln.text.indexOf(text);
+    return { el, span, kind: "word", rtl, left, w, y, seq, group, text,
+             dur: Math.min(1.1, Math.max(0.3, [...text].length / LETTERS)),
+             // a word the line says is written as it is said, where the line says it
+             spoken: at >= 0, align: at >= 0 ? ln.start + (at / ln.text.length) * (ln.end - ln.start) : null,
              start: { x: rtl ? left + w : left, y }, end: { x: rtl ? left : left + w, y } };
   };
-  const hop = (to, at) => {
-    const from = { ...pos }, p = { k: 0 }, d = hopTime(from, to);
-    tl.to(p, { k: 1, duration: d, ease: "power2.inOut",
-               onUpdate: () => place(from.x + (to.x - from.x) * p.k, from.y + (to.y - from.y) * p.k) }, at);
-    pos = { ...to };
-    return d;
+
+  /* A line's drawing, laid out at one speed: hops, strokes, words that wait
+     for the voice, and the hold after a word it does not say. */
+  const simulate = (ln, items, from, free, speed) => {
+    const steps = [];
+    let p = from, t = Math.max(ln.start + 0.06 - hopTime(from, items[0].start), free);
+    for (const it of items) {
+      const h = hopTime(p, it.start);
+      steps.push({ kind: "hop", from: p, to: it.start, at: t, dur: h });
+      t += h;
+      if (it.align !== null && it.align > t) t = it.align;
+      const d = it.kind === "path" ? it.len / speed : it.dur;
+      steps.push({ kind: it.kind, it, at: t, dur: d });
+      t += d; p = it.end;
+      if (it.hold) t += HOLD;
+    }
+    return { steps, end: t, last: p };
   };
-  const stroke = (it, at, dur) => {
+
+  const hopTween = (st) => {
+    const p = { k: 0 };
+    tl.to(p, { k: 1, duration: st.dur, ease: "power2.inOut",
+               onUpdate: () => place(st.from.x + (st.to.x - st.from.x) * p.k, st.from.y + (st.to.y - st.from.y) * p.k) },
+          st.at);
+  };
+  const strokeTween = (it, at, dur) => {
     const p = { k: 0 };
     tl.to(p, { k: 1, duration: dur, ease: "none", onUpdate: () => {
       const s = it.len * p.k;
@@ -151,9 +185,8 @@ function build() {
       const pt = it.el.getPointAtLength(s);
       place(pt.x, pt.y);
     } }, at);
-    pos = { ...it.end };
   };
-  const write = (it, at) => {
+  const writeTween = (it, at) => {
     const p = { k: 0 };
     tl.to(p, { k: 1, duration: it.dur, ease: "none", onUpdate: () => {
       // the clip opens 20% past the text so its overhang is revealed too; the
@@ -163,55 +196,78 @@ function build() {
       const edge = Math.min(1, Math.max(0, it.rtl ? cut / 100 : 1 - cut / 100));
       place(it.left + it.w * edge, it.y + 7 * Math.sin(p.k * Math.PI * 2 * (it.w / 60)));
     } }, at);
-    pos = { ...it.end };
   };
 
-  let free = 0;                                 // when the hand may move again
   // one plain selector — the renderer's bundler cannot parse a templated one
   const drawn = [...document.querySelectorAll("#board path, .word")];
-  const all = L.map((ln) => drawn.filter((el) => (el.dataset.line ?? el.parentNode.dataset.line) === ln.id).map(item));
+  const lineOf = (el) => el.dataset.line ?? el.parentNode.dataset.line;
+  const all = L.map((ln) => drawn.filter((el) => lineOf(el) === ln.id).map((el) => item(el, ln))
+    .sort((a, b) => a.seq - b.seq));
+  for (const items of all) {
+    const unsaid = items.filter((it) => it.kind === "word" && !it.spoken);
+    if (unsaid.length) unsaid[unsaid.length - 1].hold = true;
+  }
+
   // frame 0: the hand already on the board beside the first stroke, pen up
   const first = all.find((a) => a.length)[0].start;
-  pos = { x: first.x + 60, y: first.y + 90 };
+  let pos = { x: first.x + 60, y: first.y + 90 }, free = 0;
   place(pos.x, pos.y);
 
   L.forEach((ln, i) => {
     const items = all[i];
     if (!items.length) return;
-    const next = i + 1 < L.length ? L[i + 1].start : END;
-    const words = items.filter((it) => it.kind === "word");
-    const d0 = hopTime(pos, items[0].start);
-    const began = Math.max(ln.start + 0.06, free + d0) - d0;
-    // the ink's speed: fast enough to finish before the next line's words
-    const hops = items.slice(1).reduce((s, it, k) => s + hopTime(items[k].end, it.start), 0) + d0;
-    const writing = words.reduce((s, it) => s + it.dur, 0);
-    const ink = items.filter((it) => it.kind === "path").reduce((s, it) => s + it.len, 0);
-    const room = next + SPILL - began - hops - writing - 0.15;
-    const speed = Math.min(MAX_SPEED, Math.max(SPEED, ink / Math.max(room, 0.3)));
-    let t = began;
-    items.forEach((it) => {
-      t += hop(it.start, t);
-      if (it.kind === "path") { const d = it.len / speed; stroke(it, t, d); t += d; return; }
-      // a word waits for the voice to reach it, where the line says it
-      const at = ln.text.indexOf(it.span.textContent);
-      if (at >= 0) t = Math.max(t, ln.start + (at / ln.text.length) * (ln.end - ln.start));
-      write(it, t);
-      it.at = t;
-      t += it.dur;
-    });
-    for (const it of words)
-      mf(it.el.id, { type: "text", chapter: "wb", frames: [fr(it.at), fr(END)], still_from: fr(t),
-                     text: it.span.textContent, critical: true, el: "#" + it.el.id });
-    mf("g-" + ln.id, { type: "shape", chapter: "wb", frames: [fr(began), fr(END)], still_from: fr(t),
-                       critical: false, el: "#g-" + ln.id });
-    window.__MOTION.push({ id: "draw-" + ln.id, frames: [fr(began), fr(t)], magnitude: "large" });
-    free = t + (words.length ? HOLD : 0);
+    // the next line's first stroke begins on its first word; the hand must be
+    // there by then, and until then it draws
+    const due = i + 1 < L.length ? L[i + 1].start + 0.06 : END - EXIT;
+    const nextAt = i + 1 < L.length && all[i + 1].length ? all[i + 1][0].start : OFF;
+    const finish = (r) => r.end + hopTime(r.last, nextAt);
+
+    // details join group by group, in their order, while they fit at the base pace
+    let chosen = items.filter((it) => !it.group);
+    const groups = [...new Set(items.filter((it) => it.group).map((it) => it.group))];
+    for (const g of groups) {
+      const trial = items.filter((it) => chosen.includes(it) || it.group === g);
+      if (finish(simulate(ln, trial, pos, free, SPEED)) <= due) chosen = trial;
+      else break;
+    }
+    for (const it of items) if (!chosen.includes(it)) it.el.remove();
+
+    // then the one speed that ends the drawing as the next line begins
+    const fits = (s) => finish(simulate(ln, chosen, pos, free, s)) <= due;
+    let speed = MAX_SPEED;
+    if (fits(MIN_SPEED)) speed = MIN_SPEED;
+    else if (fits(MAX_SPEED)) {
+      let lo = MIN_SPEED, hi = MAX_SPEED;
+      for (let k = 0; k < 30; k++) { const mid = (lo + hi) / 2; if (fits(mid)) hi = mid; else lo = mid; }
+      speed = hi;
+    }
+    const r = simulate(ln, chosen, pos, free, speed);
+
+    // the tweens, and the motion as it really runs: split wherever the hand
+    // stands still — waiting for the voice, or holding a word to be read
+    const runs = [];
+    for (const st of r.steps) {
+      if (st.kind === "hop") hopTween(st);
+      else if (st.kind === "path") strokeTween(st.it, st.at, st.dur);
+      else writeTween(st.it, st.at);
+      const a = st.at, b = st.at + st.dur, last = runs[runs.length - 1];
+      if (last && a - last[1] < 0.1) last[1] = b; else runs.push([a, b]);
+      if (st.kind === "word")
+        mf(st.it.el.id, { type: "text", chapter: "wb", frames: [fr(a), fr(END)], still_from: fr(b),
+                          text: st.it.text, spoken: st.it.spoken, critical: true, el: "#" + st.it.el.id });
+    }
+    runs.forEach(([a, b], k) => window.__MOTION.push({ id: `draw-${ln.id}${runs.length > 1 ? `.${k + 1}` : ""}`,
+                                                       frames: [fr(a), fr(b)], magnitude: "large" }));
+    if (document.getElementById("g-" + ln.id))
+      mf("g-" + ln.id, { type: "shape", chapter: "wb", frames: [fr(r.steps[0].at), fr(END)], still_from: fr(r.end),
+                         critical: false, el: "#g-" + ln.id });
+    pos = r.last; free = r.end;
   });
 
-  // the hand leaves once the last words have been read, if there is time to
-  if (END - free >= 0.6) {
-    const d = hop(OFF, free);
-    window.__MOTION.push({ id: "exit", frames: [fr(free), fr(free + d)], magnitude: "large" });
+  // the hand leaves once the last words have been read, and the film ends with it
+  if (END - free >= EXIT) {
+    hopTween({ from: pos, to: OFF, at: free, dur: EXIT });
+    window.__MOTION.push({ id: "exit", frames: [fr(free), fr(free + EXIT)], magnitude: "large" });
   }
 
   /* a soft bed under the voice — one track, gain automation only (#26 #27) */
