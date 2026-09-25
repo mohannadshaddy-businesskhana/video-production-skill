@@ -26,7 +26,7 @@
     {
       "name": "beat continuity",
       "ok": true,
-      "detail": "55 or 110 BPM, continuous (drift 0.14/window, no dropout)",
+      "detail": "55 or 110 BPM, continuous (drift 0.17/window, no dropout)",
       "ref": "#27",
       "warn": false
     },
@@ -91,6 +91,13 @@
       "ok": true,
       "detail": "clean",
       "ref": "#29",
+      "warn": false
+    },
+    {
+      "name": "no dead air",
+      "ok": true,
+      "detail": "something is heard, moving or being read at every moment (music-led: stills ≤0.6s)",
+      "ref": "#49",
       "warn": false
     },
     {

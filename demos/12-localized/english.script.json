@@ -73,7 +73,7 @@
       "id": "ch3",
       "frames": [
         213,
-        311
+        295
       ],
       "job": "first use — a number",
       "says": [
@@ -92,7 +92,7 @@
     {
       "id": "ch4",
       "frames": [
-        311,
+        295,
         409
       ],
       "job": "second use — steps",

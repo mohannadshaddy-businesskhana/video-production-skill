@@ -28,8 +28,8 @@
   Cold-read ledger (script.json):
     ch1 0-82     establishes  this video has no filming in it
     ch2 82-213   needs ch1 · establishes a tool makes the video from an idea, a shoot takes a day
-    ch3 213-311  needs ch2 · establishes a number can be explained by motion
-    ch4 311-409  needs ch3 · establishes steps can be explained by motion
+    ch3 213-295  needs ch2 · establishes a number can be explained by motion
+    ch4 295-409  needs ch3 · establishes steps can be explained by motion
     ch5 409-475  needs ch4 · establishes any idea, no filming  (the claim)
     cta 475-540  needs ch5
 -->
@@ -123,10 +123,10 @@
       <audio id="sfx02" src="assets/sfx/whoosh-short.mp3" data-start="2.733"  data-duration="0.57" data-track-index="12" data-volume="0.45"></audio>
       <audio id="sfx03" src="assets/sfx/click-soft.mp3"   data-start="4.267"  data-duration="0.36" data-track-index="13" data-volume="0.5"></audio>
       <audio id="sfx04" src="assets/sfx/whoosh-short.mp3" data-start="7.1"    data-duration="0.57" data-track-index="14" data-volume="0.45"></audio>
-      <audio id="sfx05" src="assets/sfx/whoosh-short.mp3" data-start="10.367" data-duration="0.57" data-track-index="15" data-volume="0.4"></audio>
-      <audio id="sfx06" src="assets/sfx/pop.mp3"          data-start="11.033" data-duration="0.72" data-track-index="16" data-volume="0.35"></audio>
-      <audio id="sfx07" src="assets/sfx/pop.mp3"          data-start="11.233" data-duration="0.72" data-track-index="17" data-volume="0.35"></audio>
-      <audio id="sfx08" src="assets/sfx/pop.mp3"          data-start="11.433" data-duration="0.72" data-track-index="18" data-volume="0.35"></audio>
+      <audio id="sfx05" src="assets/sfx/whoosh-short.mp3" data-start="9.833"  data-duration="0.57" data-track-index="15" data-volume="0.4"></audio>
+      <audio id="sfx06" src="assets/sfx/pop.mp3"          data-start="10.5"   data-duration="0.72" data-track-index="16" data-volume="0.35"></audio>
+      <audio id="sfx07" src="assets/sfx/pop.mp3"          data-start="10.7"   data-duration="0.72" data-track-index="17" data-volume="0.35"></audio>
+      <audio id="sfx08" src="assets/sfx/pop.mp3"          data-start="10.9"   data-duration="0.72" data-track-index="18" data-volume="0.35"></audio>
       <audio id="sfx09" src="assets/sfx/whoosh-short.mp3" data-start="13.633" data-duration="0.57" data-track-index="19" data-volume="0.45"></audio>
       <audio id="sfx10" src="assets/sfx/whoosh-short.mp3" data-start="15.833" data-duration="0.57" data-track-index="20" data-volume="0.45"></audio>
       <audio id="sfx11" src="assets/sfx/chime.mp3"        data-start="16.367" data-duration="1.6"  data-track-index="21" data-volume="0.4"></audio>
@@ -141,11 +141,14 @@ window.__MOTION = [];
 const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
 const F = (f) => f / 30;
 
-/* every chapter starts on a beat of the track: beats 5, 13, 19, 25 and 29 */
-const CH = [["k1", 0, 82], ["k2", 82, 213], ["k3", 213, 311], ["k4", 311, 409],
+/* every chapter starts on a beat of the track: beats 5, 13, 18, 25 and 29.
+   The steps start one beat earlier than they did (311): once the number had
+   been read, the frame sat still for 0.7s — dead air (#49) */
+const K4 = 295;
+const CH = [["k1", 0, 82], ["k2", 82, 213], ["k3", 213, K4], ["k4", K4, 409],
             ["k5", 409, 475], ["k6", 475, 540]];
 /* each morph, and the frame its line can be read from once it has stopped */
-const MOVES = [[0, 20], [82, 130], [213, 245], [311, 351], [409, 425], [475, 491]];
+const MOVES = [[0, 20], [82, 130], [213, 245], [K4, K4 + 40], [409, 425], [475, 491]];
 const TEXT = L.text;
 
 /* a box, with its corners in CSS order: top-left, top-right, bottom-right, bottom-left */
@@ -190,7 +193,11 @@ function build() {
   all(BAR, 82, 20);                                   // ch2  it squashes into a day
   all(BLOCK, 110, 20);                                //      and the day folds into one block
   all(COLUMN, 213, 32);                               // ch3  the block rises into a column
-  IDS.forEach((id, i) => morph(id, STEPS[id], 311 + i * 6, 20));   // ch4  one step after another
+  IDS.forEach((id, i) => morph(id, STEPS[id], K4 + i * 6, 20));   // ch4  one step after another
+  // once the line has been read, the steps pulse in their order, one, two,
+  // three — the frame had sat still before the circle came back (#49)
+  IDS.forEach((id, i) => tl.to(path[id], { opacity: 0.55, duration: F(5), yoyo: true, repeat: 1,
+                                           ease: "power1.inOut" }, F(388 + i * 5)));
   all(CIRCLE, 409, 16);                               // ch5  back to where it started
   tl.set(["#pB", "#pC"], { visibility: "hidden" }, F(475));        // they sit exactly under A
   morph("A", PILL, 475, 16);                          // cta  the circle opens into the button
@@ -207,12 +214,12 @@ function build() {
   tl.to("#cnt", { y: 0, duration: F(32), ease: EASE }, F(213));
   tl.to(n, { v: 100, duration: F(32), ease: EASE,
              onUpdate: () => { cnt.textContent = num(Math.round(n.v)) + L.pct; } }, F(213));
-  wipe("#cnt", OPEN, SHUT_TOP, 311, 10, "power2.in");
-  tl.set("#cnt", { visibility: "hidden" }, F(321));
+  wipe("#cnt", OPEN, SHUT_TOP, K4, 10, "power2.in");
+  tl.set("#cnt", { visibility: "hidden" }, F(K4 + 10));
 
   /* each step's number wipes up out of it as the step lands */
   ["l1", "l2", "l3"].forEach((id, i) => {
-    const at = 331 + i * 6;
+    const at = K4 + 20 + i * 6;
     tl.set("#" + id, { visibility: "visible" }, F(at));
     wipe("#" + id, SHUT_TOP, OPEN, at, 8, "power2.out");
     tl.to("#" + id, { clipPath: SHUT_TOP, duration: F(6), ease: "power2.in" }, F(409));
@@ -241,15 +248,16 @@ function build() {
   tl.to("#bgm", { volume: 0, duration: F(36), ease: "none" }, F(504));
 
   /* ── the manifest ───────────────────────────────────────────────── */
+  window.__MOTION.push({ id: "steps-pulse", frames: [388, 408], magnitude: "small" });
   MOVES.forEach(([a, b], i) =>
     window.__MOTION.push({ id: "morph" + (i + 1), frames: [a, b], magnitude: "large" }));
   CH.forEach(([id, a, b], i) =>
     mf(id, { type: "text", chapter: "mg", frames: [a, b], still_from: MOVES[i][1],
              text: TEXT[i], critical: true, el: "#" + id }));
-  mf("cnt", { type: "text", chapter: "mg", frames: [213, 311], still_from: 245,
+  mf("cnt", { type: "text", chapter: "mg", frames: [213, K4], still_from: 245,
               text: num(100) + L.pct, critical: true, el: "#cnt" });
   ["l1", "l2", "l3"].forEach((id, i) =>
-    mf(id, { type: "text", chapter: "mg", frames: [331 + i * 6, 409], still_from: 351,
+    mf(id, { type: "text", chapter: "mg", frames: [K4 + 20 + i * 6, 409], still_from: K4 + 40,
              text: num(i + 1), critical: true, el: "#" + id }));
   mf("tag", { type: "text", chapter: "mg", frames: [479, 540], still_from: 491,
               text: "video-production", critical: true, el: "#tag" });

@@ -157,6 +157,7 @@ function build() {
   gsap.set(["#k1","#k2","#k3","#k4"], { opacity: 0, scale: 1.25, transformOrigin: "center" });
   gsap.set(["#h1","#v1","#n1","#c1"], { y: 24 });
   gsap.set(".rt", { scaleY: 0, transformOrigin: "center bottom" });
+  gsap.set(".rt i", { scaleX: 0, transformOrigin: "right center" });
   gsap.set(".tk", { opacity: 0, scale: 0.6, transformOrigin: "center" });
   gsap.set(".tk", { backgroundColor: "rgba(94,143,120,0)" });
 
@@ -175,6 +176,10 @@ function build() {
   tl.to("#v3", { opacity: 1, duration: F(14) }, F(190));
   tl.to("#v4", { opacity: 1, duration: F(2) }, F(200));
   tl.to(".rt", { scaleY: 1, duration: F(14), stagger: F(6), ease: "back.out(1.4)" }, F(200));
+  // once the last line has been read, each frame lays its own content out —
+  // the frame had sat still for 0.7s before the next chapter (dead air, #49)
+  tl.to(".rt i", { scaleX: 1, duration: F(10), stagger: F(4), ease: "power2.out" }, F(250));
+  window.__MOTION.push({ id: "ratios-fill", frames: [250, 292], magnitude: "small" });
 
   /* ── VALUE · numbers · 300–450 ──────────────────────────────────── */
   tl.to("#n0", { opacity: 1, duration: F(8) }, F(304));

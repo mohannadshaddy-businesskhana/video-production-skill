@@ -94,6 +94,13 @@
       "warn": false
     },
     {
+      "name": "no dead air",
+      "ok": true,
+      "detail": "something is heard, moving or being read at every moment (music-led: stills ≤0.6s)",
+      "ref": "#49",
+      "warn": false
+    },
+    {
       "name": "chapter roles",
       "ok": true,
       "detail": "spec declares no role skeleton",
