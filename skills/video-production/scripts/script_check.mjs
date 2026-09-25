@@ -283,6 +283,9 @@ const LEXICON = [
   { re: /التركيب/,            why: "a composition — a marketer has no picture for it", use: "الفيديو نفسه" },
   { re: /الفريمات|فريم/,       why: "production jargon for this audience",          use: "الكادرات / اللقطات" },
   { re: /(فحص|اختبار)[^.،]*\1/, why: "the same root twice in one line",             use: "rephrase" },
+  // «ناس» is a collective noun and takes no number (#50)
+  { re: /(^|\s)(تلات|ثلاث|تلاتة|ثلاثة|[أا]ربع|[أا]ربعة|خمس|خمسة|ستة|سبع|سبعة|تمن|تمان|ثمان|تمانية|ثمانية|تسع|تسعة|عشر|عشرة|[0-9٠-٩]+)\s+ناس/,
+    why: "a number before «ناس», a collective noun that takes none", use: "أربعة أفراد / أربعة أشخاص / أربعة موظفين" },
 ];
 const lexHits = [];
 for (const b of beats)
@@ -303,14 +306,20 @@ rep.add("repeat sentence", !!S.repeat_sentence,
 // ── 9 · reading load per beat ───────────────────────────────────────────────
 // The render-side dwell check measures elements one at a time. A beat can hold
 // three lines that each pass and still be unreadable in the time it is up.
+// A line a measured voice SAYS takes exactly as long as the voice takes: a
+// beat carrying `spoken_s` (its line's measured duration) must hold that, not
+// the 0.35s-a-word estimate for text to read (#49).
 const over = [];
+let heard = 0;
 for (const b of beats) {
-  const need = saysOf(b).reduce((s, l) => s + lineSeconds(l), 0);
+  const spoken = typeof b.spoken_s === "number";
+  if (spoken) heard++;
+  const need = spoken ? b.spoken_s : saysOf(b).reduce((s, l) => s + lineSeconds(l), 0);
   const have = sec(b.frames[1] - b.frames[0]);
-  if (need > have) over.push(`${b.id} needs ${need.toFixed(1)}s, has ${have.toFixed(1)}s`);
+  if (need > have) over.push(`${b.id} needs ${need.toFixed(1)}s${spoken ? " (spoken)" : ""}, has ${have.toFixed(1)}s`);
 }
 rep.add("reading load", over.length === 0,
-  over.length === 0 ? "every beat holds long enough for what it says"
+  over.length === 0 ? `every beat holds long enough for what it says${heard ? ` (${heard} measured as spoken)` : ""}`
     : over.slice(0, 3).join(" · "), "#31");
 
 // ── 10 · the spine is contiguous ────────────────────────────────────────────

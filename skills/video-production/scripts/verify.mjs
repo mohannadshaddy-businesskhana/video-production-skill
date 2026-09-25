@@ -477,16 +477,56 @@ function checkMotion(manifest, rep) {
           !clash.length ? "clean" : `simultaneous: ${clash.slice(0, 3).join(", ")}`, "#28");
 
   const busy = [];
+  let heard = 0;
   for (const e of manifest.elements) {
     if (e.type !== "text" || e.texture) continue;
+    // a word the voice says as it appears is taken in by the ear, not read:
+    // it needs its dwell on screen (#31), not a frozen frame (#49)
+    if (e.spoken) { heard++; continue; }
     const still = e.still_from ?? e.frames[0];
     const window = { frames: [still, Math.min(still + Math.trunc(manifest.fps * 1.5), e.frames[1])] };
     for (const m of manifest.motion_events || []) {
       if (overlapsInTime(window, m)) { busy.push(`${e.id}↔${m.id}`); break; }
     }
   }
+  const spokenNote = heard ? ` (${heard} spoken as written — heard, not read)` : "";
   rep.add("text reads in stillness", !busy.length,
-          !busy.length ? "clean" : `competing motion: ${busy.slice(0, 3).join(", ")}`, "#29");
+          (!busy.length ? "clean" : `competing motion: ${busy.slice(0, 3).join(", ")}`) + spokenNote, "#29");
+}
+
+function checkDeadAir(manifest, rep, maxS = 0.3) {
+  /* #49 — nothing is ever just sitting there. At every moment the viewer is
+   * hearing a word, watching something move or play, or still reading text
+   * that has not had its reading time. A pause in the voice while the hand
+   * waits was the viewer's own word for it: dead air.
+   *
+   * Enforced where a narration is declared: a narrated film's activity is fully
+   * in its manifest. A music-led film's cuts on the beat are not declared as
+   * motion yet, so there it would cry wolf (#41). */
+  const voice = manifest.voice || [];
+  if (!voice.length) { rep.add("no dead air", true, "no narration declared — not checked", "#49", true); return; }
+  const fps = manifest.fps, N = manifest.duration_frames, live = new Uint8Array(N);
+  const mark = ([a, b]) => { for (let f = Math.max(0, a); f < Math.min(N, b); f++) live[f] = 1; };
+  voice.forEach(mark);
+  for (const m of manifest.motion_events || []) mark(m.frames);
+  for (const e of manifest.elements) {
+    if (e.type === "video") mark(e.frames);
+    if (e.type === "text" && !e.spoken) {
+      const words = String(e.text || "").trim().split(/\s+/).filter(Boolean).length;
+      const still = e.still_from ?? e.frames[0];
+      mark([e.frames[0], still + Math.round(Math.max(1.5, words * 0.35) * fps)]);
+    }
+  }
+  const dead = [];
+  for (let f = 0, a = -1; f <= N; f++) {
+    const idle = f < N && !live[f];
+    if (idle && a < 0) a = f;
+    if (!idle && a >= 0) { if ((f - a) / fps > maxS) dead.push([a, f]); a = -1; }
+  }
+  const s = (x) => f(x / fps, 1);
+  rep.add("no dead air", !dead.length,
+    !dead.length ? `something is said, drawn or read at every moment (gaps ≤${maxS}s)`
+      : `${dead.length} dead stretch(es): ${dead.slice(0, 3).map(([a, b]) => `${s(a)}–${s(b)}s`).join(", ")}`, "#49");
 }
 
 function checkChapters(manifest, rep) {
@@ -677,6 +717,7 @@ checkOverlap(manifest, rep);
 checkCoverage(manifest, rep, structure?.coverage_floor ?? 0.45);
 checkDwell(manifest, rep);
 checkMotion(manifest, rep);
+checkDeadAir(manifest, rep);
 // narrative structure
 checkStructure(manifest, structure, rep);
 checkHeroIntro(manifest, structure, rep);

@@ -62,12 +62,35 @@ None of these fails a gate. The drawing is just wrong.
   "done", the opposite of "crossed out". Cross out with an X.
 - **Written words.** Reveal each word with a clip on the text's own box, not on its container.
   Run the clip past that box on every side, or a glyph's overhang stays cut after it is written.
-- **The hand is motion.** After written words, it holds still through the reading hold below. It
-  leaves only after, or it is the competing motion that #29 fails.
+- **The hand is motion.** After a word the voice does *not* say, it holds still through the
+  reading hold below, or it is the competing motion that #29 fails. A word the voice says as it is
+  written is heard, not read, and the hand moves straight on (#49).
+- **The hand itself.** Sausage fingers laid over a palm read as a toy. Draw one silhouette seen
+  from the back: the index finger along the barrel, its nail, the thumb under it, the knuckles, and
+  a cuff where the sleeve begins. Draw it flat, pointing left, then turn it so the tip leads.
+
+## Nothing is ever just sitting there
+
+A pause in the voice with the hand at rest is dead air (#49), and a whiteboard makes it easy: the
+drawing finishes, and the hand waits for the next line. So **each line draws until the next line
+begins.**
+
+- **Main strokes** land on the words that name them.
+- **Finishing details** join group by group, while they fit: a bulb's filament and shine, collars
+  on the people, a clock's ticks, arrows for who hands the work to whom, a play button in each
+  frame. A group is all or nothing, so no clock ends up with half its ticks.
+- **One hand speed** is then solved for the line, between 1000 and 3200 px/s, so its drawing ends
+  as the next line starts.
+
+A pause in the voice is where the hand is busiest. The "no dead air" gate in `verify.mjs` checks the
+result.
+
+Order the details so the hand has little ground to cover. Arrows drawn from the end nearest the last
+word fitted in a breath; the same arrows started from the far side did not.
 
 A working example is `demos/_src/whiteboard/` in this skill's repository. It has three parts: the
-drawing table, a layout driven by the voice's measured lines, and the pen tip read from each path's
-`getPointAtLength` at the ink's leading edge.
+drawing table with its details, a layout driven by the voice's measured lines, and the pen tip read
+from each path's `getPointAtLength` at the ink's leading edge.
 
 ## Timing that reads as handwriting
 
