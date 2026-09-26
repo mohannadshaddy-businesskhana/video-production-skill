@@ -665,6 +665,22 @@ silent was kept, and in that room that meant a television or voices behind the s
 - What sits *under* a word stays. Separating a voice from a television behind it takes a
   source-separation model, and a quieter room is the free one.
 
+
+### 53 · A whiteboard that looked like an animation
+
+**What happened:** the whiteboard had a hand, a voice and drawings landing on their words. Its lines
+were perfect geometry on a plain white page, seen from one fixed camera.
+**Result:** the reviewer's words: it comes out as an animation. In a real whiteboard video the
+drawing looks like marker, chalk or pencil, what it is drawn on looks like a board, and the video
+often starts on one part of the board and draws until the whole board is full, ending on every
+drawing side by side.
+**Rule:** **a type has a medium as well as a grammar.** The grammar (#44) says what carries the
+film. The medium says what it is made of, and the viewer judges the type by the medium first. For
+a whiteboard that is a board with a frame and old ghosts, marker ink that wanders and goes on
+unevenly, and a camera working across a board larger than the frame.
+**Also:** the ink texture was first an SVG filter, and a `feTurbulence` recomputed every frame
+never let the page load. It is now a small seeded tile painted once. The details are in
+`whiteboard.md`.
 ---
 
 ## Recurring patterns — read these if you have no time for the whole log

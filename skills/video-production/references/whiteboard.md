@@ -69,6 +69,32 @@ None of these fails a gate. The drawing is just wrong.
   from the back: the index finger along the barrel, its nail, the thumb under it, the knuckles, and
   a cuff where the sleeve begins. Draw it flat, pointing left, then turn it so the tip leads.
 
+## It has to look like a board, not an animation
+
+A version with perfect geometric lines on a white page was reviewed as "an animation". A
+whiteboard video is recognisable by three things:
+
+- **A real surface.** Show a frame at the edges, a faint sheen, the ghosts of writing that was
+  wiped off, and a tray with markers and an eraser. The viewer should know what is being drawn on.
+- **Real ink.** Every stroke wanders slightly, as a hand does. A quick line runs past its end. A
+  circle goes on past where it started instead of closing exactly. The ink goes on unevenly. In
+  the demo, each path is sampled at build time and redrawn with a slow seeded wander, then painted
+  with a small ink texture tile.
+  - **Never use an SVG filter for the texture.** `feTurbulence` recomputes its noise every frame on
+    the CPU, and the page never finished loading.
+- **A camera that works across the board.** Make the board larger than the frame. Start close on
+  one part, and move across it in reading order: for Arabic that is right, left, then the row below.
+  - The drawing that links two parts is a **bridge**: an arrow at the end of one part that the
+    camera follows into the next, so the next line starts there on its first word.
+  - End by pulling back until the whole board is in frame, full, every drawing side by side.
+
+Two traps from building it:
+
+- **An open stroke must not wrap.** Reading a point at the path's own length through a modulo
+  returned its *start*, and the overshoot drew a bar across the ٧'s open top.
+- **Never return the timeline from a probe.** `evaluate(() => tl.seek(t))` hands Playwright the
+  whole GSAP timeline to serialise, and it hangs as if the page were stuck. Return `true`.
+
 ## Nothing is ever just sitting there
 
 A pause in the voice with the hand at rest is dead air (#49), and a whiteboard makes it easy: the
