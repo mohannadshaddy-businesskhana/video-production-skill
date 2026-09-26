@@ -26,9 +26,9 @@
     {
       "name": "beat continuity",
       "ok": true,
-      "detail": "167 or 333 BPM, no dropout — but phase shifts 0.30 beat at 10.0s; listen there (usually a section change in the track, not a fault)",
+      "detail": "61 or 122 BPM, continuous (drift 0.14/window, no dropout)",
       "ref": "#27",
-      "warn": true
+      "warn": false
     },
     {
       "name": "palette",

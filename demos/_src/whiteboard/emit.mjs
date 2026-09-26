@@ -137,8 +137,8 @@ const DRAW = {
 };
 const WORDS = {
   l4: ["كاتب", "مصمم", "مونتير", "مراجع"].map((text, i) =>
-    ({ id: `w${i + 1}`, text, x: PEOPLE[i] - 85, y: 792, w: 170, size: 42 })),
-  l8: [{ id: "w5", text: "video-production", latin: true, x: 105, y: 2105, w: 600, size: 50 }],
+    ({ id: `w${i + 1}`, text, x: PEOPLE[i] - 85, y: 786, w: 170, size: 52 })),
+  l8: [{ id: "w5", text: "video-production", latin: true, x: 105, y: 2098, w: 600, size: 60 }],
 };
 
 // strokes come after their line's words (a list is written, then connected),
