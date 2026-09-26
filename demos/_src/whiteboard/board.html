@@ -31,7 +31,8 @@
     <meta name="viewport" content="width=1080, height=1920" />
     <title>@@TITLE@@</title>
     <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/aref-ruqaa-bold.ttf" as="font" type="font/ttf" crossorigin />
+    <link rel="preload" href="assets/fonts/caveat.ttf" as="font" type="font/ttf" crossorigin />
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
     <style>
       @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-arabic.woff2") format("woff2");
@@ -41,6 +42,12 @@
         font-weight:200 1000; font-style:normal; font-display:block; }
       @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
         font-weight:700; font-style:normal; font-display:block; }
+      /* handwriting: Ruqaa is the script people actually write Arabic in, on a
+         board or a notebook; Caveat is a quick Latin hand. Both OFL */
+      @font-face { font-family:"Ruqaa"; src:url("assets/fonts/aref-ruqaa-bold.ttf") format("truetype");
+        font-weight:700; font-style:normal; font-display:block; }
+      @font-face { font-family:"Hand"; src:url("assets/fonts/caveat.ttf") format("truetype");
+        font-weight:400 700; font-style:normal; font-display:block; }
       :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
               --fail:#B23A2A; --white:#FFFFFF; }
       * { margin:0; padding:0; box-sizing:border-box; }
@@ -60,10 +67,15 @@
 
       /* words, written under the pen in the same ink. The clip runs past the
          text's own box on every side so a glyph's overhang is never cut */
-      .word { position:absolute; text-align:center; font-weight:800; line-height:1.3; color:var(--ink); }
-      .word span { display:inline-block; direction:rtl; clip-path:inset(-50% -20% -50% 100%); }
-      .word.latin span { font-family:"Mono",monospace; font-weight:700; direction:ltr;
-                         clip-path:inset(-50% 100% -50% -20%); }
+      .word { position:absolute; text-align:center; font-family:"Ruqaa","Cairo",sans-serif; font-weight:700;
+              line-height:1.3; color:var(--ink); }
+      /* the ink is painted on with background-clip:text, which paints only
+         inside the box — so the box is padded to hold Ruqaa's tails, and the
+         margin gives the room back so the word does not move */
+      .word span { display:inline-block; direction:rtl; padding:0.4em 0.12em; margin:-0.4em -0.12em;
+                   clip-path:inset(-110% -20% -110% 100%); }
+      .word.latin span { font-family:"Hand",sans-serif; font-weight:700; direction:ltr;
+                         clip-path:inset(-110% 100% -110% -20%); }
     </style>
   </head>
   <body>
@@ -367,7 +379,7 @@ async function build() {
       // the clip opens 20% past the text so its overhang is revealed too; the
       // pen follows the clip's edge along the text, rising and falling a little
       const cut = 100 - 120 * p.k;
-      it.span.style.clipPath = it.rtl ? `inset(-50% -20% -50% ${cut}%)` : `inset(-50% ${cut}% -50% -20%)`;
+      it.span.style.clipPath = it.rtl ? `inset(-110% -20% -110% ${cut}%)` : `inset(-110% ${cut}% -110% -20%)`;
       const edge = Math.min(1, Math.max(0, it.rtl ? cut / 100 : 1 - cut / 100));
       place(it.left + it.w * edge, it.y + 5 * Math.sin(p.k * Math.PI * 2 * (it.w / 45)));
     } }, at);
