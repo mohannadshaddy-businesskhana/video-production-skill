@@ -17,3 +17,7 @@ __pycache__/
 node_modules/
 .DS_Store
 .env.local
+
+# a folder of finished renders put together for a reviewer — rebuilt, never stored
+review/
+review-*.zip
