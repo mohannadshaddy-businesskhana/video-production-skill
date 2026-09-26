@@ -29,6 +29,10 @@ _assets/sfx/
 # neither is stored in a public repository
 _assets/voice/
 
+# Footage of a person — their face as well as their voice. Whatever the file
+# type a phone hands over, it stays out of the repository
+_assets/footage/
+
 # The whiteboard's voice comparison: one folder per voice, emitted by
 # _src/whiteboard/emit.mjs from that voice's own timings — regenerated, and
 # the chosen voice is emitted into 05-explainer/ itself with --main
