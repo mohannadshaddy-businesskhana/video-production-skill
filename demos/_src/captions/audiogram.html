@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-  Demo 10 — captions-led.  Voice: Gemini TTS, ar-eg-podcaster-1
+  Demo 10 — captions-led.  Voice: @@VOICE@@
   Emitted by demos/_src/captions/emit.mjs from the voice's measured timings.
   Edit the template there, not this file.
 
@@ -15,7 +15,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1080, height=1920" />
-    <title>الكلام اللي بتقراه ده بيتقال دلوقتي</title>
+    <title>@@TITLE@@</title>
 
     <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
@@ -76,10 +76,10 @@
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="22.133"
+    <div id="root" data-composition-id="main" data-start="0" data-duration="@@DUR@@"
          data-fps="30" data-width="1080" data-height="1920">
 
-      <section id="cap" class="scene clip" data-start="0" data-duration="22.133" data-track-index="0">
+      <section id="cap" class="scene clip" data-start="0" data-duration="@@DUR@@" data-track-index="0">
         <div id="ring"></div>
         <div id="avatar">
           <!-- a microphone, in bone on the ink circle -->
@@ -91,12 +91,7 @@
         </div>
         <div id="who">video-production</div>
 
-        <div class="cap" id="cap-l1"><span class="w">الكلام</span> <span class="w">اللي</span> <span class="w">بتقراه</span> <span class="w">ده،</span> <span class="w">بيتقال</span> <span class="w">دلوقتي.</span></div>
-        <div class="cap" id="cap-l2"><span class="w">أداة</span> <span class="w">واحدة</span> <span class="w">عملت</span> <span class="w">الفيديو</span> <span class="w">ده،</span> <span class="w">وحطّت</span> <span class="w">كل</span> <span class="w">كلمة</span> <span class="w">في</span> <span class="w">وقتها.</span></div>
-        <div class="cap" id="cap-l3"><span class="w">عادةً</span> <span class="w">حد</span> <span class="w">في</span> <span class="w">الفريق</span> <span class="w">بيكتب</span> <span class="w">الترجمة</span> <span class="w">بإيده،</span> <span class="w">ويظبّطها</span> <span class="w">كلمة</span> <span class="w">كلمة.</span></div>
-        <div class="cap" id="cap-l4"><span class="w">الأداة</span> <span class="w">بتقيس</span> <span class="w">الصوت،</span> <span class="w">وبتعرف</span> <span class="w">كل</span> <span class="w">كلمة</span> <span class="w">اتقالت</span> <span class="w">إمتى.</span></div>
-        <div class="cap" id="cap-l5"><span class="w">فالفيديو</span> <span class="w">بيتفهم،</span> <span class="w">حتى</span> <span class="w">لو</span> <span class="w">اتشاف</span> <span class="w">من</span> <span class="w">غير</span> <span class="w">صوت.</span></div>
-        <div class="cap" id="cap-l6"><span class="w">تابعنا —</span> <span class="w">كل</span> <span class="w">يوم</span> <span class="w">نوع</span> <span class="w">فيديو</span> <span class="w">جديد.</span></div>
+@@CAPTIONS@@
 
         <div id="note"></div>
         <div id="btn">
@@ -113,21 +108,16 @@
         <div id="cta-name">video-production</div>
       </section>
 
-      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="22.133"
+      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="@@DUR@@"
              data-track-index="10" data-volume="1"></audio>
-      <audio id="vo-l1" src="assets/voice/captions-podcaster-1/measured/l1.wav" data-role="voice" data-start="0.1" data-duration="2.3" data-track-index="11" data-volume="1"></audio>
-      <audio id="vo-l2" src="assets/voice/captions-podcaster-1/measured/l2.wav" data-role="voice" data-start="2.7" data-duration="3.9" data-track-index="12" data-volume="1"></audio>
-      <audio id="vo-l3" src="assets/voice/captions-podcaster-1/measured/l3.wav" data-role="voice" data-start="6.9" data-duration="4.28" data-track-index="13" data-volume="1"></audio>
-      <audio id="vo-l4" src="assets/voice/captions-podcaster-1/measured/l4.wav" data-role="voice" data-start="11.48" data-duration="3.46" data-track-index="14" data-volume="1"></audio>
-      <audio id="vo-l5" src="assets/voice/captions-podcaster-1/measured/l5.wav" data-role="voice" data-start="15.24" data-duration="2.38" data-track-index="15" data-volume="1"></audio>
-      <audio id="vo-l6" src="assets/voice/captions-podcaster-1/measured/l6.wav" data-role="voice" data-start="17.92" data-duration="2.2" data-track-index="16" data-volume="1"></audio>
+@@AUDIO@@
     </div>
 
     <script>
-const L = [{"id":"l1","text":"الكلام اللي بتقراه ده، بيتقال دلوقتي.","start":0.1,"end":2.4,"words":[{"w":"الكلام","start":0.16,"end":0.5},{"w":"اللي","start":0.5,"end":0.72},{"w":"بتقراه","start":0.76,"end":1.04},{"w":"ده،","start":1.04,"end":1.2},{"w":"بيتقال","start":1.56,"end":1.86},{"w":"دلوقتي.","start":1.86,"end":2.28}],"in":0,"out":2.51},{"id":"l2","text":"أداة واحدة عملت الفيديو ده، وحطّت كل كلمة في وقتها.","start":2.7,"end":6.6,"words":[{"w":"أداة","start":2.76,"end":3.06},{"w":"واحدة","start":3.06,"end":3.4},{"w":"عملت","start":3.58,"end":3.98},{"w":"الفيديو","start":4,"end":4.44},{"w":"ده،","start":4.44,"end":4.56},{"w":"وحطّت","start":4.94,"end":5.18},{"w":"كل","start":5.18,"end":5.44},{"w":"كلمة","start":5.54,"end":5.76},{"w":"في","start":5.82,"end":6.06},{"w":"وقتها.","start":6.12,"end":6.48}],"in":2.51,"out":6.71},{"id":"l3","text":"عادةً حد في الفريق بيكتب الترجمة بإيده، ويظبّطها كلمة كلمة.","start":6.9,"end":11.18,"words":[{"w":"عادةً","start":6.96,"end":7.36},{"w":"حد","start":7.36,"end":7.58},{"w":"في","start":7.58,"end":7.8},{"w":"الفريق","start":7.8,"end":8.24},{"w":"بيكتب","start":8.24,"end":8.72},{"w":"الترجمة","start":8.8,"end":9.28},{"w":"بإيده،","start":9.34,"end":9.72},{"w":"ويظبّطها","start":9.72,"end":10.28},{"w":"كلمة","start":10.32,"end":10.76},{"w":"كلمة.","start":10.78,"end":11.06}],"in":6.71,"out":11.29},{"id":"l4","text":"الأداة بتقيس الصوت، وبتعرف كل كلمة اتقالت إمتى.","start":11.48,"end":14.94,"words":[{"w":"الأداة","start":11.54,"end":11.88},{"w":"بتقيس","start":11.88,"end":12.18},{"w":"الصوت،","start":12.18,"end":12.46},{"w":"وبتعرف","start":12.88,"end":13.36},{"w":"كل","start":13.52,"end":13.66},{"w":"كلمة","start":13.66,"end":13.9},{"w":"اتقالت","start":13.9,"end":14.44},{"w":"إمتى.","start":14.48,"end":14.82}],"in":11.29,"out":15.07},{"id":"l5","text":"فالفيديو بيتفهم، حتى لو اتشاف من غير صوت.","start":15.24,"end":17.62,"words":[{"w":"فالفيديو","start":15.32,"end":15.84},{"w":"بيتفهم،","start":15.88,"end":16.2},{"w":"حتى","start":16.32,"end":16.44},{"w":"لو","start":16.44,"end":16.54},{"w":"اتشاف","start":16.64,"end":16.88},{"w":"من","start":16.9,"end":17.06},{"w":"غير","start":17.08,"end":17.32},{"w":"صوت.","start":17.32,"end":17.5}],"in":15.07,"out":17.73},{"id":"l6","text":"تابعنا — كل يوم نوع فيديو جديد.","start":17.92,"end":20.12,"words":[{"w":"تابعنا","start":17.98,"end":18.38},{"w":"كل","start":18.84,"end":19.04},{"w":"يوم","start":19.04,"end":19.28},{"w":"نوع","start":19.28,"end":19.48},{"w":"فيديو","start":19.48,"end":19.76},{"w":"جديد.","start":19.76,"end":20}],"in":17.73,"out":22.133333333333333}];          // each line: when it is on the page, and when each of its words is said
-const WAVE = [0.747,0.792,0.792,0.601,0.611,0.074,1,0.541,0.81,0.515,0.322,0.663,0.818,0.62,0.187,0.909,0.889,0.681,0.671,0.727,0.595,0.677,0.623,0.691,0.193,0.794,0.616,0.302,0.787,0.791,0.854,0.505,0.221,0.807,0.85,0.585,0.757,0.564,0.193,0.703,0.15,0.846,0.805,0.393];        // the voice's loudness in bars, 0–1, over the time it speaks
-const LEVEL = [0,0,0,0.012,0.015,0.456,0.09,0.02,0.021,0.33,0.983,0.844,1,0.91,0.775,0.93,0.977,0.857,0.83,0.986,0.215,0.112,0.121,0.541,0.463,0.282,0.265,0.647,0.917,1,0.852,0.361,1,0.969,0.647,0.333,0.079,0.025,0.018,0.01,0.019,0.025,0.014,0.011,0.008,0.009,0.059,0.217,0.494,0.84,0.877,0.745,0.166,0.117,0.355,0.194,0.524,0.901,0.778,0.522,0.197,0.317,0.51,0.295,0.29,0.325,0.343,0.238,0.13,0.06,0.019,0.024,0,0,0,0,0,0,0,0,0,0.006,0.019,0.692,0.958,0.749,0.712,1,1,1,1,1,1,0.815,0.373,0.284,0.326,0.419,0.62,0.85,0.487,0.189,0.042,0.029,0.013,0.016,0.015,0.172,0.143,0.544,0.835,0.953,1,0.731,0.793,0.933,0.714,0.583,0.401,0.048,0.25,0.563,0.357,0.236,0.161,0.353,0.665,0.616,0.262,0.401,0.469,0.376,0.31,0.183,0.317,0.198,0.126,0.033,0.022,0.021,0.019,0.016,0.015,0.011,0.01,0.026,0.031,0.02,0.172,0.342,0.521,0.717,0.46,0.23,0.182,0.248,0.88,0.823,0.073,0.02,0.017,0.677,0.787,0.138,0.084,0.023,0.287,1,0.947,0.652,0.717,0.899,0.545,0.062,0.199,0.928,0.83,0.805,0.802,0.73,0.672,0.289,0.074,0.234,0.732,0.671,0.384,0.286,0.065,0.111,0.321,0.247,0.231,0.192,0.101,0.061,0.041,0.011,0,0,0,0,0,0,0,0,0,0.03,0.335,0.799,0.568,0.408,0.361,0.563,0.349,0.967,1,0.564,1,1,0.526,0.407,1,0.835,0.473,0.265,0.326,0.406,0.878,1,0.588,0.636,1,0.47,0.161,0.8,0.723,0.332,0.085,0.115,0.799,0.677,0.593,0.755,0.448,0.431,0.428,0.277,0.302,0.33,0.669,0.834,0.911,0.422,0.07,0.168,0.115,0.652,0.643,0.406,0.574,0.14,0.033,0.045,0.652,0.538,0.399,0.299,0.206,0.486,0.852,0.759,0.83,0.957,0.919,0.639,0.239,0.108,0.101,0.039,0.232,0.632,0.546,0.472,0.582,0.512,0.289,0.259,0.581,0.73,0.7,0.626,0.634,0.665,0.588,0.487,0.439,0.47,0.504,0.368,0.258,0.338,0.571,0.509,0.293,0.288,0.556,0.985,0.261,0.142,0.28,0.66,0.522,0.217,0.086,0.181,0.903,0.761,0.843,0.845,0.68,0.461,0.159,0.084,0.232,0.433,0.259,0.227,0.245,0.212,0.201,0.146,0.062,0.031,0.04,0.003,0,0,0,0,0,0,0,0,0.016,0.02,0.318,0.864,0.752,0.382,0.481,0.893,0.593,0.735,1,1,0.635,0.772,0.941,0.163,0.103,0.261,0.653,0.342,0.2,0.221,0.597,0.273,0.218,0.202,0.149,0.411,0.362,0.218,0.056,0.017,0.02,0.043,0.04,0.02,0.01,0.005,0.006,0.014,0.014,0.007,0.285,0.594,0.494,0.169,0.104,0.065,0.203,0.991,1,0.933,0.997,0.972,0.618,0.667,0.186,0.068,0.031,0.019,0.011,0.085,0.428,1,1,0.854,0.857,0.689,0.595,0.951,0.494,0.06,0.194,0.32,1,0.989,0.879,0.702,0.872,0.878,0.566,0.165,0.124,0.201,0.339,0.547,0.591,0.567,0.439,0.072,0.109,0.149,0.284,0.411,0.355,0.292,0.07,0.053,0.178,0.15,0.1,0.022,0.037,0.025,0.003,0,0,0,0,0,0,0,0,0.021,0.041,0.209,0.985,1,1,0.674,0.359,1,1,0.435,0.567,1,1,0.672,0.642,0.812,0.542,0.057,0.095,0.085,0.654,0.971,0.757,0.7,0.748,0.52,0.503,0.24,0.015,0.01,0.01,0.015,0.156,0.358,0.452,0.308,1,0.773,0.142,0.015,0.011,0.522,0.894,0.688,0.842,0.669,0.643,0.429,0.112,0.267,0.538,0.636,0.363,0.105,0.395,0.635,0.509,0.412,0.232,0.409,0.512,0.183,0.169,0.192,0.135,0.215,0.135,0.079,0.048,0.015,0.005,0,0,0,0,0,0,0,0,0.008,0.005,0.179,0.834,0.914,0.491,0.77,0.931,0.728,0.437,0.213,0.154,0.148,0.129,0.101,0.038,0.008,0.01,0.01,0.009,0.007,0.01,0.009,0.013,0.022,0.008,0.006,0.004,0.13,0.144,1,1,0.672,0.661,0.601,0.533,0.868,0.849,1,1,0.897,0.559,0.601,0.727,0.639,0.904,0.751,0.551,0.503,0.323,0.313,0.717,0.614,0.339,0.335,0.494,0.438,0.214,0.216,0.129,0.143,0.185,0.15,0.066,0.035,0.006,0.001,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];      // the voice's loudness frame by frame, 0–1
-const END = 22.133, VOICE_END = 20.12, CTA_AT = 20.22;
+const L = @@LINES@@;          // each line: when it is on the page, and when each of its words is said
+const WAVE = @@WAVE@@;        // the voice's loudness in bars, 0–1, over the time it speaks
+const LEVEL = @@LEVEL@@;      // the voice's loudness frame by frame, 0–1
+const END = @@DUR@@, VOICE_END = @@VOICE_END@@, CTA_AT = @@CTA_AT@@;
 const FPS = 30, FADE = 0.12, RISE = 0.3;
 window.__FMT = { id: "vertical", w: 1080, h: 1920, safeTop: 230, safeBottom: 1690, zones: {} };
 window.__MF = [];
@@ -202,7 +192,7 @@ function build() {
   paint(0);
 
   /* music under the voice — one continuous track, gain automation only */
-  tl.fromTo("#bgm", { volume: 0 }, { volume: 0.088, duration: 0.6, ease: "none", immediateRender: false }, 0);
+  tl.fromTo("#bgm", { volume: 0 }, { volume: @@BED@@, duration: 0.6, ease: "none", immediateRender: false }, 0);
   tl.to("#bgm", { volume: 0, duration: 1.2, ease: "none" }, END - 1.2);
 
   /* the manifest. The captions are said as they are shown: heard, not read */

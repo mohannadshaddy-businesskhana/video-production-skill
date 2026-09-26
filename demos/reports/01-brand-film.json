@@ -12,8 +12,15 @@
     {
       "name": "duration",
       "ok": true,
-      "detail": "18.00s (expected 18.00s)",
+      "detail": "21.00s (expected 21.00s)",
       "ref": "",
+      "warn": false
+    },
+    {
+      "name": "delivery bitrate",
+      "ok": true,
+      "detail": "0.9 Mbps (limit 16)",
+      "ref": "#54",
       "warn": false
     },
     {
@@ -26,14 +33,14 @@
     {
       "name": "beat continuity",
       "ok": true,
-      "detail": "55 or 110 BPM, continuous (drift 0.12/window, no dropout)",
+      "detail": "55 or 110 BPM, continuous (drift 0.13/window, no dropout)",
       "ref": "#27",
       "warn": false
     },
     {
       "name": "palette",
       "ok": true,
-      "detail": "worst 0.2% off-palette at 9.8s (limit 2%) · 12/12 frames read",
+      "detail": "worst 0.2% off-palette at 9.6s (limit 2%) · 12/12 frames read",
       "ref": "#01",
       "warn": false
     },
@@ -68,7 +75,7 @@
     {
       "name": "content coverage",
       "ok": true,
-      "detail": "worst 55% in ch3 (floor 35%)",
+      "detail": "worst 40% in ch4 (floor 35%)",
       "ref": "#21",
       "warn": false
     },

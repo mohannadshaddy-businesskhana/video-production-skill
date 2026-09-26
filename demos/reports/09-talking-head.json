@@ -17,6 +17,13 @@
       "warn": false
     },
     {
+      "name": "delivery bitrate",
+      "ok": true,
+      "detail": "0.6 Mbps (limit 16)",
+      "ref": "#54",
+      "warn": false
+    },
+    {
       "name": "loudness",
       "ok": true,
       "detail": "-14.0 LUFS (target -14)",
@@ -33,7 +40,7 @@
     {
       "name": "palette",
       "ok": true,
-      "detail": "worst 0.4% off-palette at 15.8s (limit 2%) · 12/12 frames read",
+      "detail": "worst 0.2% off-palette at 17.2s (limit 2%) · 12/12 frames read",
       "ref": "#01",
       "warn": false
     },
@@ -91,6 +98,13 @@
       "ok": true,
       "detail": "clean",
       "ref": "#29",
+      "warn": false
+    },
+    {
+      "name": "no dead air",
+      "ok": true,
+      "detail": "something is heard, moving or being read at every moment (music-led: stills ≤0.6s)",
+      "ref": "#49",
       "warn": false
     },
     {

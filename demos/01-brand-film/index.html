@@ -1,7 +1,26 @@
 <!doctype html>
 <!--
-  Demo 01 — brand film.  Built from script.json; run script_check.mjs first.
-  HOOK 0–3s · VALUE 3–15s · CTA 15–18s
+  Demo 01 — brand film.  v2: the cinema medium.  Built from script.json; run script_check.mjs first.
+
+  v1 was reviewed as looking like the other types: lines stacked on a dark
+  page, slides with a counter. A brand film is IMAGERY, ONE LINE AT A TIME,
+  SLOW AND CINEMATIC — atmosphere, one claim said slowly (video-types.md).
+  With no footage to shoot, the imagery here is made of the one thing cinema
+  is made of: light in a dark room. A sliver of light opens into a frame; a
+  lamp over a late night of editing; three lights coming on in turn; frames
+  of light; a spotlight on an empty place; fifteen lights, one per check; a
+  week of frames. Dust in the air, and a vignette.
+
+  No film grain. Grain drawn fresh every frame made every frame a new
+  picture: the render came out at 118 Mbps, 310 MB for 21 seconds, and a
+  platform's re-encode smears it away regardless.
+
+  Each line is a shot of its own. The shot moves in — light comes up, the
+  camera settles — then HOLDS, still, for exactly the time the line takes to
+  read (#29), and moves on. No hold is longer than its reading: a still that
+  outlasts the words is dead air (#49).
+
+  HOOK 0–3s · VALUE 3–11.7s · 11.7–18s · CTA 18–21s
 -->
 <html lang="ar">
   <head>
@@ -22,114 +41,129 @@
       @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
         font-weight:700; font-style:normal; font-display:block; }
 
-      :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
-              --fail:#B23A2A; --white:#FFFFFF; --pass-lt:#5E8F78; }
+      :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; }
 
       * { margin:0; padding:0; box-sizing:border-box; }
       html, body { width:1080px; height:1920px; overflow:hidden; background:#14181F; }
-      #root { position:relative; width:100%; height:100%; overflow:hidden;
+      #root { position:relative; width:100%; height:100%; overflow:hidden; background:var(--ink);
               font-family:"Cairo",sans-serif; color:var(--bone); }
       .scene { position:absolute; inset:0; overflow:hidden; }
-      .pane  { position:absolute; inset:0; direction:rtl; }
+      .shot  { position:absolute; inset:0; transform-origin:540px 820px; }
 
-      .tag  { position:absolute; right:88px; top:250px; font-family:"Mono",monospace;
-              font-size:26px; letter-spacing:.16em; color:var(--amber);
-              direction:ltr; text-align:right; font-weight:700; }
-      .line { position:absolute; right:88px; width:904px; font-weight:600;
-              line-height:1.36; letter-spacing:-.01em; }
-      .xl   { font-size:100px; }
-      .lg   { font-size:74px; }
-      .md   { font-size:56px; }
-      .amber { color:var(--amber); }
+      /* the words: large, light, centred — a title over a shot, not a slide */
+      .line { position:absolute; left:90px; width:900px; text-align:center; direction:rtl;
+              font-weight:300; font-size:70px; line-height:1.5; letter-spacing:.005em; }
+      .line b { font-weight:600; color:var(--amber); }
+      .name { position:absolute; left:90px; width:900px; text-align:center; direction:ltr;
+              font-family:"Mono",monospace; font-weight:700; font-size:38px; letter-spacing:.14em;
+              color:var(--amber); text-shadow:0 0 22px rgba(199,123,14,.55); }
 
-      /* ch1 — the frame you are watching, bracketed */
-      .brk { position:absolute; border:5px solid var(--amber); width:96px; height:96px; }
-      .brk.tl { left:56px;  top:330px;  border-right:none;  border-bottom:none; }
-      .brk.tr { right:56px; top:330px;  border-left:none;   border-bottom:none; }
-      .brk.bl { left:56px;  bottom:330px; border-right:none; border-top:none; }
-      .brk.br { right:56px; bottom:330px; border-left:none;  border-top:none; }
+      /* light — every glow is bone or amber over the dark, so every tone on
+         screen is a blend of the palette */
+      .glow   { position:absolute; border-radius:50%; }
+      .frame  { position:absolute; border:5px solid rgba(245,242,234,.92); border-radius:6px;
+                background:rgba(245,242,234,.05);
+                box-shadow:0 0 40px 6px rgba(245,242,234,.28), inset 0 0 40px rgba(245,242,234,.10); }
+      .frame.a { border-color:rgba(199,123,14,.95);
+                 box-shadow:0 0 40px 6px rgba(199,123,14,.35), inset 0 0 40px rgba(199,123,14,.12); }
+      .dot    { position:absolute; width:30px; height:30px; margin:-15px 0 0 -15px; border-radius:50%;
+                background:#F5F2EA; box-shadow:0 0 26px 10px rgba(245,242,234,.40); }
+      .dot.a  { background:#C77B0E; box-shadow:0 0 26px 10px rgba(199,123,14,.50); }
+      .beam   { position:absolute; filter:blur(18px); }
 
-      /* ch2 — three ratios, designed not cropped */
-      .ratios { position:absolute; left:0; right:0; top:1140px; height:420px;
-                display:flex; align-items:center; justify-content:center; gap:34px; }
-      .rt { border:4px solid rgba(245,242,234,.30); border-radius:6px; position:relative;
-            background:rgba(245,242,234,.05); }
-      .rt::after { content:attr(data-k); position:absolute; left:0; right:0; bottom:-46px;
-                   text-align:center; font-family:"Mono",monospace; font-size:24px;
-                   color:rgba(245,242,234,.6); font-weight:700; }
-      .rt i { position:absolute; left:14%; right:14%; background:var(--amber);
-              height:10px; border-radius:5px; }
-      .rt i.a { top:26%; } .rt i.b { top:46%; right:40%; } .rt i.c { top:66%; right:28%; }
-      .r916 { width:170px; height:302px; }
-      .r11  { width:250px; height:250px; }
-      .r169 { width:390px; height:219px; }
-
-      /* ch3 — the checks counting through */
-      .cnt  { position:absolute; right:88px; top:1080px; width:904px;
-              font-size:210px; font-weight:800;
-              color:var(--pass-lt); direction:rtl; text-align:right; line-height:1; }
-      .cntl { position:absolute; right:88px; top:1392px; width:904px;
-              font-size:36px; color:rgba(245,242,234,.6);
-              direction:rtl; text-align:right; font-weight:700; }
-      .ticks { position:absolute; right:88px; top:1476px; width:904px; display:flex;
-               flex-direction:row-reverse; flex-wrap:wrap; gap:14px; }
-      .tk { width:46px; height:46px; border:4px solid var(--pass-lt); border-radius:4px; }
-
-      .name { position:absolute; right:88px; top:1500px; width:904px;
-              font-family:"Mono",monospace; font-size:40px; letter-spacing:.06em;
-              color:var(--amber); direction:ltr; text-align:right; font-weight:700; }
+      /* the grade: a vignette over everything, dust in the air. Its darkest
+         stop stays under .6: the layout audit scores a gradient by its
+         darkest colour, wherever the words sit under it */
+      #vignette { position:absolute; inset:0; pointer-events:none;
+                  background:radial-gradient(ellipse 78% 62% at 50% 44%, rgba(20,24,31,0) 55%, rgba(20,24,31,.58) 100%); }
+      .mote { position:absolute; width:4px; height:4px; border-radius:50%; background:rgba(245,242,234,.5); }
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="18"
+    <div id="root" data-composition-id="main" data-start="0" data-duration="21"
          data-fps="30" data-width="1080" data-height="1920">
 
-      <!-- HOOK · 0–3s -->
+      <!-- HOOK · 0–3s · a sliver of light opens into a frame: this video -->
       <section id="ch1" class="scene clip" data-start="0" data-duration="3" data-track-index="0">
-        <div class="pane">
-          <div class="brk tl" id="k1"></div><div class="brk tr" id="k2"></div>
-          <div class="brk bl" id="k3"></div><div class="brk br" id="k4"></div>
-          <div class="line xl" id="h1" style="top:780px">الفيديو ده<br>محدش فتح فيه <span class="amber">بريمير</span>.</div>
+        <div class="shot" id="s1">
+          <div class="glow" id="s1-halo" style="left:140px; top:260px; width:800px; height:900px;
+               background:radial-gradient(closest-side, rgba(245,242,234,.16), rgba(245,242,234,0))"></div>
+          <div class="frame" id="s1-frame" style="left:345px; top:356px; width:390px; height:693px"></div>
+          <div class="line" id="h1" style="top:1210px">الفيديو ده<br>محدش فتح فيه <b>بريمير</b>.</div>
         </div>
       </section>
 
-      <!-- VALUE · comparison · 3–10s -->
-      <section id="ch2" class="scene clip" data-start="3" data-duration="7" data-track-index="1">
-        <div class="pane">
-          <div class="tag" id="v0">01</div>
-          <div class="line lg" id="v1" style="top:380px">فيديو زيه كان ياخد<br>يوم ومونتير.</div>
-          <div class="line md" id="v2" style="top:700px">أداة واحدة بتكتبه وتبنيه وتفحصه.</div>
-          <div class="line md" id="v3" style="top:860px">وبتلات مقاسات <span class="amber">في نفس الوقت</span>.</div>
-          <div class="ratios" id="v4">
-            <div class="rt r169" data-k="16:9"><i class="a"></i><i class="b"></i><i class="c"></i></div>
-            <div class="rt r11"  data-k="1:1"><i class="a"></i><i class="b"></i><i class="c"></i></div>
-            <div class="rt r916" data-k="9:16"><i class="a"></i><i class="b"></i><i class="c"></i></div>
-          </div>
+      <!-- VALUE · 3–11.7s · the old way, the tool, three sizes -->
+      <section id="ch2" class="scene clip" data-start="3" data-duration="8.667" data-track-index="1">
+        <div class="shot" id="s2">
+          <!-- a lamp over a late night of editing -->
+          <div class="beam" id="s2-cone" style="left:190px; top:180px; width:700px; height:900px;
+               clip-path:polygon(44% 0, 56% 0, 100% 100%, 0 100%);
+               background:linear-gradient(rgba(199,123,14,.55), rgba(199,123,14,.05))"></div>
+          <div class="glow" id="s2-pool" style="left:150px; top:930px; width:780px; height:220px;
+               background:radial-gradient(closest-side, rgba(199,123,14,.42), rgba(199,123,14,0))"></div>
+          <div class="dot a" id="s2-bulb" style="left:540px; top:190px"></div>
+          <div class="line" id="v1" style="top:1230px">فيديو زيه كان ياخد<br>يوم و<b>مونتير</b>.</div>
+        </div>
+        <div class="shot" id="s3">
+          <!-- one tool: it writes, builds and checks — three lights, in turn -->
+          <div class="beam" id="s3-thread" style="left:270px; top:752px; width:540px; height:6px; filter:none;
+               background:linear-gradient(90deg, rgba(245,242,234,.7), rgba(245,242,234,.7));
+               transform-origin:100% 50%"></div>
+          <div class="dot" id="s3-d1" style="left:810px; top:755px"></div>
+          <div class="dot" id="s3-d2" style="left:540px; top:755px"></div>
+          <div class="dot a" id="s3-d3" style="left:270px; top:755px"></div>
+          <div class="glow" id="s3-halo" style="left:120px; top:440px; width:840px; height:640px;
+               background:radial-gradient(closest-side, rgba(245,242,234,.10), rgba(245,242,234,0))"></div>
+          <div class="line" id="v2" style="top:1180px">أداة واحدة<br>بتكتبه وتبنيه <b>وتفحصه</b>.</div>
+        </div>
+        <div class="shot" id="s4">
+          <!-- three frames of light at once: 16:9, 1:1, 9:16 -->
+          <div class="glow" id="s4-halo" style="left:60px; top:420px; width:960px; height:760px;
+               background:radial-gradient(closest-side, rgba(245,242,234,.12), rgba(245,242,234,0))"></div>
+          <div class="frame" id="s4-f1" style="left:96px;  top:720px; width:330px; height:186px"></div>
+          <div class="frame" id="s4-f2" style="left:470px; top:696px; width:210px; height:210px"></div>
+          <div class="frame a" id="s4-f3" style="left:724px; top:580px; width:186px; height:326px"></div>
+          <div class="line" id="v3" style="top:1180px">وبتلات مقاسات<br><b>في نفس الوقت</b>.</div>
         </div>
       </section>
 
-      <!-- VALUE · numbers · 10–15s -->
-      <section id="ch3" class="scene clip" data-start="10" data-duration="5" data-track-index="2">
-        <div class="pane">
-          <div class="tag" id="n0">02</div>
-          <div class="line xl" id="n1" style="top:420px">من غير <span class="amber">مونتير</span>.</div>
-          <div class="line md" id="n2" style="top:700px">وبيعدّي على ١٥ اختبار قبل ما يخرج.</div>
-          <div class="cnt"  id="n3">٠</div>
-          <div class="cntl" id="n4">اختبار عدّوا</div>
-          <div class="ticks" id="n5"></div>
+      <!-- 11.7–18s · no editor, and fifteen checks -->
+      <section id="ch3" class="scene clip" data-start="11.667" data-duration="6.333" data-track-index="2">
+        <div class="shot" id="s5">
+          <!-- a spotlight on an empty place -->
+          <div class="beam" id="s5-beam" style="left:300px; top:0px; width:480px; height:1060px;
+               clip-path:polygon(40% 0, 60% 0, 100% 100%, 0 100%);
+               background:linear-gradient(rgba(245,242,234,.30), rgba(245,242,234,.08))"></div>
+          <div class="glow" id="s5-pool" style="left:250px; top:960px; width:580px; height:170px;
+               background:radial-gradient(closest-side, rgba(245,242,234,.38), rgba(245,242,234,0))"></div>
+          <div class="line" id="n1" style="top:1250px">من غير <b>مونتير</b>.</div>
+        </div>
+        <div class="shot" id="s6">
+          <!-- fifteen lights, one per check, coming on in reading order -->
+          <div class="glow" id="s6-halo" style="left:140px; top:420px; width:800px; height:700px;
+               background:radial-gradient(closest-side, rgba(245,242,234,.10), rgba(245,242,234,0))"></div>
+          <div id="s6-grid"></div>
+          <div class="line" id="n2" style="top:1180px">وبيعدّي على <b>١٥ اختبار</b><br>قبل ما يخرج.</div>
         </div>
       </section>
 
-      <!-- CTA · 15–18s -->
-      <section id="ch4" class="scene clip" data-start="15" data-duration="3" data-track-index="3">
-        <div class="pane">
-          <div class="tag" id="c0">03</div>
-          <div class="line lg" id="c1" style="top:720px">تابع —<br>كل يوم <span class="amber">نوع فيديو</span> جديد.</div>
-          <div class="name" id="c2">video-production</div>
+      <!-- CTA · 18–21s · a week of frames: a new type every day -->
+      <section id="ch4" class="scene clip" data-start="18" data-duration="3" data-track-index="3">
+        <div class="shot" id="s7">
+          <div class="glow" id="s7-halo" style="left:40px; top:560px; width:1000px; height:560px;
+               background:radial-gradient(closest-side, rgba(199,123,14,.14), rgba(199,123,14,0))"></div>
+          <div id="s7-week"></div>
+          <div class="line" id="c1" style="top:1080px">تابع —<br>كل يوم <b>نوع فيديو</b> جديد.</div>
+          <div class="name" id="c2" style="top:1330px">video-production</div>
         </div>
       </section>
 
-      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="18"
+      <!-- over every shot: dust in the air, and the vignette -->
+      <div id="air" class="scene"></div>
+      <div id="vignette"></div>
+
+      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="21"
              data-track-index="10" data-volume="1"></audio>
     </div>
 
@@ -139,99 +173,133 @@ window.__MF = [];
 window.__MOTION = [];
 const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
 const F = (f) => f / 30;
-const arabic = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
+const rng = (seed) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
 
 function build() {
-  // fifteen tick boxes, one per check
-  const ticks = document.getElementById("n5");
+  const tl = gsap.timeline({ paused: true });
+
+  /* the fifteen lights and the week of frames */
+  const grid = document.getElementById("s6-grid");
   for (let i = 0; i < 15; i++) {
+    const row = Math.floor(i / 5), col = i % 5;               // right to left, top to bottom
     const d = document.createElement("div");
-    d.className = "tk"; d.id = "tk" + i;
-    ticks.appendChild(d);
+    d.className = "dot" + (i === 14 ? " a" : ""); d.id = "g" + i;
+    d.style.left = `${810 - col * 135}px`; d.style.top = `${600 + row * 150}px`;
+    grid.appendChild(d);
+  }
+  const week = document.getElementById("s7-week");
+  for (let i = 0; i < 7; i++) {
+    const f = document.createElement("div");
+    f.className = "frame" + (i === 0 ? " a" : ""); f.id = "w" + i;
+    Object.assign(f.style, { left: `${870 - i * 118}px`, top: "720px", width: "92px", height: "164px" });
+    week.appendChild(f);
+  }
+
+  /* dust drifting slowly up through the dark, the same every render */
+  const air = document.getElementById("air"), r = rng(7);
+  for (let i = 0; i < 34; i++) {
+    const m = document.createElement("div");
+    m.className = "mote";
+    const x = r() * 1080, y = 300 + r() * 1400, s = 0.5 + r() * 1.2;
+    Object.assign(m.style, { left: `${x}px`, top: `${y}px`, opacity: (0.15 + r() * 0.35).toFixed(2),
+                             transform: `scale(${s.toFixed(2)})` });
+    air.appendChild(m);
+    tl.fromTo(m, { x: 0, y: 0 }, { x: (r() - 0.5) * 60, y: -(40 + r() * 90), duration: 21, ease: "none",
+                                   immediateRender: false }, 0);
   }
 
   /* initial state OUTSIDE the timeline — tl.set(…,0) does not apply at frame 0 */
-  const fade = ["#h1","#v0","#v1","#v2","#v3","#v4","#n0","#n1","#n2","#n3","#n4",
-                "#c0","#c1","#c2"];
-  gsap.set(fade, { opacity: 0 });
-  gsap.set(["#k1","#k2","#k3","#k4"], { opacity: 0, scale: 1.25, transformOrigin: "center" });
-  gsap.set(["#h1","#v1","#n1","#c1"], { y: 24 });
-  gsap.set(".rt", { scaleY: 0, transformOrigin: "center bottom" });
-  gsap.set(".rt i", { scaleX: 0, transformOrigin: "right center" });
-  gsap.set(".tk", { opacity: 0, scale: 0.6, transformOrigin: "center" });
-  gsap.set(".tk", { backgroundColor: "rgba(94,143,120,0)" });
+  const shots = ["#s1", "#s2", "#s3", "#s4", "#s5", "#s6", "#s7"];
+  gsap.set(shots, { opacity: 0, scale: 1.035 });
+  gsap.set([".line", ".name"], { opacity: 0, filter: "blur(10px)" });
+  gsap.set("#s1-frame", { scaleX: 0.02, scaleY: 0.012, transformOrigin: "50% 50%" });
+  gsap.set(["#s3-d1", "#s3-d2", "#s3-d3", ".dot"], { opacity: 0, scale: 0.4 });
+  gsap.set("#s2-bulb", { opacity: 1, scale: 1 });
+  gsap.set("#s3-thread", { scaleX: 0 });
+  gsap.set([".frame"], { opacity: 0 });
+  gsap.set("#s1-frame", { opacity: 1 });
 
-  const tl = gsap.timeline({ paused: true });
-  const rise = { opacity: 1, y: 0, ease: "power2.out" };
+  /* a shot: light comes up and the camera settles; then it holds, still,
+     for its line's reading time; then it goes dark before the next */
+  const come = (sel, at, dur = 14) => {
+    tl.to(sel, { opacity: 1, duration: F(dur), ease: "power2.out" }, F(at));
+    tl.to(sel, { scale: 1, duration: F(dur + 8), ease: "power2.out" }, F(at));
+  };
+  const words = (sel, at) => tl.to(sel, { opacity: 1, filter: "blur(0px)", duration: F(12), ease: "power2.out" }, F(at));
+  const go = (sel, at, dur = 8) => tl.to(sel, { opacity: 0, duration: F(dur), ease: "power1.in" }, F(at));
+  const move = (id, a, b) => window.__MOTION.push({ id, frames: [a, b], magnitude: "large" });
 
-  /* ── HOOK · 0–90 · a visual event, then the line ─────────────────── */
-  tl.to(["#k1","#k2","#k3","#k4"], { opacity: 1, scale: 1, duration: F(8),
-                                     stagger: F(2), ease: "power3.out" }, F(0));
-  tl.to("#h1", { ...rise, duration: F(14) }, F(2));
+  /* Every shot runs the same way: IN — the light comes up and the camera
+     settles (22 frames), the line coming into focus as it lands — then a HOLD
+     of exactly the line's reading time at 0.35s a word, 1.5s at least, with
+     nothing moving; then OUT to dark (5–8 frames). The frame numbers below
+     are that rule worked out, shot by shot. */
 
-  /* ── VALUE · 90–300 ─────────────────────────────────────────────── */
-  tl.to("#v0", { opacity: 1, duration: F(8) }, F(94));
-  tl.to("#v1", { ...rise, duration: F(14) }, F(96));
-  tl.to("#v2", { opacity: 1, duration: F(14) }, F(140));
-  tl.to("#v3", { opacity: 1, duration: F(14) }, F(190));
-  tl.to("#v4", { opacity: 1, duration: F(2) }, F(200));
-  tl.to(".rt", { scaleY: 1, duration: F(14), stagger: F(6), ease: "back.out(1.4)" }, F(200));
-  // once the last line has been read, each frame lays its own content out —
-  // the frame had sat still for 0.7s before the next chapter (dead air, #49)
-  tl.to(".rt i", { scaleX: 1, duration: F(10), stagger: F(4), ease: "power2.out" }, F(250));
-  window.__MOTION.push({ id: "ratios-fill", frames: [250, 292], magnitude: "small" });
+  /* ── HOOK · 0–90 · a sliver of light opens into a frame: this video ── */
+  gsap.set("#s1", { opacity: 1, scale: 1.02 });
+  tl.to("#s1-frame", { scaleX: 1, duration: F(12), ease: "power3.out" }, F(0));
+  tl.to("#s1-frame", { scaleY: 1, duration: F(16), ease: "power3.inOut" }, F(12));
+  tl.to("#s1", { scale: 1, duration: F(30), ease: "power2.out" }, F(0));
+  words("#h1", 20);                                  // in focus 32 · read 32–85
+  move("open", 0, 30);
+  go("#s1", 85, 5); move("s1-out", 85, 90);
 
-  /* ── VALUE · numbers · 300–450 ──────────────────────────────────── */
-  tl.to("#n0", { opacity: 1, duration: F(8) }, F(304));
-  tl.to("#n1", { ...rise, duration: F(12) }, F(306));
-  tl.to("#n2", { opacity: 1, duration: F(14) }, F(350));
-  tl.to(["#n3","#n4"], { opacity: 1, duration: F(8) }, F(312));
-  // the counter is driven by onUpdate over an object — tl.call is skipped on seek
-  const c = { v: 0 };
-  tl.to(c, { v: 15, duration: F(70), ease: "power1.out",
-             onUpdate: () => { document.getElementById("n3").textContent = arabic(Math.round(c.v)); } }, F(316));
-  tl.to(".tk", { opacity: 1, scale: 1, backgroundColor: "rgba(94,143,120,.55)",
-                 duration: F(6), stagger: F(4.4), ease: "power2.out" }, F(316));
+  /* ── VALUE · 90–350 ───────────────────────────────────────────── */
+  come("#s2", 90);  words("#v1", 100); move("s2-in", 90, 112);    // read 112–175
+  go("#s2", 175);   move("s2-out", 175, 183);
+  come("#s3", 183); move("s3-in", 183, 205);
+  tl.to("#s3-d1", { opacity: 1, scale: 1, duration: F(6), ease: "back.out(2)" }, F(185));
+  tl.to("#s3-thread", { scaleX: 1, duration: F(14), ease: "power2.inOut" }, F(187));
+  tl.to("#s3-d2", { opacity: 1, scale: 1, duration: F(6), ease: "back.out(2)" }, F(191));
+  tl.to("#s3-d3", { opacity: 1, scale: 1, duration: F(6), ease: "back.out(2)" }, F(197));
+  words("#v2", 193);                                 // read 205–258
+  go("#s3", 258);   move("s3-out", 258, 266);
+  come("#s4", 266); move("s4-in", 266, 288);
+  tl.to(["#s4-f1", "#s4-f2", "#s4-f3"], { opacity: 1, duration: F(10), ease: "power2.out" }, F(268));
+  words("#v3", 276);                                 // read 288–341
+  go("#s4", 341);   move("s4-out", 341, 349);
 
-  /* ── CTA · 450–540 ──────────────────────────────────────────────── */
-  tl.to("#c0", { opacity: 1, duration: F(8) }, F(454));
-  tl.to("#c1", { ...rise, duration: F(16) }, F(456));
-  tl.to("#c2", { opacity: 1, duration: F(12) }, F(470));
+  /* ── 350–540 · no editor · fifteen checks ─────────────────────── */
+  come("#s5", 350); words("#n1", 360); move("s5-in", 350, 372);   // read 372–417
+  go("#s5", 417);   move("s5-out", 417, 425);
+  come("#s6", 425);
+  tl.to(".dot[id^=g]", { opacity: 1, scale: 1, duration: F(5), stagger: F(1.3), ease: "back.out(2)" }, F(426));
+  words("#n2", 441);                                 // the lights are all on at 450 · read 453–527
+  move("s6-in", 425, 453);
+  go("#s6", 527);   move("s6-out", 527, 535);
+
+  /* ── CTA · 540–630 · a week of frames, and the name ───────────── */
+  come("#s7", 540);
+  tl.to(".frame[id^=w]", { opacity: 1, duration: F(6), stagger: F(1.5), ease: "power2.out" }, F(541));
+  words(["#c1", "#c2"], 550);                        // read 562–625
+  move("s7-in", 540, 562);
 
   /* ── music — one continuous track, gain automation only (#26 #27) ─ */
   tl.fromTo("#bgm", { volume: 0 }, { volume: 0.40, duration: 0.9, ease: "none",
             immediateRender: false }, 0);
-  tl.to("#bgm", { volume: 0.29, duration: F(8), ease: "none" }, F(300));
-  tl.to("#bgm", { volume: 0.40, duration: F(20), ease: "none" }, F(340));
-  tl.to("#bgm", { volume: 0, duration: 1.4, ease: "none" }, F(498));
+  tl.to("#bgm", { volume: 0, duration: 1.4, ease: "none" }, F(588));
 
-  /* ── the manifest — still_from is where each tween actually ends ── */
-  const t = (id, ch, fr, still, text, crit) =>
-    mf(id, { type: "text", chapter: ch, frames: fr, still_from: still, text: text,
-             critical: crit !== false, el: "#" + id });
+  /* ── the manifest — still_from is where each line has come into focus ── */
+  const t = (id, ch, fr, still, text) =>
+    mf(id, { type: "text", chapter: ch, frames: fr, still_from: still, text, critical: true, el: "#" + id });
   const sh = (id, ch, fr, still) =>
-    mf(id, { type: "shape", chapter: ch, frames: fr, still_from: still,
-             critical: false, el: "#" + id });
+    mf(id, { type: "shape", chapter: ch, frames: fr, still_from: still, critical: false, el: "#" + id });
 
-  sh("k1", "ch1", [0, 90], 8); sh("k4", "ch1", [0, 90], 14);
-  t("h1", "ch1", [0, 90], 16, "الفيديو ده محدش فتح فيه بريمير.");
-
-  t("v0", "ch2", [90, 300], 102, "", false);
-  t("v1", "ch2", [90, 300], 110, "فيديو زيه كان ياخد يوم ومونتير.");
-  t("v2", "ch2", [90, 300], 154, "أداة واحدة بتكتبه وتبنيه وتفحصه.");
-  t("v3", "ch2", [90, 300], 204, "وبتلات مقاسات في نفس الوقت.");
-  sh("v4", "ch2", [90, 300], 220);
-
-  t("n0", "ch3", [300, 450], 312, "", false);
-  t("n1", "ch3", [300, 450], 318, "من غير مونتير.");
-  t("n2", "ch3", [300, 450], 364, "وبيعدّي على ١٥ اختبار قبل ما يخرج.");
-  t("n3", "ch3", [300, 450], 386, "١٥", false);
-  t("n4", "ch3", [300, 450], 320, "اختبار عدّوا", false);
-  sh("n5", "ch3", [300, 450], 386);
-
-  t("c0", "ch4", [450, 540], 462, "", false);
-  t("c1", "ch4", [450, 540], 472, "تابع — كل يوم نوع فيديو جديد.");
-  t("c2", "ch4", [450, 540], 482, "", false);
+  sh("s1-halo", "ch1", [0, 90], 30); sh("s1-frame", "ch1", [0, 90], 28);
+  t("h1", "ch1", [20, 90], 32, "الفيديو ده محدش فتح فيه بريمير.");
+  sh("s2-cone", "ch2", [90, 183], 112); sh("s2-pool", "ch2", [90, 183], 112);
+  t("v1", "ch2", [100, 183], 112, "فيديو زيه كان ياخد يوم ومونتير.");
+  sh("s3-halo", "ch2", [183, 266], 205);
+  t("v2", "ch2", [193, 266], 205, "أداة واحدة بتكتبه وتبنيه وتفحصه.");
+  sh("s4-halo", "ch2", [266, 350], 288);
+  t("v3", "ch2", [276, 350], 288, "وبتلات مقاسات في نفس الوقت.");
+  sh("s5-beam", "ch3", [350, 425], 372); sh("s5-pool", "ch3", [350, 425], 372);
+  t("n1", "ch3", [360, 425], 372, "من غير مونتير.");
+  sh("s6-halo", "ch3", [425, 540], 453);
+  t("n2", "ch3", [441, 540], 453, "وبيعدّي على ١٥ اختبار قبل ما يخرج.");
+  sh("s7-halo", "ch4", [540, 630], 562);
+  t("c1", "ch4", [550, 630], 562, "تابع — كل يوم نوع فيديو جديد.");
+  t("c2", "ch4", [550, 630], 562, "video-production");
 
   window.__timelines = window.__timelines || {};
   window.__timelines["main"] = tl;

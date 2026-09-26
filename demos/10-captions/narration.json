@@ -1,0 +1,14 @@
+{
+  "title": "10 — فيديو بالكلام المكتوب · «الكلام اللي بتقراه ده بيتقال دلوقتي»",
+  "language": "ar-EG",
+  "note": "One line per caption page. The voice sets the timing: each line's measured duration becomes its beat, and each word lights up at its own measured start (voice_timings.mjs --words).",
+  "style": "a natural Egyptian speaker talking straight to the viewer on social media: brisk, warm and confident, like a creator sharing something useful, not an advertisement",
+  "lines": [
+    { "id": "l1", "text": "الكلام اللي بتقراه ده، بيتقال دلوقتي." },
+    { "id": "l2", "text": "أداة واحدة عملت الفيديو ده، وحطّت كل كلمة في وقتها." },
+    { "id": "l3", "text": "عادةً حد في الفريق بيكتب الترجمة بإيده، ويظبّطها كلمة كلمة." },
+    { "id": "l4", "text": "الأداة بتقيس الصوت، وبتعرف كل كلمة اتقالت إمتى." },
+    { "id": "l5", "text": "فالفيديو بيتفهم، حتى لو اتشاف من غير صوت." },
+    { "id": "l6", "text": "تابعنا — كل يوم نوع فيديو جديد." }
+  ]
+}

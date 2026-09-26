@@ -116,6 +116,19 @@ function checkIntegrity(video, rep) {
           err === "" ? "clean" : err.split("\n")[0].slice(0, 60), "#35");
 }
 
+// Twice what YouTube asks for at 1080p30, and seven times the heaviest demo.
+// A render above it has a layer that repaints every pixel every frame.
+const MAX_MBPS = 16;
+function checkBitrate(video, rep) {
+  // #54 — film grain drawn fresh every frame: 118 Mbps, 310 MB for 21 seconds.
+  const r = run("ffprobe", ["-v", "error", "-show_entries", "format=bit_rate", "-of", "csv=p=0", video]);
+  const mbps = parseFloat((r.stdout || "").trim()) / 1e6;
+  if (!isFinite(mbps)) { rep.add("delivery bitrate", false, "unreadable", "#54"); return; }
+  const ok = mbps <= MAX_MBPS;
+  rep.add("delivery bitrate", ok, `${f(mbps, 1)} Mbps (limit ${MAX_MBPS})`
+    + (ok ? "" : " — something repaints the whole frame every frame"), "#54");
+}
+
 function checkDuration(video, manifest, rep) {
   const dur = ffprobeDuration(video);
   if (dur === null) { rep.add("duration", false, "unreadable"); return; }
@@ -745,6 +758,7 @@ const rep = new Report();
 // file and audio
 checkIntegrity(video, rep);
 checkDuration(video, manifest, rep);
+checkBitrate(video, rep);
 checkLoudness(video, lufs, rep);
 checkBeatContinuity(video, rep);
 if (!has("skip-palette")) checkPalette(video, colors, manifest, rep);

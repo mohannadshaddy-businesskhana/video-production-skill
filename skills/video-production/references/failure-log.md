@@ -681,6 +681,47 @@ unevenly, and a camera working across a board larger than the frame.
 **Also:** the ink texture was first an SVG filter, and a `feTurbulence` recomputed every frame
 never let the page load. It is now a small seeded tile painted once. The details are in
 `whiteboard.md`.
+
+### 54 · Film grain that made every frame a new picture
+
+**What happened:** the brand film's cinema medium had film grain: six noise tiles, a different one
+every frame, over the whole 1080×1920 frame. Every check passed.
+**Result:** the file was 310 MB for 21 seconds, at 118 Mbps. The other demos are 0.5–2.2 Mbps. An
+encoder can predict a frame from the one before it, but not noise, so every frame was paid for in
+full at CRF 16. A platform's re-encode then smears the grain away anyway, so the cost bought
+nothing the viewer would see.
+**Rule:** a texture over the whole frame must not change every frame. Keep what encodes: glows,
+a vignette, a few specks of dust. `verify.mjs` now fails any render above 16 Mbps.
+**Also:** a texture that moves every frame hides dead air from the gate, since the measured
+picture never stops changing. The film passed "no dead air" with the grain on, which proved
+nothing. Prove the choreography with a control render that has the texture switched off. This
+one passed with grain and dust both off.
+**Also:** the vignette's darkest stop was .78, and `hyperframes check` reported two lines as
+hidden under it. The audit scores a gradient by its darkest colour, not by the colour where the
+text sits, so a vignette over the words keeps its darkest stop under .6.
+
+### 55 · Word timings: four wrong turns before they held
+
+**What happened:** captions that light as each word is said need each word's start, and no free
+voice gives one. `voice_timings.mjs --words` aligns the known text to the loudness: cuts at dips,
+pieces matched to letter counts. Each of these gave a plausible table of times, and each was wrong:
+- **A pause counted into the word before it.** A word before a comma looked long, so two cuts
+  went into the pause and the next word came out 0 ms long. Pieces are now measured in voiced time.
+- **A comma with no pause.** A stop consonant's dip inside the next word pulled «ده،» past its
+  own pause. After a comma or a dash, a cut now has to land in a pause.
+- **A pause that was a consonant.** The silence of a doubled stop running into another («بتحطّ
+  كل», 120 ms) passed as a comma's pause. A pause is now 160 ms or more; the commas' were 270–490.
+- **A fix that was right about the language and wrong about the result.** A shadda doubles a
+  consonant, so it was counted as a letter, and three words of one line moved a whole word late.
+  It was taken out again.
+**How they were caught:** by looking. `--plot` draws each line's spectrogram with the cuts on it:
+a pause is a dark band, and a comma's cut belongs in one. Asking a listening model instead failed
+twice. Given a line's clips all at once, it wrote the whole line for nearly every clip. One clip
+per request is two requests a word, which the free tier refused before a single answer came back.
+**What is left:** pauses and commas land right. Inside fast speech, a short word can still light
+about 0.2 s early («كل» in «وحطّت كل»).
+**Rule:** a measurement with no automatic check gets a picture you can check by eye, and every
+change to it is compared on the lines already read. The shadda looked right and was not.
 ---
 
 ## Recurring patterns — read these if you have no time for the whole log

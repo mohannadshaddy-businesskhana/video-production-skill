@@ -3,6 +3,7 @@
  *
  *   node tts_gemini.mjs --lines narration.json --out voice/gemini-kore [--voice Kore] [--gap 0.35]
  *   node tts_gemini.mjs --voices ar-EG          # the voices the library has for a language
+ *   node tts_gemini.mjs --check <measured>      # does each line piece say its line?
  *
  * Why this exists: the local engine has no Arabic, and a voice-led type —
  * whiteboard, captions, explainer — cannot be faked. Gemini's TTS speaks
@@ -123,6 +124,25 @@ const headers = { "x-goog-api-key": key, "Content-Type": "application/json" };
 const bare = (s) => s.replace(/[ً-ْـ]/g, "").replace(/[أإآ]/g, "ا").replace(/ة/g, "ه")
   .replace(/ى/g, "ي").replace(/[^\p{L}\p{N} ]/gu, " ").split(/\s+/).filter(Boolean);
 const sameWord = (a, b) => !!a && !!b && (a === b || a.includes(b) || b.includes(a));
+
+// what a listening model hears in some clips, as one string per clip; null when none answered
+async function listen(parts) {
+  const body = JSON.stringify({ contents: [{ role: "user", parts }],
+                                generationConfig: { responseMimeType: "application/json", temperature: 0 } });
+  // the listening model is often overloaded; a second one is as good for this
+  for (const model of [flag("check-model", "gemini-flash-latest"), "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash"]) {
+    try {
+      const res = await call(`/models/${model}:generateContent`, { method: "POST", headers, body });
+      return JSON.parse(res.candidates[0].content.parts.map((p) => p.text).join(""));
+    } catch (e) {
+      const m = String(e.message).match(/"message":\s*"([^"]{0,140})/);
+      console.error(`${model}: ${m ? m[1] : String(e.message).slice(0, 80)} — trying the next`);
+    }
+  }
+  console.error("no listening model answered — nothing was checked"); process.exitCode = 2;
+  return null;
+}
+
 async function check(dir) {
   const T = JSON.parse(readFileSync(join(dir, "timings.json"), "utf8"));
   const parts = [{ text: `These are ${T.lines.length} short audio clips of Arabic speech, in order. Transcribe `
@@ -130,16 +150,8 @@ async function check(dir) {
     + `${T.lines.length} strings, one per clip.` }];
   for (const l of T.lines)
     parts.push({ inline_data: { mime_type: "audio/wav", data: readFileSync(join(dir, l.file)).toString("base64") } });
-  const body = JSON.stringify({ contents: [{ role: "user", parts }],
-                                generationConfig: { responseMimeType: "application/json", temperature: 0 } });
-  let res = null;
-  // the listening model is often overloaded; a second one is as good for this
-  for (const model of [flag("check-model", "gemini-flash-latest"), "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash"]) {
-    try { res = await call(`/models/${model}:generateContent`, { method: "POST", headers, body }); break; }
-    catch (e) { const m = String(e.message).match(/"message":\s*"([^"]{0,140})/); console.error(`${model}: ${m ? m[1] : String(e.message).slice(0, 80)} — trying the next`); }
-  }
-  if (!res) { console.error("no listening model answered — nothing was checked"); process.exitCode = 2; return; }
-  const heard = JSON.parse(res.candidates[0].content.parts.map((p) => p.text).join(""));
+  const heard = await listen(parts);
+  if (!heard) return;
   const words = T.lines.map((l) => bare(l.text)), got = heard.map((h) => bare(h || ""));
   const has = (i, w) => i >= 0 && i < got.length && got[i].some((g) => sameWord(g, w));
   let moved = 0, differ = 0;
