@@ -48,73 +48,102 @@ const box = (x0, y0, x1, y1, r) =>
   `M ${x0 + r} ${y0} H ${x1 - r} Q ${x1} ${y0} ${x1} ${y0 + r} V ${y1 - r} Q ${x1} ${y1} ${x1 - r} ${y1} `
   + `H ${x0 + r} Q ${x0} ${y1} ${x0} ${y1 - r} V ${y0 + r} Q ${x0} ${y0} ${x0 + r} ${y0} Z`;
 
-const PEOPLE = [900, 660, 420, 180];     // the first in line stands on the right, where Arabic starts
-const HEAD = { y: 936, r: 46 };
+/* ── the board ────────────────────────────────────────────────────────────
+   A real whiteboard, larger than the frame: 1620×2880 board units, in four
+   parts of 810×1440. The camera frames one part at a time — a part fills the
+   1080×1920 frame at 1.333× — and crosses the board in Arabic reading order:
+   top right, top left, bottom right, bottom left. At the end it pulls back to
+   the whole board, every drawing side by side. All coordinates below are
+   board units. */
+const PART = { w: 810 };
+const PARTS = { z1: [810, 0], z2: [0, 0], z3: [810, 1440], z4: [0, 1440] };
+const STAGE = {
+  views: {
+    open: [905, -26, 620],             // the hook: close on the calendar, the board's top edge in view
+    ...Object.fromEntries(Object.entries(PARTS).map(([k, [x, y]]) => [k, [x, y, PART.w]])),
+    all: [-30, -27, 1680],             // the whole board, its frame and its tray
+    rest: [-52, -66, 1724],            // …drifting back a little further while it is looked at
+  },
+  // the part each line is drawn in; a line in a new part is where the camera moves
+  lines: { l1: "open", l2: "z1", l3: "z2", l4: "z2", l5: "z2", l6: "z2", l7: "z3", l8: "z4" },
+};
+
+const PEOPLE = [675, 495, 315, 135];     // the first in line stands on the right, where Arabic starts
+const HEAD = { y: 600, r: 40 };
 const DRAW = {
-  l1: [                                   // a calendar page: ٧ crossed out, ١ written beside it
-    ["ink", box(580, 262, 1000, 600, 20)],
-    ["ink", "M 660 238 V 290"], ["ink", "M 920 238 V 290"],  // its rings
-    ["ink", "M 580 330 H 1000"],
-    ["ink b", "M 820 395 L 880 560 L 940 395"],            // ٧
+  l1: [                                   // top right: a calendar page, ٧ crossed out, ١ beside it
+    ["ink", box(1000, 330, 1430, 720, 22)],
+    ["ink", "M 1085 300 V 362"], ["ink", "M 1345 300 V 362"],  // its rings
+    ["ink", "M 1000 420 H 1430"],
+    ["ink b", "M 1245 500 L 1305 680 L 1365 500"],         // ٧
     // an X, never one diagonal: a V with a single stroke through it reads as a
     // tick in a box — "done", the opposite of what is meant
-    ["ink a b", "M 800 400 L 960 560"], ["ink a b", "M 960 400 L 800 560"],
-    ["ink a b", "M 690 395 V 560"],                        // ١
-    ["ink a", "M 664 588 H 716", "underline"],
+    ["ink a b", "M 1225 505 L 1385 675"], ["ink a b", "M 1385 505 L 1225 675"],
+    ["ink a b", "M 1110 500 V 680"],                       // ١
+    ["ink a", "M 1080 712 H 1140", "underline"],
   ],
-  l2: [                                   // the idea
-    ["ink", "M 162 528 A 100 100 0 1 1 298 528"],
-    ["ink", "M 290 548 H 170"], ["ink", "M 182 582 H 278"], ["ink", "M 260 614 H 200"],
-    ["ink a", "M 76 428 H 40"], ["ink a", "M 118 326 L 90 302"], ["ink a", "M 230 278 V 240"],
-    ["ink a", "M 342 326 L 370 302"], ["ink a", "M 384 428 H 420"],
-    ["ink t", "M 206 512 L 214 482 L 222 512 L 230 482 L 238 512 L 246 482 L 254 512", "filament"],
-    ["ink t", "M 164 431 A 70 70 0 0 1 195 394", "shine"],
+  l2: [                                   // top right, under it: the idea
+    ["ink", "M 1140 1090 A 110 110 0 1 1 1290 1090"],
+    ["ink", "M 1282 1112 H 1148"], ["ink", "M 1160 1150 H 1270"], ["ink", "M 1250 1186 H 1180"],
+    ["ink a", "M 1030 980 H 990"], ["ink a", "M 1075 870 L 1045 842"], ["ink a", "M 1215 830 V 788"],
+    ["ink a", "M 1355 870 L 1385 842"], ["ink a", "M 1400 980 H 1440"],
+    ["ink t", "M 1188 1070 L 1197 1036 L 1206 1070 L 1215 1036 L 1224 1070 L 1233 1036 L 1242 1070", "filament"],
+    ["ink t", "M 1142 983 A 78 78 0 0 1 1176 942", "shine"],
   ],
-  l3: [                                   // four people in a row
+  l3: [                                   // top left: four people in a row
     ...PEOPLE.flatMap((x) => [
       ["ink", ring(x, HEAD.y, HEAD.r)],
-      ["ink", `M ${x + 70} 1145 Q ${x + 70} 1005 ${x} 1005 Q ${x - 70} 1005 ${x - 70} 1145`],
+      ["ink", `M ${x + 58} 780 Q ${x + 58} 660 ${x} 660 Q ${x - 58} 660 ${x - 58} 780`],
     ]),
-    ...PEOPLE.map((x) => ["ink t", `M ${x - 16} 1012 L ${x} 1032 L ${x + 16} 1012`, "collars"]),
+    ...PEOPLE.map((x) => ["ink t", `M ${x - 13} 666 L ${x} 684 L ${x + 13} 666`, "collars"]),
   ],
   // after the names: who hands the work to whom. Drawn from the left, where the
   // last name ends — starting at the far arrow cost a hop that did not fit
   l4: PEOPLE.slice(0, 3).reverse().flatMap((x) => [
-    ["ink", `M ${x - 82} 1080 H ${x - 158}`, "arrows"],
-    ["ink", `M ${x - 142} 1064 L ${x - 160} 1080 L ${x - 142} 1096`, "arrows"],
+    ["ink", `M ${x - 66} 725 H ${x - 114}`, "arrows"],
+    ["ink", `M ${x - 100} 713 L ${x - 116} 725 L ${x - 100} 737`, "arrows"],
   ]),
   l5: [                                   // each waits for the one before: a clock between them
     ...PEOPLE.slice(0, 3).flatMap((x) => [
-      ["ink a", ring(x - 120, HEAD.y, 32)],
-      ["ink a", `M ${x - 120} 914 V ${HEAD.y} H ${x - 102}`],
+      ["ink a", ring(x - 90, HEAD.y, 24)],
+      ["ink a", `M ${x - 90} 584 V ${HEAD.y} H ${x - 78}`],
     ]),
     // a clock face's ticks, all three clocks' twelve first, then their six…
-    ...[["t12", 0, -29, 0, -25], ["t6", 0, 29, 0, 25], ["t3", 29, 0, 25, 0], ["t9", -29, 0, -25, 0]]
+    ...[["t12", 0, -21, 0, -18], ["t6", 0, 21, 0, 18], ["t3", 21, 0, 18, 0], ["t9", -21, 0, -18, 0]]
       .flatMap(([g, x1, y1, x2, y2]) => PEOPLE.slice(0, 3).map((x) =>
-        ["ink a t", `M ${x - 120 + x1} ${HEAD.y + y1} L ${x - 120 + x2} ${HEAD.y + y2}`, g])),
+        ["ink a t", `M ${x - 90 + x1} ${HEAD.y + y1} L ${x - 90 + x2} ${HEAD.y + y2}`, g])),
   ],
-  l6: [                                   // the tool does the four at once
-    ["ink a b", ring(540, 1065, 520, 335)],
-    ["ink a b", "M 1066 1065 A 526 341 0 0 1 540 1406", "again"],
+  l6: [                                   // the tool does the four's work at once
+    ["ink a b", ring(405, 710, 395, 300)],
+    ["ink a b", "M 802 710 A 399 304 0 0 1 405 1014", "again"],
+    // a bridge ends a part: it leads the pen, and the camera with it, into the
+    // next one, so the next line starts there on its first word
+    ["ink a bridge to-z3", "M 640 975 Q 700 1750 955 2030"],
+    ["ink a", "M 947 1999 L 955 2030 L 925 2019"],
   ],
-  l7: [                                   // delivered in three sizes — 9:16, 1:1, 16:9
-    ["ink", box(775, 1430, 854, 1570, 10)],
-    ["ink", box(555, 1430, 695, 1570, 10)],
-    ["ink", box(226, 1430, 475, 1570, 10)],
-    ["ink t", "M 806 1486 L 828 1500 L 806 1514 Z", "play"],
-    ["ink t", "M 614 1484 L 640 1500 L 614 1516 Z", "play"],
-    ["ink t", "M 340 1484 L 366 1500 L 340 1516 Z", "play"],
+  l7: [                                   // bottom right: delivered in three sizes — 9:16, 1:1, 16:9
+    ["ink", box(1375, 2062, 1447, 2190, 10)],
+    ["ink", box(1215, 2070, 1335, 2190, 10)],
+    ["ink", box(983, 2082, 1175, 2190, 10)],
+    ["ink t", "M 1404 2116 L 1420 2126 L 1404 2136 Z", "play"],
+    ["ink t", "M 1266 2118 L 1286 2130 L 1266 2142 Z", "play"],
+    ["ink t", "M 1070 2124 L 1090 2136 L 1070 2148 Z", "play"],
+    ["ink a bridge to-z4", "M 975 2140 Q 860 2118 752 2135"],
+    ["ink a", "M 775 2147 L 750 2135 L 774 2121"],
   ],
-  l8: [["ink a b", "M 800 1633 L 842 1673 L 930 1591"]], // try it — after the name has been read
+  l8: [                                   // bottom left: try it
+    ["ink a b", "M 330 2262 L 380 2312 L 480 2212"],      // the tick — after the name has been read
+  ],
 };
 const WORDS = {
   l4: ["كاتب", "مصمم", "مونتير", "مراجع"].map((text, i) =>
-    ({ id: `w${i + 1}`, text, x: PEOPLE[i] - 120, y: 1160, w: 240, size: 54 })),
-  l8: [{ id: "w5", text: "video-production", latin: true, x: 120, y: 1602, w: 620, size: 52 }],
+    ({ id: `w${i + 1}`, text, x: PEOPLE[i] - 85, y: 792, w: 170, size: 42 })),
+  l8: [{ id: "w5", text: "video-production", latin: true, x: 105, y: 2105, w: 600, size: 50 }],
 };
 
-// strokes come after their line's words (a list is written, then connected);
-// the order within a line is the table's
+// strokes come after their line's words (a list is written, then connected),
+// except a bridge, which leads into the part the words are on; the order
+// within a line is the table's
 const board = () => Object.entries(DRAW).map(([id, strokes]) =>
   `          <g id="g-${id}" data-line="${id}">\n`
   + strokes.map(([cls, d, group], k) => `            <path class="${cls}" d="${d}" data-seq="${100 + k}"`
@@ -132,9 +161,11 @@ const words = () => Object.entries(WORDS).flatMap(([line, ws]) => ws.map((w, k) 
 const LEAD = 0.15;                      // s before the first word: the pen is already on the board
 const GAP = 0.35;
 const BREATH = { l4: 0.6 };
-// after the last line starts: the name written (1.0s) and held to be read
-// (1.6s), the tick, the hand gone — and the film ends with it
-const TAIL = 3.25;
+// after the last line starts: the bridge into the last part, the name
+// written (1.0s) and held to be read (1.6s), the tick, then the pull-back to
+// the whole board (1.2s) and a moment to look at it — the CTA stays within
+// the last 5s the script gate allows
+const TAIL = 4.85;
 const FPS = 30;
 const BED_AT_19 = 0.09;                 // the bed's gain under a voice at -19 LUFS
 
@@ -175,7 +206,8 @@ function writeDemo(dir, v, T, lay, base) {
     .replace("@@VOICE@@", v.label).replace("@@TITLE@@", `سبورة — ${v.label}`)
     .replaceAll("@@DUR@@", String(+lay.dur.toFixed(3))).replace("@@BED@@", bed.toFixed(3))
     .replace("@@BOARD@@", board()).replace("@@WORDS@@", words()).replace("@@AUDIO@@", audio)
-    .replace("@@LINES@@", JSON.stringify(lay.lines.map(({ file, duration, ...l }) => l)));
+    .replace("@@LINES@@", JSON.stringify(lay.lines.map(({ file, duration, ...l }) => l)))
+    .replace("@@STAGE@@", JSON.stringify(STAGE));
   if (html.includes("@@")) throw new Error(`${v.key}: a placeholder was left unfilled`);
   writeFileSync(join(dir, "index.html"), html, "utf8");
   writeFileSync(join(dir, "script.json"), JSON.stringify(scriptFor(base, v, lay), null, 2) + "\n", "utf8");

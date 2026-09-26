@@ -22,7 +22,7 @@ whether a voice or the music leads, and how the edit breathes
 | `06-motion-graphics` | motion graphics | **one shape for the whole film** — a circle, a day, a block, a chart, three steps, the circle again, a button. Nothing cuts, nothing fades | ✅ v2 |
 | `07-music-video` | music video | **the whole frame cuts on every beat** — 33 hard cuts from the track's own beat map; the claim lands on the drop | ✅ v2 |
 | `08-product-tour` | product tour | **a cursor drives the interface for the whole film** — scroll, push in, type, click, pull back | ✅ v3 |
-| `05-explainer` | whiteboard | **a hand drawing on a board while a narrator explains.** Each drawing starts on the line that names it, timed from the voice's own measured takes | 🔄 built in three voices, one to be chosen |
+| `05-explainer` | whiteboard | **a hand drawing in marker on a real board while a narrator explains.** Each drawing starts on the line that names it, timed from the voice's own measured takes. The camera starts close, works across the board in reading order along the arrows that link the drawings, and ends on the whole board, full | ✅ v4 (voice: Gemini, ar-eg-podcaster-1) |
 | `09-talking-head` | talking head | a person on camera, cut on sentences | ⏳ needs a voice and a face |
 | `10-captions` | captions-led | speech, with its words lighting as they are spoken | ⏳ needs a voice |
 

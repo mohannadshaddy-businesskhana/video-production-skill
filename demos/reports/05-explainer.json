@@ -12,28 +12,28 @@
     {
       "name": "duration",
       "ok": true,
-      "detail": "18.00s (expected 18.00s)",
+      "detail": "24.90s (expected 24.87s)",
       "ref": "",
       "warn": false
     },
     {
       "name": "loudness",
       "ok": true,
-      "detail": "-14.0 LUFS (target -14)",
+      "detail": "-14.1 LUFS (target -14)",
       "ref": "#25",
       "warn": false
     },
     {
       "name": "beat continuity",
       "ok": true,
-      "detail": "55 or 110 BPM, continuous (drift 0.14/window, no dropout)",
+      "detail": "167 or 333 BPM, no dropout — but phase shifts 0.30 beat at 10.0s; listen there (usually a section change in the track, not a fault)",
       "ref": "#27",
-      "warn": false
+      "warn": true
     },
     {
       "name": "palette",
       "ok": true,
-      "detail": "worst 0.5% off-palette at 17.2s (limit 2%) · 12/12 frames read",
+      "detail": "worst 0.1% off-palette at 23.8s (limit 2%) · 12/12 frames read",
       "ref": "#01",
       "warn": false
     },
@@ -68,7 +68,7 @@
     {
       "name": "content coverage",
       "ok": true,
-      "detail": "worst 48% in ch1 (floor 45%)",
+      "detail": "worst 53% in wb (floor 45%)",
       "ref": "#21",
       "warn": false
     },
@@ -89,8 +89,15 @@
     {
       "name": "text reads in stillness",
       "ok": true,
-      "detail": "clean",
+      "detail": "clean (4 spoken as written — heard, not read)",
       "ref": "#29",
+      "warn": false
+    },
+    {
+      "name": "no dead air",
+      "ok": true,
+      "detail": "something is heard, moving or being read at every moment (voice-led: stills ≤0.3s)",
+      "ref": "#49",
       "warn": false
     },
     {

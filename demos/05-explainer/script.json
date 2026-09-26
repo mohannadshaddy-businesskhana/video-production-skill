@@ -1,17 +1,14 @@
 {
-  "title": "05 — سبورة · «ليه الفيديو بياخد أسبوع؟»",
+  "title": "05 — سبورة · «ليه الفيديو بياخد أسبوع؟» · Gemini TTS, ar-eg-podcaster-1",
   "fps": 30,
   "content_type": "teach",
-  "note": "PROVISIONAL frames, estimated at 2.6 words a second. The narration sets the real timing: once a voice is recorded, each beat takes its line's measured duration.",
-
+  "note": "Frames from the measured narration (Gemini TTS, ar-eg-podcaster-1): each beat is its line's spoken duration and the pause after it — emitted by demos/_src/whiteboard/emit.mjs.",
   "audience": "فرق ماركتنج ووكالات بتطلّع فيديوهات لعملاء",
   "category_noun": "أداة بتعمل الفيديو",
   "alternative": "الفيديو بيعدّي على كاتب ومصمم ومونتير ومراجع، واحد ورا التاني",
-
   "mechanism": "بتعمل الكتابة والتصميم والمونتاج والمراجعة في قعدة واحدة",
   "claim": "فيديو جاهز في يوم بدل أسبوع، لإن الأربع خطوات بتحصل مرة واحدة",
   "repeat_sentence": "الفيديو بياخد أسبوع عشان بيعدّي على أربعة أفراد، والأداة بتعمل شغل الأربعة مرة واحدة",
-
   "hook": {
     "type": "cost",
     "line": "فيديو في يوم، بدل أسبوع؟",
@@ -19,42 +16,175 @@
     "visual": "إيد بترسم نتيجة وتشطب السبعة أيام",
     "written": "رقم ١ مكتوب بإيد مكان السبعة"
   },
-
-  "cta": { "kind": "lead", "words": "جرّبها — اللينك في البايو." },
-
+  "cta": {
+    "kind": "lead",
+    "words": "جرّبها — اللينك في البايو."
+  },
   "assumed_known": [],
   "jargon": [],
-
   "beats": [
-    { "id": "l1", "frames": [0, 66], "job": "الخطّاف — السؤال والرسمة",
-      "says": ["فيديو في يوم، بدل أسبوع؟"], "shows": "إيد بترسم نتيجة وتشطب السبعة",
-      "establishes": ["الفيديو ممكن ياخد يوم"], "is_hook": true, "shows_subject": true },
-    { "id": "l2", "frames": [66, 168], "job": "الفئة",
-      "says": ["في أداة بتعمل كده — تعالى أرسملك إزاي."], "shows": "لمبة فوق",
-      "needs": ["الفيديو ممكن ياخد يوم"], "establishes": ["في أداة بتعمل الفيديو في يوم"],
-      "names_category": true, "shows_subject": true },
-    { "id": "l3", "frames": [168, 240], "job": "التكلفة: الطريقة العادية",
-      "says": ["الفيديو العادي بيعدّي على أربعة أفراد:"], "shows": "أربعة أشخاص في صف",
-      "needs": ["في أداة بتعمل الفيديو في يوم"], "establishes": ["الفيديو العادي فيه أربعة أفراد"],
-      "states_stakes": true, "value_form": "steps", "shows_subject": true },
-    { "id": "l4", "frames": [240, 312], "job": "مين هما",
-      "says": ["كاتب، ومصمم، ومونتير، ومراجع."], "shows": "اسم كل واحد تحته",
-      "needs": ["الفيديو العادي فيه أربعة أفراد"], "establishes": ["الأربعة هما كاتب ومصمم ومونتير ومراجع"],
-      "value_form": "steps", "shows_subject": true },
-    { "id": "l5", "frames": [312, 390], "job": "ليه بياخد أسبوع",
-      "says": ["وكل واحد مستني اللي قبله يخلّص."], "shows": "أسهم وساعات بينهم",
-      "needs": ["الأربعة هما كاتب ومصمم ومونتير ومراجع"], "establishes": ["الانتظار هو اللي بياخد الأسبوع"],
-      "value_form": "steps", "shows_subject": true },
-    { "id": "l6", "frames": [390, 462], "job": "الادعاء",
-      "says": ["الأداة بتعمل شغل الأربعة مرة واحدة،"], "shows": "دايرة حوالين الأربعة",
-      "needs": ["الانتظار هو اللي بياخد الأسبوع"], "establishes": ["الأداة بتشيل الانتظار"],
-      "is_claim": true, "value_form": "steps", "shows_subject": true },
-    { "id": "l7", "frames": [462, 528], "job": "النتيجة",
-      "says": ["وبتسلّمه جاهز بتلات مقاسات."], "shows": "تلات مستطيلات",
-      "needs": ["الأداة بتشيل الانتظار"], "establishes": ["الفيديو بيطلع جاهز بتلات مقاسات"],
-      "value_form": "steps", "shows_subject": true },
-    { "id": "l8", "frames": [528, 600], "job": "الدعوة",
-      "says": ["جرّبها — اللينك في البايو."], "shows": "علامة صح واسم الأداة",
-      "needs": ["الفيديو بيطلع جاهز بتلات مقاسات"], "is_cta": true }
+    {
+      "id": "l1",
+      "frames": [
+        0,
+        82
+      ],
+      "job": "الخطّاف — السؤال والرسمة",
+      "says": [
+        "فيديو في يوم، بدل أسبوع؟"
+      ],
+      "shows": "إيد بترسم نتيجة وتشطب السبعة",
+      "establishes": [
+        "الفيديو ممكن ياخد يوم"
+      ],
+      "is_hook": true,
+      "shows_subject": true,
+      "spoken_s": 2.22
+    },
+    {
+      "id": "l2",
+      "frames": [
+        82,
+        165
+      ],
+      "job": "الفئة",
+      "says": [
+        "في أداة بتعمل كده — تعالى أرسملك إزاي."
+      ],
+      "shows": "لمبة فوق",
+      "needs": [
+        "الفيديو ممكن ياخد يوم"
+      ],
+      "establishes": [
+        "في أداة بتعمل الفيديو في يوم"
+      ],
+      "names_category": true,
+      "shows_subject": true,
+      "spoken_s": 2.44
+    },
+    {
+      "id": "l3",
+      "frames": [
+        165,
+        267
+      ],
+      "job": "التكلفة: الطريقة العادية",
+      "says": [
+        "الفيديو العادي بيعدّي على أربعة أفراد:"
+      ],
+      "shows": "أربعة أشخاص في صف",
+      "needs": [
+        "في أداة بتعمل الفيديو في يوم"
+      ],
+      "establishes": [
+        "الفيديو العادي فيه أربعة أفراد"
+      ],
+      "states_stakes": true,
+      "value_form": "steps",
+      "shows_subject": true,
+      "spoken_s": 3.04
+    },
+    {
+      "id": "l4",
+      "frames": [
+        267,
+        377
+      ],
+      "job": "مين هما",
+      "says": [
+        "كاتب، ومصمم، ومونتير، ومراجع."
+      ],
+      "shows": "اسم كل واحد تحته",
+      "needs": [
+        "الفيديو العادي فيه أربعة أفراد"
+      ],
+      "establishes": [
+        "الأربعة هما كاتب ومصمم ومونتير ومراجع"
+      ],
+      "value_form": "steps",
+      "shows_subject": true,
+      "spoken_s": 3.06
+    },
+    {
+      "id": "l5",
+      "frames": [
+        377,
+        447
+      ],
+      "job": "ليه بياخد أسبوع",
+      "says": [
+        "وكل واحد مستني اللي قبله يخلّص."
+      ],
+      "shows": "أسهم وساعات بينهم",
+      "needs": [
+        "الأربعة هما كاتب ومصمم ومونتير ومراجع"
+      ],
+      "establishes": [
+        "الانتظار هو اللي بياخد الأسبوع"
+      ],
+      "value_form": "steps",
+      "shows_subject": true,
+      "spoken_s": 2
+    },
+    {
+      "id": "l6",
+      "frames": [
+        447,
+        538
+      ],
+      "job": "الادعاء",
+      "says": [
+        "الأداة بتعمل شغل الأربعة مرة واحدة،"
+      ],
+      "shows": "دايرة حوالين الأربعة",
+      "needs": [
+        "الانتظار هو اللي بياخد الأسبوع"
+      ],
+      "establishes": [
+        "الأداة بتشيل الانتظار"
+      ],
+      "is_claim": true,
+      "value_form": "steps",
+      "shows_subject": true,
+      "spoken_s": 2.68
+    },
+    {
+      "id": "l7",
+      "frames": [
+        538,
+        600
+      ],
+      "job": "النتيجة",
+      "says": [
+        "وبتسلّمه جاهز بتلات مقاسات."
+      ],
+      "shows": "تلات مستطيلات",
+      "needs": [
+        "الأداة بتشيل الانتظار"
+      ],
+      "establishes": [
+        "الفيديو بيطلع جاهز بتلات مقاسات"
+      ],
+      "value_form": "steps",
+      "shows_subject": true,
+      "spoken_s": 1.7
+    },
+    {
+      "id": "l8",
+      "frames": [
+        600,
+        746
+      ],
+      "job": "الدعوة",
+      "says": [
+        "جرّبها — اللينك في البايو."
+      ],
+      "shows": "علامة صح واسم الأداة",
+      "needs": [
+        "الفيديو بيطلع جاهز بتلات مقاسات"
+      ],
+      "is_cta": true,
+      "spoken_s": 1.8
+    }
   ]
 }

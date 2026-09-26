@@ -6,22 +6,24 @@
   table and one voice's measured timings — edit those, never this file.
 
   A whiteboard video is A HAND DRAWING ON A BOARD WHILE A VOICE EXPLAINS
-  (references/whiteboard.md). The narration drives it: each line's drawing
-  starts on its first words, and every time comes from the voice's own
-  measured takes — never an estimate.
+  (references/whiteboard.md), and it has to look like one. v3 was reviewed as
+  "an animation": perfect geometric lines on a white page. So:
 
-  Nothing is ever just sitting there (#49). Each line draws until the next one
-  begins: its main strokes land on the words that name them, then finishing
-  details — a filament, collars, a clock's ticks — are added while they fit,
-  and one hand speed is solved so the drawing ends as the next line starts.
-  A pause in the voice is where the hand is busiest.
+  - THE BOARD is a board: an aluminium frame, a faint sheen, ghosts of
+    writing wiped off before, a tray with markers and an eraser.
+  - THE INK is marker ink: every stroke wobbles as a hand does, a quick line
+    overshoots its end, a circle does not quite close, and the ink has rough
+    edges and uneven density.
+  - THE CAMERA starts close on part of the board and works across it in
+    Arabic reading order — right, left, then the row below — following the
+    pen along the arrows that link one drawing to the next. At the end it
+    pulls back until the whole board is in frame, filled, every drawing side
+    by side.
 
-  One clock drives the ink and the hand: a stroke reveals by its dash offset
-  and the pen tip sits at the ink's leading edge, read from the same path at
-  the same length, so the hand never lags the line. Words are written under
-  the pen from the right, as Arabic is; the tool's name from the left. A word
-  the voice says as it is written is heard, not read, and the hand moves on;
-  a word it does not say is held still for 1.6s, while the voice talks on.
+  Nothing is ever just sitting there (#49): each line draws until the next
+  begins, finishing details fill the voice's pauses, and a word the voice
+  says as it is written is heard, not held. The drawing, the camera and the
+  words all run on one timeline, laid out from the voice's measured takes.
 -->
 <html lang="ar">
   <head>
@@ -42,20 +44,22 @@
       :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --pass:#2C6E52;
               --fail:#B23A2A; --white:#FFFFFF; }
       * { margin:0; padding:0; box-sizing:border-box; }
-      html, body { width:1080px; height:1920px; overflow:hidden; background:#FFFFFF; }
+      html, body { width:1080px; height:1920px; overflow:hidden; background:#F5F2EA; }
       #root { position:relative; width:100%; height:100%; overflow:hidden;
-              font-family:"Cairo",sans-serif; background:var(--white); }
-      .scene { position:absolute; inset:0; }
-      svg.layer { position:absolute; left:0; top:0; width:1080px; height:1920px; }
+              font-family:"Cairo",sans-serif; background:var(--bone); }
+      .scene { position:absolute; inset:0; overflow:hidden; }
+      /* the camera: everything on the board lives in board units inside it */
+      #cam { position:absolute; left:0; top:0; width:1620px; height:2880px; transform-origin:0 0; }
+      svg.layer { position:absolute; left:-600px; top:-600px; width:2820px; height:4100px; overflow:visible; }
 
       /* marker ink: one weight, round ends, amber for what the story turns on */
-      .ink { fill:none; stroke:var(--ink); stroke-width:10; stroke-linecap:round; stroke-linejoin:round; }
-      .ink.a { stroke:var(--amber); stroke-width:12; }
-      .ink.b { stroke-width:15; }
-      .ink.t { stroke-width:6; }
+      .ink { fill:none; stroke:var(--ink); stroke-width:9; stroke-linecap:round; stroke-linejoin:round; }
+      .ink.a { stroke:var(--amber); stroke-width:10; }
+      .ink.b { stroke-width:13; }
+      .ink.t { stroke-width:5.5; }
 
-      /* words, written under the pen. The clip runs past the text's own box on
-         every side so a glyph's overhang is never cut once it is written */
+      /* words, written under the pen in the same ink. The clip runs past the
+         text's own box on every side so a glyph's overhang is never cut */
       .word { position:absolute; text-align:center; font-weight:800; line-height:1.3; color:var(--ink); }
       .word span { display:inline-block; direction:rtl; clip-path:inset(-50% -20% -50% 100%); }
       .word.latin span { font-family:"Mono",monospace; font-weight:700; direction:ltr;
@@ -66,38 +70,82 @@
     <div id="root" data-composition-id="main" data-start="0" data-duration="@@DUR@@"
          data-fps="30" data-width="1080" data-height="1920">
       <section id="wb" class="scene clip" data-start="0" data-duration="@@DUR@@" data-track-index="0">
-        <svg class="layer" id="board" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
-@@BOARD@@
-        </svg>
-@@WORDS@@
-        <!-- the hand, seen from its back: the marker's tip at (0,0), the index
-             finger along the barrel, the thumb under it, the arm off to the lower
-             right. Drawn flat pointing left, then turned so the tip leads -->
-        <svg class="layer" id="handlayer" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
-          <g id="hand" transform="translate(1250 2150)">
-            <g transform="rotate(50) scale(0.78)" stroke="#14181F" stroke-width="5"
-               stroke-linejoin="round" stroke-linecap="round">
-              <path d="M 344 -96 L 900 -128 L 900 150 L 362 84 Z" fill="#14181F"/>
-              <path d="M 334 -90 Q 352 -96 370 -94 L 388 84 Q 368 90 350 86 Z" fill="#F5F2EA"/>
-              <path d="M 0 -3 L 24 -11 L 24 11 L 0 3 Z" fill="#14181F"/>
-              <rect x="22" y="-13" width="14" height="26" rx="3" fill="#14181F"/>
-              <rect x="34" y="-15" width="230" height="30" rx="7" fill="#C77B0E"/>
-              <path d="M 162 -15 L 58 -15 Q 38 -15 36 -31 Q 36 -47 56 -48 L 116 -49
-                       Q 140 -50 156 -64 L 174 -86 Q 184 -100 204 -102 Q 238 -112 272 -106
-                       Q 312 -100 340 -84 Q 352 -30 356 30 L 360 82
-                       Q 322 92 282 84 Q 250 78 230 62 Q 206 42 186 22 Q 176 8 162 -15 Z" fill="#E9D4B3"/>
-              <path d="M 40 -34 Q 42 -44 54 -45 L 70 -45 Q 70 -36 62 -32 Q 50 -29 40 -34 Z"
-                    fill="#F5F2EA" stroke-width="3"/>
-              <path d="M 70 16 Q 54 22 58 38 Q 64 52 86 54 L 186 72 Q 222 80 244 64 Q 250 54 236 46
-                       Q 204 34 168 26 L 112 18 Q 90 14 70 16 Z" fill="#E3C292"/>
-              <path d="M 62 36 Q 66 26 80 24" fill="none" stroke-width="3"/>
-              <path d="M 194 -84 Q 204 -78 214 -86" fill="none" stroke-width="3"/>
-              <path d="M 238 -94 Q 248 -88 258 -95" fill="none" stroke-width="3"/>
-              <path d="M 280 -88 Q 290 -83 298 -89" fill="none" stroke-width="3"/>
-              <path d="M 124 -46 Q 131 -34 128 -22" fill="none" stroke-width="3"/>
+        <div id="cam">
+          <svg class="layer" id="surface" viewBox="-600 -600 2820 4100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- aluminium: ink over white, so every grey is a blend of the palette -->
+              <linearGradient id="alu" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#14181F" stop-opacity="0.12"/>
+                <stop offset="0.5" stop-color="#14181F" stop-opacity="0.30"/>
+                <stop offset="1" stop-color="#14181F" stop-opacity="0.18"/>
+              </linearGradient>
+              <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0.30" stop-color="#FFFFFF" stop-opacity="0"/>
+                <stop offset="0.42" stop-color="#FFFFFF" stop-opacity="0.9"/>
+                <stop offset="0.52" stop-color="#FFFFFF" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- the wall, the frame, the board -->
+            <rect x="-600" y="-600" width="2820" height="4100" fill="#F5F2EA"/>
+            <rect x="-30" y="-30" width="1680" height="2940" rx="16" fill="#FFFFFF"/>
+            <rect x="-30" y="-30" width="1680" height="2940" rx="16" fill="url(#alu)"/>
+            <rect x="0" y="0" width="1620" height="2880" rx="4" fill="#FCFBF8"/>
+            <rect x="0" y="0" width="1620" height="2880" rx="4" fill="url(#sheen)" opacity="0.55"/>
+            <!-- what was written here before, and wiped -->
+            <g fill="none" stroke="#14181F" stroke-linecap="round" opacity="0.045">
+              <path d="M 860 120 Q 905 70 950 128 T 1040 126 T 1130 118" stroke-width="10"/>
+              <path d="M 1460 1250 L 1560 1250 M 1480 1300 L 1580 1296" stroke-width="9"/>
+              <path d="M 120 1180 Q 220 1100 330 1190" stroke-width="12"/>
+              <path d="M 70 1330 H 760" stroke-width="46" opacity="0.5"/>
+              <path d="M 900 1560 Q 1010 1500 1120 1575 Q 1220 1640 1330 1560" stroke-width="10"/>
+              <path d="M 1330 2560 L 1420 2640 M 1420 2560 L 1330 2640" stroke-width="9"/>
+              <path d="M 160 2520 Q 300 2470 440 2530 Q 580 2590 700 2520" stroke-width="44" opacity="0.45"/>
             </g>
-          </g>
-        </svg>
+            <!-- the tray, a marker in each colour, and the eraser -->
+            <rect x="-40" y="2910" width="1700" height="34" rx="8" fill="#FFFFFF"/>
+            <rect x="-40" y="2910" width="1700" height="34" rx="8" fill="url(#alu)"/>
+            <g stroke="#14181F" stroke-width="3" stroke-linejoin="round">
+              <rect x="240" y="2884" width="200" height="26" rx="8" fill="#C77B0E"/>
+              <rect x="420" y="2884" width="54" height="26" rx="8" fill="#14181F"/>
+              <rect x="560" y="2884" width="200" height="26" rx="8" fill="#14181F"/>
+              <rect x="740" y="2884" width="54" height="26" rx="8" fill="#F5F2EA"/>
+              <rect x="1180" y="2870" width="210" height="40" rx="7" fill="#14181F"/>
+              <rect x="1186" y="2898" width="198" height="12" rx="3" fill="#F5F2EA" stroke="none"/>
+            </g>
+          </svg>
+          <svg class="layer" id="board" viewBox="-600 -600 2820 4100" xmlns="http://www.w3.org/2000/svg">
+@@BOARD@@
+          </svg>
+@@WORDS@@
+          <!-- the hand, seen from its back: the marker's tip at (0,0), the index
+               finger along the barrel, the thumb under it, the arm off to the
+               lower right. Drawn flat pointing left, then turned so the tip leads -->
+          <svg class="layer" id="handlayer" viewBox="-600 -600 2820 4100" xmlns="http://www.w3.org/2000/svg">
+            <g id="hand" transform="translate(2100 3400)">
+              <g transform="rotate(50) scale(0.585)" stroke="#14181F" stroke-width="6.5"
+                 stroke-linejoin="round" stroke-linecap="round">
+                <path d="M 344 -96 L 900 -128 L 900 150 L 362 84 Z" fill="#14181F"/>
+                <path d="M 334 -90 Q 352 -96 370 -94 L 388 84 Q 368 90 350 86 Z" fill="#F5F2EA"/>
+                <path d="M 0 -3 L 24 -11 L 24 11 L 0 3 Z" fill="#14181F"/>
+                <rect x="22" y="-13" width="14" height="26" rx="3" fill="#14181F"/>
+                <rect x="34" y="-15" width="230" height="30" rx="7" fill="#C77B0E"/>
+                <path d="M 162 -15 L 58 -15 Q 38 -15 36 -31 Q 36 -47 56 -48 L 116 -49
+                         Q 140 -50 156 -64 L 174 -86 Q 184 -100 204 -102 Q 238 -112 272 -106
+                         Q 312 -100 340 -84 Q 352 -30 356 30 L 360 82
+                         Q 322 92 282 84 Q 250 78 230 62 Q 206 42 186 22 Q 176 8 162 -15 Z" fill="#E9D4B3"/>
+                <path d="M 40 -34 Q 42 -44 54 -45 L 70 -45 Q 70 -36 62 -32 Q 50 -29 40 -34 Z"
+                      fill="#F5F2EA" stroke-width="4"/>
+                <path d="M 70 16 Q 54 22 58 38 Q 64 52 86 54 L 186 72 Q 222 80 244 64 Q 250 54 236 46
+                         Q 204 34 168 26 L 112 18 Q 90 14 70 16 Z" fill="#E3C292"/>
+                <path d="M 62 36 Q 66 26 80 24" fill="none" stroke-width="4"/>
+                <path d="M 194 -84 Q 204 -78 214 -86" fill="none" stroke-width="4"/>
+                <path d="M 238 -94 Q 248 -88 258 -95" fill="none" stroke-width="4"/>
+                <path d="M 280 -88 Q 290 -83 298 -89" fill="none" stroke-width="4"/>
+                <path d="M 124 -46 Q 131 -34 128 -22" fill="none" stroke-width="4"/>
+              </g>
+            </g>
+          </svg>
+        </div>
       </section>
 
       <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="@@DUR@@"
@@ -107,6 +155,7 @@
 
     <script>
 const L = @@LINES@@;                       // this voice's lines: absolute start/end, in seconds
+const STAGE = @@STAGE@@;                   // the camera's views and which view each line is drawn in
 const END = @@DUR@@;
 window.__FMT = { id: "vertical", w: 1080, h: 1920, safeTop: 230, safeBottom: 1690, zones: {} };
 window.__MF = [];
@@ -114,35 +163,158 @@ window.__MOTION = [];
 const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
 const fr = (s) => Math.round(s * 30);
 
-const SPEED = 1500;          // px of ink a second: the pace details are chosen at
-const MIN_SPEED = 1000;      // slower than this drags
-const MAX_SPEED = 3200;      // faster than this reads as a machine, not a hand
+// speeds are in board units; a zone is seen at 1.333×, so 1125 units a second
+// is the 1500 px a second on screen that v3 drew at
+const SPEED = 1125;          // the pace details are chosen at
+const MIN_SPEED = 750;       // slower than this drags
+const MAX_SPEED = 2400;      // faster than this reads as a machine, not a hand
 const LETTERS = 16;          // handwriting: letters a second
 const HOLD = 1.6;            // s of stillness after words the voice does not say (#29)
-const EXIT = 0.3;
-const OFF = { x: 1250, y: 2150 };
+const PAN = 0.8;             // s: the camera moving to the next part of the board
+const BRIDGE = 0.7;          // s at least: a bridge is drawn at the camera's pace
+const REVEAL = 1.2;          // s: pulling back to the whole board
+const OFF = { x: 2100, y: 3400 };
 
-function build() {
+/* a seeded generator: the same wobble on every render and every machine */
+const rng = (seed) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+
+/* A marker stroke by hand: the geometry is sampled and re-drawn with a slow
+   wander across it, a straight stroke runs a little past its end, and a closed
+   one goes on past where it started instead of meeting it exactly. */
+function roughen(el, k) {
+  const len = el.getTotalLength(), r = rng(1009 + k * 7919);
+  const p0 = el.getPointAtLength(0), pe = el.getPointAtLength(len);
+  const closed = Math.hypot(pe.x - p0.x, pe.y - p0.y) < 2;
+  const amp = Math.min(2.6, 0.5 + len / 320);
+  const w1 = 60 + r() * 70, w2 = 18 + r() * 14, ph1 = r() * 6.2832, ph2 = r() * 6.2832;
+  const over = closed ? Math.min(60, 0.06 * len) : Math.min(7, 0.05 * len);
+  // only a closed stroke wraps round: wrapping an open one read its end as its
+  // start, and the overshoot drew a bar back across the ٧'s open top
+  const at = (s) => el.getPointAtLength(closed ? ((s % len) + len) % len : Math.max(0, Math.min(len, s)));
+  const pts = [];
+  const total = len + over, n = Math.max(4, Math.ceil(total / 4));
+  for (let i = 0; i <= n; i++) {
+    const s = (i / n) * total;
+    let p, tx, ty;
+    if (!closed && s > len) {                     // past the end, along the last direction
+      const a = at(len - 1), b = at(len);
+      tx = b.x - a.x; ty = b.y - a.y;
+      const tl = Math.hypot(tx, ty) || 1; tx /= tl; ty /= tl;
+      p = { x: b.x + tx * (s - len), y: b.y + ty * (s - len) };
+    } else {
+      const a = at(s - 0.6), b = at(s + 0.6);
+      tx = b.x - a.x; ty = b.y - a.y;
+      const tl = Math.hypot(tx, ty) || 1; tx /= tl; ty /= tl;
+      p = at(s);
+    }
+    // the loop's second time round sits a little outside the first
+    const drift = closed && s > len ? (s - len) * 0.08 : 0;
+    const off = amp * (0.7 * Math.sin(6.2832 * s / w1 + ph1) + 0.3 * Math.sin(6.2832 * s / w2 + ph2)) + drift;
+    pts.push([p.x - ty * off, p.y + tx * off]);
+  }
+  let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {        // through every point, smoothly
+    const a = pts[i - 1] || pts[i], b = pts[i], c = pts[i + 1], e = pts[i + 2] || c;
+    d += ` C ${(b[0] + (c[0] - a[0]) / 6).toFixed(1)} ${(b[1] + (c[1] - a[1]) / 6).toFixed(1)}`
+       + ` ${(c[0] - (e[0] - b[0]) / 6).toFixed(1)} ${(c[1] - (e[1] - b[1]) / 6).toFixed(1)}`
+       + ` ${c[0].toFixed(1)} ${c[1].toFixed(1)}`;
+  }
+  el.setAttribute("d", d);
+}
+
+/* Dry-erase ink is not a flat colour: it goes on unevenly, denser where the pen
+   slowed, with a fine grain from the board. The texture is made once, here, as
+   a tile — an SVG filter recomputed its noise every frame and the page never
+   finished loading. Seeded, so every render paints the same ink. */
+function inkTexture(hex, seed) {
+  const N = 128, c = document.createElement("canvas");
+  c.width = c.height = N;
+  const g = c.getContext("2d"), img = g.createImageData(N, N), r = rng(seed);
+  const rgb = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  // value noise on a coarse lattice, wrapped so the tile repeats without a seam
+  const lattice = (m) => {
+    const v = Array.from({ length: m * m }, () => r());
+    const at = (i, j) => v[(((j % m) + m) % m) * m + (((i % m) + m) % m)];
+    return (x, y) => {
+      const fx = (x / N) * m, fy = (y / N) * m, x0 = Math.floor(fx), y0 = Math.floor(fy);
+      const sx = (fx - x0) ** 2 * (3 - 2 * (fx - x0)), sy = (fy - y0) ** 2 * (3 - 2 * (fy - y0));
+      return (at(x0, y0) * (1 - sx) + at(x0 + 1, y0) * sx) * (1 - sy)
+           + (at(x0, y0 + 1) * (1 - sx) + at(x0 + 1, y0 + 1) * sx) * sy;
+    };
+  };
+  const blot = lattice(4), fine = lattice(16);
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    const a = 0.68 + 0.24 * blot(x, y) + 0.1 * fine(x, y) - 0.1 * r();
+    const o = (y * N + x) * 4;
+    img.data[o] = rgb[0]; img.data[o + 1] = rgb[1]; img.data[o + 2] = rgb[2];
+    img.data[o + 3] = Math.round(255 * Math.min(1, Math.max(0.55, a)));
+  }
+  g.putImageData(img, 0, 0);
+  return c.toDataURL("image/png");
+}
+
+async function build() {
+  const TEX = { ink: inkTexture("#14181F", 11), amber: inkTexture("#C77B0E", 23) };
+  const NS = "http://www.w3.org/2000/svg", defs = document.createElementNS(NS, "defs");
+  const loaded = [];
+  for (const [k, url] of Object.entries(TEX)) {
+    const pat = document.createElementNS(NS, "pattern"), im = document.createElementNS(NS, "image");
+    pat.setAttribute("id", `tex-${k}`); pat.setAttribute("patternUnits", "userSpaceOnUse");
+    pat.setAttribute("width", "128"); pat.setAttribute("height", "128");
+    im.setAttribute("width", "128"); im.setAttribute("height", "128");
+    loaded.push(new Promise((ok) => { im.addEventListener("load", ok); im.addEventListener("error", ok); }));
+    im.setAttribute("href", url);
+    pat.appendChild(im); defs.appendChild(pat);
+    const pre = new Image(); pre.src = url; loaded.push(pre.decode().catch(() => {}));
+  }
+  document.getElementById("board").prepend(defs);
+  // no frame is registered until the ink is there to paint with
+  await Promise.all(loaded);
+
   const tl = gsap.timeline({ paused: true });
-  const hand = document.getElementById("hand");
+  const hand = document.getElementById("hand"), camEl = document.getElementById("cam");
   const place = (x, y) => hand.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)})`);
   // pen lifted: a short hop is quick, a long one takes longer, never more than 0.3s
-  const hopTime = (a, b) => Math.min(0.3, Math.max(0.08, Math.hypot(b.x - a.x, b.y - a.y) / 2600));
+  const hopTime = (a, b) => Math.min(0.3, Math.max(0.08, Math.hypot(b.x - a.x, b.y - a.y) / 2000));
 
-  /* every item the hand draws: a stroke, measured once here before any frame,
-     or a word, measured from its text's own box */
+  /* the camera frames a rectangle of the board, [x, y, width]; its height is the frame's shape */
+  const view = { x: 0, y: 0, w: 1 };
+  const shoot = () => {
+    const s = 1080 / view.w;
+    camEl.style.transform = `translate(${(-view.x * s).toFixed(2)}px, ${(-view.y * s).toFixed(2)}px) scale(${s.toFixed(5)})`;
+  };
+  const aim = (name, at, dur, ease) => {
+    const [x, y, w] = STAGE.views[name];
+    tl.to(view, { x, y, w, duration: dur, ease, onUpdate: shoot }, at);
+  };
+  const first = STAGE.views[STAGE.lines[L[0].id]];
+  Object.assign(view, { x: first[0], y: first[1], w: first[2] });
+  shoot();
+
+  /* every item the hand draws: a stroke, roughened and measured once here
+     before any frame, or a word, measured from its text's own box */
+  let k = 0;
   const item = (el, ln) => {
     const seq = Number(el.dataset.seq), group = el.dataset.group || null;
     if (el.tagName.toLowerCase() === "path") {
+      roughen(el, k++);
+      el.style.stroke = el.classList.contains("a") ? "url(#tex-amber)" : "url(#tex-ink)";
       const len = Math.ceil(el.getTotalLength());
       // the gap is long enough that no dash's round cap sits on either end of
       // the path while it is hidden
       el.style.strokeDasharray = `${len} ${2 * len + 40}`;
       el.style.strokeDashoffset = `${len + 20}`;
       const p = el.getPointAtLength(0), q = el.getPointAtLength(len);
-      return { el, kind: "path", len, seq, group, start: { x: p.x, y: p.y }, end: { x: q.x, y: q.y } };
+      // a bridge ends a part of the board and leads into the next: the camera
+      // follows the pen along it, into the part named by its to-… class
+      const to = ([...el.classList].find((c) => c.startsWith("to-")) || "").slice(3) || null;
+      return { el, kind: "path", len, seq, group, bridge: !!to, to,
+               start: { x: p.x, y: p.y }, end: { x: q.x, y: q.y } };
     }
     const span = el.firstElementChild, rtl = !el.classList.contains("latin");
+    // the letters are painted with the same ink as the strokes
+    Object.assign(span.style, { backgroundImage: `url(${TEX.ink})`, backgroundSize: "96px 96px",
+                                webkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" });
     const left = el.offsetLeft + span.offsetLeft, w = span.offsetWidth;
     const y = el.offsetTop + span.offsetTop + span.offsetHeight * 0.62;
     const text = span.textContent, at = ln.text.indexOf(text);
@@ -154,20 +326,23 @@ function build() {
   };
 
   /* A line's drawing, laid out at one speed: hops, strokes, words that wait
-     for the voice, and the hold after a word it does not say. */
-  const simulate = (ln, items, from, free, speed) => {
+     for the voice, the hold after a word it does not say. When the camera has
+     to go to another part of the board first, the line's first hop is its
+     move; a bridge is drawn at the camera's pace, not the pen's. */
+  const simulate = (ln, items, from, free, speed, pan) => {
     const steps = [];
-    let p = from, t = Math.max(ln.start + 0.06 - hopTime(from, items[0].start), free);
-    for (const it of items) {
-      const h = hopTime(p, it.start);
+    const hop0 = pan ? PAN : hopTime(from, items[0].start);
+    let p = from, t = Math.max(ln.start + 0.06 - hop0, free);
+    items.forEach((it, j) => {
+      const h = j === 0 ? hop0 : hopTime(p, it.start);
       steps.push({ kind: "hop", from: p, to: it.start, at: t, dur: h });
       t += h;
-      if (it.align !== null && it.align > t) t = it.align;
-      const d = it.kind === "path" ? it.len / speed : it.dur;
+      if (it.align !== null && it.align !== undefined && it.align > t) t = it.align;
+      const d = it.kind === "path" ? (it.bridge ? Math.max(BRIDGE, it.len / speed) : it.len / speed) : it.dur;
       steps.push({ kind: it.kind, it, at: t, dur: d });
       t += d; p = it.end;
       if (it.hold) t += HOLD;
-    }
+    });
     return { steps, end: t, last: p };
   };
 
@@ -194,7 +369,7 @@ function build() {
       const cut = 100 - 120 * p.k;
       it.span.style.clipPath = it.rtl ? `inset(-50% -20% -50% ${cut}%)` : `inset(-50% ${cut}% -50% -20%)`;
       const edge = Math.min(1, Math.max(0, it.rtl ? cut / 100 : 1 - cut / 100));
-      place(it.left + it.w * edge, it.y + 7 * Math.sin(p.k * Math.PI * 2 * (it.w / 60)));
+      place(it.left + it.w * edge, it.y + 5 * Math.sin(p.k * Math.PI * 2 * (it.w / 45)));
     } }, at);
   };
 
@@ -209,46 +384,67 @@ function build() {
   }
 
   // frame 0: the hand already on the board beside the first stroke, pen up
-  const first = all.find((a) => a.length)[0].start;
-  let pos = { x: first.x + 60, y: first.y + 90 }, free = 0;
+  const firstAt = all.find((a) => a.length)[0].start;
+  let pos = { x: firstAt.x + 40, y: firstAt.y + 60 }, free = 0;
   place(pos.x, pos.y);
 
+  let camAt = STAGE.lines[L[0].id];               // the part of the board in frame
   L.forEach((ln, i) => {
     const items = all[i];
     if (!items.length) return;
+    // does the camera have to move before this line can draw? — not if a
+    // bridge at the end of the last line already took it there
+    const pan = STAGE.lines[ln.id] !== camAt;
+    const leaves = items.filter((it) => it.bridge).map((it) => it.to).pop() || STAGE.lines[ln.id];
     // the next line's first stroke begins on its first word; the hand must be
     // there by then, and until then it draws
-    const due = i + 1 < L.length ? L[i + 1].start + 0.06 : END - EXIT;
+    const due = i + 1 < L.length ? L[i + 1].start + 0.06 : END - REVEAL - 0.5;
     const nextAt = i + 1 < L.length && all[i + 1].length ? all[i + 1][0].start : OFF;
-    const finish = (r) => r.end + hopTime(r.last, nextAt);
+    const nextPans = i + 1 < L.length && STAGE.lines[L[i + 1].id] !== leaves;
+    const finish = (r) => r.end + (nextPans ? PAN : hopTime(r.last, nextAt));
 
     // details join group by group, in their order, while they fit at the base pace
     let chosen = items.filter((it) => !it.group);
     const groups = [...new Set(items.filter((it) => it.group).map((it) => it.group))];
     for (const g of groups) {
       const trial = items.filter((it) => chosen.includes(it) || it.group === g);
-      if (finish(simulate(ln, trial, pos, free, SPEED)) <= due) chosen = trial;
+      if (finish(simulate(ln, trial, pos, free, SPEED, pan)) <= due) chosen = trial;
       else break;
     }
     for (const it of items) if (!chosen.includes(it)) it.el.remove();
 
     // then the one speed that ends the drawing as the next line begins
-    const fits = (s) => finish(simulate(ln, chosen, pos, free, s)) <= due;
+    const fits = (s) => finish(simulate(ln, chosen, pos, free, s, pan)) <= due;
     let speed = MAX_SPEED;
     if (fits(MIN_SPEED)) speed = MIN_SPEED;
     else if (fits(MAX_SPEED)) {
       let lo = MIN_SPEED, hi = MAX_SPEED;
-      for (let k = 0; k < 30; k++) { const mid = (lo + hi) / 2; if (fits(mid)) hi = mid; else lo = mid; }
+      for (let n = 0; n < 30; n++) { const mid = (lo + hi) / 2; if (fits(mid)) hi = mid; else lo = mid; }
       speed = hi;
     }
-    const r = simulate(ln, chosen, pos, free, speed);
+    const r = simulate(ln, chosen, pos, free, speed, pan);
 
-    // the tweens, and the motion as it really runs: split wherever the hand
-    // stands still — waiting for the voice, or holding a word to be read
+    // the camera moves to this line's part of the board as its first hop
+    if (pan) {
+      const a = r.steps[0].at, b = r.steps[0].dur;
+      aim(STAGE.lines[ln.id], a, b, "power2.inOut");
+      window.__MOTION.push({ id: `camera-${ln.id}`, frames: [fr(a), fr(a + b)], magnitude: "large" });
+    }
+
+    // the tweens, and the pen's motion as it really runs: split wherever the
+    // hand stands still — waiting for the voice, or holding a word to be read
     const runs = [];
     for (const st of r.steps) {
       if (st.kind === "hop") hopTween(st);
-      else if (st.kind === "path") strokeTween(st.it, st.at, st.dur);
+      else if (st.kind === "path") {
+        strokeTween(st.it, st.at, st.dur);
+        // along a bridge, the camera follows the pen into the next part
+        if (st.it.bridge) {
+          aim(st.it.to, st.at, st.dur, "power1.inOut");
+          window.__MOTION.push({ id: `camera-${ln.id}-to-${st.it.to}`, frames: [fr(st.at), fr(st.at + st.dur)],
+                                 magnitude: "large" });
+        }
+      }
       else writeTween(st.it, st.at);
       const a = st.at, b = st.at + st.dur, last = runs[runs.length - 1];
       if (last && a - last[1] < 0.1) last[1] = b; else runs.push([a, b]);
@@ -256,19 +452,24 @@ function build() {
         mf(st.it.el.id, { type: "text", chapter: "wb", frames: [fr(a), fr(END)], still_from: fr(b),
                           text: st.it.text, spoken: st.it.spoken, critical: true, el: "#" + st.it.el.id });
     }
-    runs.forEach(([a, b], k) => window.__MOTION.push({ id: `draw-${ln.id}${runs.length > 1 ? `.${k + 1}` : ""}`,
-                                                       frames: [fr(a), fr(b)], magnitude: "large" }));
+    // the pen is a small motion on screen: in a view of one part of the board
+    // it draws near the middle, and when the camera moves it moves with it
+    runs.forEach(([a, b], n) => window.__MOTION.push({ id: `draw-${ln.id}${runs.length > 1 ? `.${n + 1}` : ""}`,
+                                                       frames: [fr(a), fr(b)], magnitude: "small" }));
     if (document.getElementById("g-" + ln.id))
       mf("g-" + ln.id, { type: "shape", chapter: "wb", frames: [fr(r.steps[0].at), fr(END)], still_from: fr(r.end),
                          critical: false, el: "#g-" + ln.id });
-    pos = r.last; free = r.end;
+    pos = r.last; free = r.end; camAt = leaves;
   });
 
-  // the hand leaves once the last words have been read, and the film ends with it
-  if (END - free >= EXIT) {
-    hopTween({ from: pos, to: OFF, at: free, dur: EXIT });
-    window.__MOTION.push({ id: "exit", frames: [fr(free), fr(free + EXIT)], magnitude: "large" });
-  }
+  /* the reveal: the hand leaves, and the camera pulls back until the whole
+     board is in frame — then goes on drifting back while it is looked at */
+  const reveal = Math.max(free, 0.1);
+  hopTween({ from: pos, to: OFF, at: reveal, dur: 0.6 });
+  aim("all", reveal, REVEAL, "power2.inOut");
+  aim("rest", reveal + REVEAL, Math.max(0.3, END - reveal - REVEAL), "none");
+  window.__MOTION.push({ id: "reveal", frames: [fr(reveal), fr(reveal + REVEAL)], magnitude: "large" });
+  window.__MOTION.push({ id: "drift", frames: [fr(reveal + REVEAL), fr(END)], magnitude: "small" });
 
   /* a soft bed under the voice — one track, gain automation only (#26 #27) */
   tl.fromTo("#bgm", { volume: 0 }, { volume: @@BED@@, duration: 0.6, ease: "none", immediateRender: false }, 0);
