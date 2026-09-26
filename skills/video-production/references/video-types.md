@@ -34,6 +34,22 @@ they are.
 | **Brand film** | imagery, one line at a time | slow, cinematic | often narration | long holds | atmosphere. One claim, said slowly |
 | **Explainer** | illustrated scenes | scene changes | narration | scene per idea | illustration + a voice explaining it |
 
+## A type is also a medium
+
+The grammar says what carries the film. The **medium** says what the film is made of, and a viewer
+judges the type by the medium first (failure log #53). Two films with different grammars, both
+made of clean shapes on a flat page, still read as the same style. Keep the brand's palette and
+fonts, and change the material:
+
+| Type | Medium in the demos | What makes it read as that material |
+|---|---|---|
+| **Whiteboard** | marker on a real board | an aluminium frame, a tray, old ghost marks; ink that wanders and goes on unevenly; a camera working across a board larger than the frame (`whiteboard.md`) |
+| **Brand film** | light in a dark room | every image is made of light: a frame of light, a lamp's cone, lights coming on, a spotlight; dust in the air; a vignette. One line per shot: the shot moves in, holds still for exactly the reading time, and goes dark |
+| **Captions-led** (no face) | a voice note playing | a speaker whose ring breathes with the voice; a waveform in a pill that fills as it plays, with a play button and a clock; the words in large type, faint until said, amber while said. With no face to film, the voice itself is what is shown |
+
+With no footage, a brand film's imagery is built from what cinema itself is made of, and light
+in a dark room is the one that needs no camera. Keep whole-frame textures static (#54).
+
 ## Operations are not types
 
 Four things in any list of "video types" are **operations on a video that

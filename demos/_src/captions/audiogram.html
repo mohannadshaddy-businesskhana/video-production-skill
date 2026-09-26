@@ -1,0 +1,222 @@
+<!doctype html>
+<!--
+  Demo 10 — captions-led.  Voice: @@VOICE@@
+  Emitted by demos/_src/captions/emit.mjs from the voice's measured timings.
+  Edit the template there, not this file.
+
+  The medium is a voice note playing: who is speaking, a waveform that fills
+  as it plays, and the words in large type in the middle, each one lighting
+  up as it is said. The voice sets every time in here. Each line is its own
+  measured take, and each word lights where voice_timings.mjs --words heard
+  it start. A word that has not been said yet is already on the page, faint,
+  so the eye can run ahead of the ear; the one being said is amber.
+-->
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>@@TITLE@@</title>
+
+    <link rel="preload" href="assets/fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/jetbrainsmono-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+
+    <style>
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-arabic.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block;
+        unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0898-08E1,U+08E3-08FF,U+FB50-FDFF,U+FE70-FEFF; }
+      @font-face { font-family:"Cairo"; src:url("assets/fonts/cairo-latin.woff2") format("woff2");
+        font-weight:200 1000; font-style:normal; font-display:block; }
+      @font-face { font-family:"Mono"; src:url("assets/fonts/jetbrainsmono-latin.woff2") format("woff2");
+        font-weight:700; font-style:normal; font-display:block; }
+
+      :root { --ink:#14181F; --bone:#F5F2EA; --amber:#C77B0E; --white:#FFFFFF; }
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:1080px; height:1920px; overflow:hidden; background:#F5F2EA; }
+      #root { position:relative; width:100%; height:100%; overflow:hidden; background:var(--bone);
+              font-family:"Cairo",sans-serif; color:var(--ink); }
+      .scene { position:absolute; inset:0; overflow:hidden; }
+
+      /* who is speaking: a circle that breathes with the voice */
+      #avatar { position:absolute; left:858px; top:268px; width:132px; height:132px; border-radius:50%;
+                background:var(--ink); }
+      #avatar svg { position:absolute; inset:0; }
+      #ring   { position:absolute; left:858px; top:268px; width:132px; height:132px; border-radius:50%;
+                border:4px solid var(--amber); }
+      #who    { position:absolute; right:252px; top:302px; direction:ltr; text-align:right;
+                font-family:"Mono",monospace; font-weight:700; font-size:36px; letter-spacing:.06em; }
+
+      /* the words: large, heavy, centred; faint until said, amber while said */
+      .cap { position:absolute; left:90px; top:640px; width:900px; text-align:center; direction:rtl;
+             font-weight:800; font-size:94px; line-height:1.5; text-wrap:balance; opacity:0; }
+      /* line-height 1.5: the layout audit measures a word by Cairo's full
+         ascent and descent, and at 1.32 each row overlapped the one above */
+      .cap .w       { color:rgba(20,24,31,.2); }
+      .cap .w.said  { color:var(--ink); }
+      .cap .w.now   { color:var(--amber); }
+
+      /* the voice note: a pill with a play button, bars and a playhead */
+      #note  { position:absolute; left:80px; top:1290px; width:920px; height:190px; border-radius:95px;
+               background:var(--white); box-shadow:0 14px 44px rgba(20,24,31,.10); }
+      #btn   { position:absolute; left:843px; top:1323px; width:124px; height:124px; border-radius:50%;
+               background:var(--ink); }
+      #btn svg { position:absolute; inset:0; }
+      .bars  { position:absolute; left:130px; top:1310px; width:690px; height:150px; }
+      .bars i { position:absolute; width:8px; border-radius:4px; }
+      #base i { background:rgba(20,24,31,.16); }
+      #play i { background:var(--amber); }
+      #head  { position:absolute; top:1374px; width:22px; height:22px; border-radius:50%; background:var(--amber); }
+      #time  { position:absolute; right:112px; top:1500px; direction:ltr;
+               font-family:"Mono",monospace; font-weight:700; font-size:30px; color:rgba(20,24,31,.55); }
+
+      /* the close: the name, under the last line */
+      #cta-name { position:absolute; left:90px; top:1150px; width:900px; text-align:center; direction:ltr;
+                  font-family:"Mono",monospace; font-weight:700; font-size:46px; letter-spacing:.1em;
+                  color:var(--amber); opacity:0; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="@@DUR@@"
+         data-fps="30" data-width="1080" data-height="1920">
+
+      <section id="cap" class="scene clip" data-start="0" data-duration="@@DUR@@" data-track-index="0">
+        <div id="ring"></div>
+        <div id="avatar">
+          <!-- a microphone, in bone on the ink circle -->
+          <svg viewBox="0 0 132 132" aria-hidden="true">
+            <rect x="52" y="30" width="28" height="48" rx="14" fill="#F5F2EA"/>
+            <path d="M 40 64 Q 40 92 66 92 Q 92 92 92 64" fill="none" stroke="#F5F2EA" stroke-width="6" stroke-linecap="round"/>
+            <path d="M 66 92 V 104 M 52 104 H 80" fill="none" stroke="#F5F2EA" stroke-width="6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div id="who">video-production</div>
+
+@@CAPTIONS@@
+
+        <div id="note"></div>
+        <div id="btn">
+          <svg viewBox="0 0 124 124" aria-hidden="true">
+            <g id="icon-pause" fill="#F5F2EA"><rect x="43" y="38" width="13" height="48" rx="4"/><rect x="68" y="38" width="13" height="48" rx="4"/></g>
+            <path id="icon-play" d="M 76 62 L 50 45 L 50 79 Z" fill="#F5F2EA" opacity="0"/>
+          </svg>
+        </div>
+        <div class="bars" id="base"></div>
+        <div class="bars" id="play"></div>
+        <div id="head"></div>
+        <div id="time">0:00</div>
+
+        <div id="cta-name">video-production</div>
+      </section>
+
+      <audio id="bgm" src="assets/music/bed.mp3" data-start="0" data-duration="@@DUR@@"
+             data-track-index="10" data-volume="1"></audio>
+@@AUDIO@@
+    </div>
+
+    <script>
+const L = @@LINES@@;          // each line: when it is on the page, and when each of its words is said
+const WAVE = @@WAVE@@;        // the voice's loudness in bars, 0–1, over the time it speaks
+const LEVEL = @@LEVEL@@;      // the voice's loudness frame by frame, 0–1
+const END = @@DUR@@, VOICE_END = @@VOICE_END@@, CTA_AT = @@CTA_AT@@;
+const FPS = 30, FADE = 0.12, RISE = 0.3;
+window.__FMT = { id: "vertical", w: 1080, h: 1920, safeTop: 230, safeBottom: 1690, zones: {} };
+window.__MF = [];
+window.__MOTION = [];
+const mf = (id, o) => { window.__MF.push(Object.assign({ id }, o)); };
+const fr = (s) => Math.round(s * FPS);
+const clamp = (x) => Math.max(0, Math.min(1, x));
+
+/* the bars of the voice note, right to left as Arabic reads, twice: the
+   unplayed ones faint, and an amber copy revealed from the right as it plays */
+const BARS = { w: 690, h: 150, pitch: 690 / WAVE.length, min: 10 };
+function makeBars() {
+  for (const id of ["base", "play"]) {
+    const box = document.getElementById(id);
+    WAVE.forEach((v, k) => {
+      const i = document.createElement("i"), h = BARS.min + v * (BARS.h - BARS.min);
+      Object.assign(i.style, { left: `${BARS.w - (k + 1) * BARS.pitch + (BARS.pitch - 8) / 2}px`,
+                               top: `${(BARS.h - h) / 2}px`, height: `${h}px` });
+      box.appendChild(i);
+    });
+  }
+}
+
+/* One clock paints the whole frame from the time alone, so any frame can be
+   rendered on its own and comes out the same (GSAP seek-safety). */
+const spans = L.map((l) => [...document.getElementById("cap-" + l.id).querySelectorAll(".w")]);
+const lastClass = new Map();
+function setClass(el, c) { if (lastClass.get(el) !== c) { el.className = c; lastClass.set(el, c); } }
+
+function paintWords(t) {
+  L.forEach((l, i) => {
+    const el = document.getElementById("cap-" + l.id);
+    const on = l.in <= 0 ? 1 : clamp((t - l.in) / FADE), off = l.out >= END ? 0 : clamp((t - l.out) / FADE);
+    el.style.opacity = String(on * (1 - off));
+    spans[i].forEach((s, k) => {
+      const w = l.words[k], next = l.words[k + 1];
+      const until = next ? next.start : l.end + 0.2;
+      setClass(s, t < w.start ? "w" : t < until ? "w now" : "w said");
+    });
+  });
+}
+
+function paintNote(t) {
+  const p = clamp(t / VOICE_END), x = BARS.w * (1 - p);
+  document.getElementById("play").style.clipPath = `inset(0 0 0 ${x.toFixed(1)}px)`;
+  document.getElementById("head").style.left = `${(130 + x - 11).toFixed(1)}px`;
+  const s = Math.floor(t < VOICE_END ? t : VOICE_END);
+  document.getElementById("time").textContent = `0:${String(s).padStart(2, "0")}`;
+  const playing = t < VOICE_END;
+  document.getElementById("icon-pause").setAttribute("opacity", playing ? "1" : "0");
+  document.getElementById("icon-play").setAttribute("opacity", playing ? "0" : "1");
+  const v = LEVEL[Math.min(LEVEL.length - 1, Math.max(0, fr(t)))] || 0;
+  const ring = document.getElementById("ring");
+  ring.style.transform = `scale(${(1 + 0.2 * v).toFixed(3)})`;
+  ring.style.opacity = (0.25 + 0.75 * v).toFixed(3);
+}
+
+function paintClose(t) {
+  const k = clamp((t - CTA_AT) / RISE), e = 1 - (1 - k) ** 3;
+  const el = document.getElementById("cta-name");
+  el.style.opacity = String(e);
+  el.style.transform = `translateY(${(16 * (1 - e)).toFixed(2)}px)`;
+}
+
+const paint = (t) => { paintWords(t); paintNote(t); paintClose(t); };
+
+function build() {
+  makeBars();
+  const tl = gsap.timeline({ paused: true });
+  const clock = { t: 0 };
+  tl.to(clock, { t: END, duration: END, ease: "none", onUpdate: () => paint(clock.t) }, 0);
+  paint(0);
+
+  /* music under the voice — one continuous track, gain automation only */
+  tl.fromTo("#bgm", { volume: 0 }, { volume: @@BED@@, duration: 0.6, ease: "none", immediateRender: false }, 0);
+  tl.to("#bgm", { volume: 0, duration: 1.2, ease: "none" }, END - 1.2);
+
+  /* the manifest. The captions are said as they are shown: heard, not read */
+  const F = fr(END);
+  mf("avatar", { type: "shape", chapter: "cap", frames: [0, F], still_from: 0, critical: false, el: "#avatar" });
+  mf("who", { type: "text", chapter: "cap", frames: [0, F], still_from: 0, text: "video-production",
+              critical: false, el: "#who" });
+  L.forEach((l) => mf("cap-" + l.id, { type: "text", chapter: "cap", frames: [fr(Math.max(0, l.in)), fr(l.out)],
+    still_from: fr(Math.max(0, l.in) + (l.in <= 0 ? 0 : FADE)), text: l.text, spoken: true, critical: true,
+    el: "#cap-" + l.id }));
+  mf("note", { type: "shape", chapter: "cap", frames: [0, F], still_from: 0, critical: false, el: "#note" });
+  mf("time", { type: "text", chapter: "cap", frames: [0, F], still_from: 0, text: "0:00", texture: true,
+               critical: false, el: "#time" });
+  mf("cta-name", { type: "text", chapter: "cap", frames: [fr(CTA_AT), F], still_from: fr(CTA_AT + RISE),
+                   text: "video-production", critical: true, el: "#cta-name" });
+  window.__MOTION.push({ id: "cta-rise", frames: [fr(CTA_AT), fr(CTA_AT + RISE)], magnitude: "small" });
+
+  window.__timelines = window.__timelines || {};
+  window.__timelines["main"] = tl;
+  tl.seek(0);
+}
+
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(build);
+else build();
+    </script>
+  </body>
+</html>

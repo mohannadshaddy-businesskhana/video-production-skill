@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* A recorded narration, measured into the same timings.json the TTS tools write.
  *
- *   node voice_timings.mjs --lines narration.json --in takes/ --out voice/recorded [--clean]
+ *   node voice_timings.mjs --lines narration.json --in takes/ --out voice/recorded [--clean] [--words [--plot]]
  *                          [--gap 0.35] [--max-pause 0.45]
  *
  * `--in` is either a folder with one take per line (l1.m4a, l2.m4a … — any
@@ -23,7 +23,7 @@ const flag = (n, d) => { const i = argv.indexOf("--" + n); return i === -1 ? d :
 const linesPath = flag("lines"), input = flag("in"), out = flag("out");
 const gap = Number(flag("gap", "0.35"));
 if (!linesPath || !input || !out) {
-  console.error("usage: voice_timings.mjs --lines narration.json --in <folder|file> --out <dir> [--clean] "
+  console.error("usage: voice_timings.mjs --lines narration.json --in <folder|file> --out <dir> [--clean] [--words [--plot]] "
     + "[--gap 0.35] [--max-pause 0.45]");
   process.exit(2);
 }
@@ -224,6 +224,128 @@ function capPauses(file) {
   return cut.reduce((s, [a, b]) => s + (b - a), 0);
 }
 
+/* --words: when each word of a line is said, for captions that light up as
+ * they are spoken. The text is known, so this is alignment again: cut the
+ * line's speech into its words where its loudness dips, choosing the cuts
+ * whose pieces best match what each word's letters predict. Connected speech
+ * runs many words together with no dip at all, so a cut may fall anywhere;
+ * a dip only makes it cheaper. A piece is measured by its VOICED windows: a
+ * pause belongs to no word, and counted into the word before a comma it made
+ * that word look long and pulled two cuts into the pause, leaving the next
+ * word no sound at all. The punctuation predicts the pauses, as it does
+ * between lines: after a comma or a dash the cut belongs in a pause, and a
+ * stop consonant's dip inside the next word had pulled «ده،» past its own.
+ * A pause is 160 ms of silence or more. A stop's closure is 40–80 ms, and
+ * «صوت،» took one for its comma; a doubled stop running into another, as in
+ * «بتحطّ كل», is 120 ms, and «الصوت،» took that. The commas' own pauses were
+ * 270–490 ms. No word holds a pause inside it. A cut
+ * that lands in a pause moves to where the next word's sound starts: a
+ * caption lights with the sound, not the silence. */
+const WORDS = argv.includes("--words");
+const DIP_REACH = 8;                  // windows either side a dip is measured against: 160 ms
+const DIP_WEIGHT = 0.012;             // cost saved per dB of dip at a cut
+const MIN_WORD = 3;                   // windows: no word is said in under 60 ms
+const PUNCT_PAUSE = 0.5;              // cost of a punctuated word's cut landing outside a pause
+const INNER_PAUSE = 0.5;              // cost of each pause a word would hold inside it
+const PAUSE_MIN = 8;                  // windows of silence that make a pause: 160 ms
+const MARK = /[.؟?!:،,؛;—–]$/u;
+// the silent runs long enough to be pauses, as [first, last + 1) windows
+function pauseRuns(silent) {
+  const runs = [];
+  for (let j = 0, s = -1; j <= silent.length; j++) {
+    if (j < silent.length && silent[j]) { if (s < 0) s = j; continue; }
+    if (s >= 0 && j - s >= PAUSE_MIN) runs.push([s, j]);
+    s = -1;
+  }
+  return runs;
+}
+// the spoken words, each knowing whether a mark follows it — a dash stands alone
+function spokenWords(text) {
+  const out = [];
+  for (const tok of text.split(/\s+/).filter(Boolean)) {
+    if (/[\p{L}\p{N}]/u.test(tok)) out.push({ w: tok, mark: MARK.test(tok) });
+    else if (out.length && MARK.test(tok)) out[out.length - 1].mark = true;
+  }
+  return out;
+}
+
+function dipDepths(dB) {
+  return dB.map((v, j) => {
+    const left = Math.max(...dB.slice(Math.max(0, j - DIP_REACH), j + 1));
+    const right = Math.max(...dB.slice(j, j + DIP_REACH + 1));
+    return Math.min(25, Math.max(0, Math.min(left, right) - v));
+  });
+}
+
+// the n−1 cuts between windows a and b; dp over every window, a cut at a dip
+// cheaper. voiced[j] counts the windows before j that carry sound; mark[k]
+// says a pause is due after word k
+function bestCuts(a, b, expect, { dip, voiced, runs, mark }) {
+  const inPause = (j) => runs.some(([s, e]) => s <= j && j < e);
+  const held = (p, q) => runs.filter(([s, e]) => s > p && e < q).length;
+  const n = expect.length;
+  const seg = (p, q, k) => ((voiced[q] - voiced[p] - expect[k]) / expect[k]) ** 2 + INNER_PAUSE * held(p, q);
+  const cutCost = (j, k) => -DIP_WEIGHT * dip[j] + (mark[k] && !inPause(j) ? PUNCT_PAUSE : 0);
+  let prev = new Map([[a, 0]]);
+  const back = [];
+  for (let k = 0; k < n - 1; k++) {
+    const cur = new Map(), from = new Map();
+    for (let j = a + MIN_WORD * (k + 1); j <= b - MIN_WORD * (n - 1 - k); j++) {
+      let best = Infinity, arg = -1;
+      for (const [p, c] of prev) {
+        const v = j - p < MIN_WORD ? Infinity : c + seg(p, j, k) + cutCost(j, k);
+        if (v < best) { best = v; arg = p; }
+      }
+      if (arg >= 0) { cur.set(j, best); from.set(j, arg); }
+    }
+    back.push(from); prev = cur;
+  }
+  let best = Infinity, at = -1;
+  for (const [p, c] of prev) {
+    const v = b - p < MIN_WORD ? Infinity : c + seg(p, b, n - 1);
+    if (v < best) { best = v; at = p; }
+  }
+  const cuts = [];
+  for (let k = n - 2; k >= 0; k--) { cuts.unshift(at); at = back[k].get(at); }
+  return cuts;
+}
+
+function wordTimes(file, text) {
+  const words = spokenWords(text);
+  const { env, loud } = envelope(file), th = loud * 10 ** (-SPEECH_DB / 20);
+  const a = env.findIndex((v) => v > th), b = env.length - [...env].reverse().findIndex((v) => v > th);
+  const silent = env.map((v) => v <= th), voiced = [0];
+  silent.forEach((s, j) => voiced.push(voiced[j] + (s ? 0 : 1)));
+  // letters, not sounds: counting a shadda as the second consonant it is
+  // moved three words of one line a word late, and made another line worse
+  const w = words.map((x) => [...x.w.replace(/[^\p{L}\p{N}]/gu, "")].length + 1);
+  const W = w.reduce((s, x) => s + x, 0), said = voiced[b] - voiced[a];
+  const cuts = bestCuts(a, b, w.map((x) => (x / W) * said), { dip: dipDepths(env.map(db)), voiced,
+                        runs: pauseRuns(silent), mark: words.map((x) => x.mark) });
+  const edges = [a, ...cuts, b];
+  const onset = (j) => { while (j < b && silent[j]) j++; return j; };
+  const offset = (j) => { while (j > a && silent[j - 1]) j--; return j; };
+  return words.map((x, k) => ({ w: x.w, start: +(onset(edges[k]) * WIN).toFixed(3),
+                                end: +(offset(edges[k + 1]) * WIN).toFixed(3) }));
+}
+
+/* --plot: each line's spectrogram over its waveform, a red mark where each
+ * word starts, written beside the line as lN.png. Nothing checks the word
+ * cuts automatically: a listener handed a line's clips all at once wrote the
+ * whole line for nearly every clip, and one clip per request is two requests
+ * a word, past the free tier. So the cuts are checked by looking: a pause is
+ * a dark band, and a comma's cut belongs in one. */
+const PLOT = argv.includes("--plot");
+const PX = 500;                                 // pixels per second
+function plot(row) {
+  const W = Math.round(row.duration * PX);
+  const marks = row.words.map((w) => `drawbox=x=${Math.round((w.start - row.start) * PX)}:y=0:w=3:h=ih:color=red@0.9:t=fill`);
+  ff(["-i", join(out, row.file), "-filter_complex",
+      `[0]asplit[a][b];[a]showspectrumpic=s=${W}x400:legend=0:scale=log:stop=8000,${marks.join(",")}[s];`
+      + `[b]showwavespic=s=${W}x160:colors=white[w];[s][w]vstack`, "-frames:v", "1",
+      join(out, row.file.replace(/\.wav$/, ".png"))]);
+}
+
 const isDir = statSync(input).isDirectory();
 const takes = isDir ? readdirSync(input) : [];
 const pieces = [];
@@ -247,7 +369,8 @@ for (const [i, line] of N.lines.entries()) {
   const m = integrated(raw);
   if (m.i === null || m.i < -70) throw new Error(`${raw}: silent or unreadable`);
   pieces.push({ id: line.id, text: line.text, file: `${line.id}.wav`, duration: +duration(raw).toFixed(3),
-                pauses_cut: +pausesCut.toFixed(2), lufs_in: +m.i.toFixed(1), peak_in: m.peak ?? -99, path: raw });
+                pauses_cut: +pausesCut.toFixed(2), lufs_in: +m.i.toFixed(1), peak_in: m.peak ?? -99, path: raw,
+                ...(WORDS ? { words: wordTimes(raw, line.text) } : {}) });
 }
 // the level every line can reach: each line's headroom caps it
 const common = Math.min(LINE_LUFS, ...pieces.map((p) => p.lufs_in + (PEAK_CEIL - p.peak_in)));
@@ -260,6 +383,8 @@ for (const p of pieces) {
 let t = 0;
 const rows = pieces.map((p, i) => {
   const row = { ...p, start: +t.toFixed(3), end: +(t + p.duration).toFixed(3) };
+  // the words on the narration's own clock, like the lines
+  if (p.words) row.words = p.words.map((w) => ({ ...w, start: +(t + w.start).toFixed(3), end: +(t + w.end).toFixed(3) }));
   t += p.duration + (i < pieces.length - 1 ? gap : 0);
   return row;
 });
@@ -271,9 +396,12 @@ ff(["-f", "concat", "-safe", "0", "-i", list, "-c:a", "pcm_s16le", join(out, "na
 writeFileSync(join(out, "timings.json"), JSON.stringify({
   source: "recording", clean: CLEAN, gap, sample_rate: RATE, total: +t.toFixed(3), ...(alignment ? { alignment } : {}),
   lines: rows }, null, 2) + "\n");
-for (const r of rows)
+for (const r of rows) {
   console.log(`${r.id}  ${r.duration.toFixed(2)}s  ${String(r.lufs_in).padStart(5)} → ${r.lufs} LUFS  ${r.text}`
     + (r.pauses_cut ? `   (${r.pauses_cut}s of pause cut)` : ""));
+  if (r.words) console.log("     " + r.words.map((w) => `${w.w} ${w.start.toFixed(2)}`).join(" · "));
+  if (r.words && PLOT) plot(r);
+}
 console.log(`\n${rows.length} line(s), ${t.toFixed(2)}s → ${join(out, "narration.wav")} + timings.json`);
 if (alignment)
   console.log(alignment.clear

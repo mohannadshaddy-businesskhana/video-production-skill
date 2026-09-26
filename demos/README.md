@@ -16,7 +16,7 @@ whether a voice or the music leads, and how the edit breathes
 
 | | Type | What carries it · what the camera and the edit do | Status |
 |---|---|---|---|
-| `01-brand-film` | brand film | one claim at a time, slow holds, air | ✅ |
+| `01-brand-film` | brand film | **light in a dark room** — a frame of light, a lamp, lights coming on in turn, a spotlight, fifteen lights, a week of frames. One line per shot: it moves in, holds still for exactly its reading time, and goes dark | ✅ v2 |
 | `02-pr-to-video` | step-by-step tutorial | a numbered spine, one step per chapter | ✅ |
 | `03-launch-video` | launch video | **the product, fast** — close-ups of the workspace cut on the beats, whips between chapters, a speed ramp into the drop, a sound on every hit | ✅ v2 |
 | `06-motion-graphics` | motion graphics | **one shape for the whole film** — a circle, a day, a block, a chart, three steps, the circle again, a button. Nothing cuts, nothing fades | ✅ v2 |
@@ -24,7 +24,7 @@ whether a voice or the music leads, and how the edit breathes
 | `08-product-tour` | product tour | **a cursor drives the interface for the whole film** — scroll, push in, type, click, pull back | ✅ v3 |
 | `05-explainer` | whiteboard | **a hand drawing in marker on a real board while a narrator explains.** Each drawing starts on the line that names it, timed from the voice's own measured takes. The camera starts close, works across the board in reading order along the arrows that link the drawings, and ends on the whole board, full | ✅ v4 (voice: Gemini, ar-eg-podcaster-1) |
 | `09-talking-head` | talking head | a person on camera, cut on sentences | ⏳ needs a voice and a face |
-| `10-captions` | captions-led | speech, with its words lighting as they are spoken | ⏳ needs a voice |
+| `10-captions` | captions-led | **a voice note playing, its words in large type lighting as they are said** — the speaker's ring breathes with the voice, the waveform fills as it plays, and each word turns amber at the start voice_timings.mjs measured for it | ✅ v2 (voice: Gemini, ar-eg-podcaster-1) |
 
 A type that is led by a voice is not faked here. The local speech engine has no
 Arabic, so a voice-led type waits for a voice that speaks it rather than
@@ -42,7 +42,18 @@ node _src/whiteboard/emit.mjs
 ```
 
 `emit.mjs` writes one composition per measured voice into `05-explainer/<voice>/`.
-09 and 10 still wait for a voice.
+
+10 needs each word's start as well as each line's, so its voice is measured with `--words`
+(`--plot` draws each line's spectrogram with the word cuts on it, to look at):
+
+```bash
+node ../skills/video-production/scripts/tts_gemini.mjs --lines 10-captions/narration.json --out _assets/voice/captions-podcaster-1 --voice ar-eg-podcaster-1 --model gemini-3.8-flash-tts --whole
+node ../skills/video-production/scripts/voice_timings.mjs --lines 10-captions/narration.json --in _assets/voice/captions-podcaster-1/take.wav --out _assets/voice/captions-podcaster-1/measured --words --plot --gap 0.3
+node _src/captions/emit.mjs
+./build.sh 10-captions
+```
+
+09 still waits for a person on camera.
 
 ## The operations
 

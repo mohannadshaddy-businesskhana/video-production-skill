@@ -17,6 +17,13 @@
       "warn": false
     },
     {
+      "name": "delivery bitrate",
+      "ok": true,
+      "detail": "0.8 Mbps (limit 16)",
+      "ref": "#54",
+      "warn": false
+    },
+    {
       "name": "loudness",
       "ok": true,
       "detail": "-13.9 LUFS (target -14)",
