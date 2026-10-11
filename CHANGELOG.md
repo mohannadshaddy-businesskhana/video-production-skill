@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.1 — 2026-10-11
+- tts_batch.mjs: index per video — a line shared by two videos no longer mixes two models' voices (failure-log #71)
+
 ## v1.2.0 — 2026-10-11
 - Arabic narration: `references/arabic-voice.md` — the spoken form (full tashkeel, pause form before every comma and full stop, numbers in words), the tested Gemini TTS chain with measured free quotas, and the listening check (failure-log #68–#71).
 - `scripts/tts_batch.mjs` — a batch's narration on a free tier: several videos per request, a fallback chain of TTS models on 429, one model per video, every line heard back and a misheard line regenerated alone.

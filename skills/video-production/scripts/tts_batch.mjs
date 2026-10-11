@@ -7,7 +7,8 @@
  * jobs.json: [{ "id": "S-02", "lines": ["<spoken text, fully diacritized>", …] }, …]
  *   the SPOKEN form — tashkeel, pause form, numbers in words (arabic-voice.md §1), never the caption.
  * Output per line: <cache>/<sha1(voice+model+text)>.wav + .json ([[start, dur, word], …] for captions),
- * and <cache>/index.json: { "<text>": { "key", "model" } } — the build reads each line from there.
+ * and <cache>/index.json: { "<video id>": { "model", "keys": { "<text>": "<key>" } } } — PER VIDEO, because a line
+ * shared by two videos («تجدها في هوامش») can be voiced on two models; keyed by text it would mix voices (#71).
  *
  * Why grouped: the free tier is ~10 requests/day PER MODEL (measured Oct 2026), so a request carries
  * several videos' lines; voice_timings.mjs splits the take back into lines. One or two lines → one
@@ -158,7 +159,7 @@ async function group(jobs) {
     } catch (e) { if (quota(e)) { console.log(`  ${model}: quota reached — next model`); retired.add(model); continue; } throw e; }
     const moveOn = [];
     for (const j of jobs) {
-      if (await verify(j, model, work)) for (const t of j.lines) index[t] = { key: keyOf(t, model), model };
+      if (await verify(j, model, work)) index[j.id] = { model, keys: Object.fromEntries(j.lines.map((t) => [t, keyOf(t, model)])) };
       else moveOn.push(j);
     }
     saveIndex();
@@ -175,12 +176,12 @@ const jobs = JSON.parse(readFileSync(jobsPath, "utf8")).map((j) => ({ id: j.id, 
 
 if (argv.includes("--check")) {
   for (const j of jobs) {
-    const done = j.lines.filter((t) => index[t] && has(index[t].key));
-    const res = await listen(done.map((t) => index[t].key), done);
+    const e = index[j.id], done = e ? j.lines.filter((t) => e.keys[t] && has(e.keys[t])) : [];
+    const res = await listen(done.map((t) => e.keys[t]), done);
     console.log(`${j.id}: ${!res ? "⚠ UNCHECKED" : res.every((r) => r.ok) ? `✓ ${res.length} heard as written` : `✗ ${res.filter((r) => !r.ok).length} differ`}`);
   }
 } else {
-  const todo = jobs.filter((j) => !j.lines.every((t) => index[t] && has(index[t].key)));
+  const todo = jobs.filter((j) => !(index[j.id] && j.lines.every((t) => index[j.id].keys[t] && has(index[j.id].keys[t]))));
   const groups = []; for (let i = 0; i < todo.length; i += G) groups.push(todo.slice(i, i + G));
   console.log(`${todo.length} video(s) to voice → ${groups.length} request(s) of up to ${G}`);
   if (argv.includes("--dry")) groups.forEach((g, i) => console.log(`  ${i + 1}. ${g.map((j) => `${j.id}(${j.lines.length})`).join(" ")}`));
