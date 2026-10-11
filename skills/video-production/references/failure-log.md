@@ -57,6 +57,12 @@
 | 40 | Re-layout at the block level instead of the design level | Layout |
 | 41 | The limits of automated audio checking | Process |
 | 46 | A check that graded its own resampling | Process |
+| 56 | "A sound problem" that was missing sound | Audio |
+| 57 | Whisper on Egyptian Arabic: invented words, rewritten dialect | Language |
+| 58 | A fixed graphics panel over a presenter's chin | Layout |
+| 59 | A follow CTA on a video that posts to two accounts | Conversion |
+| 60 | Written summaries over a captioned talk, and a badge that never leaves | Form |
+| 61 | The last frame caught the presenter looking away | Edit |
 
 ---
 
@@ -722,6 +728,165 @@ per request is two requests a word, which the free tier refused before a single 
 about 0.2 s early («كل» in «وحطّت كل»).
 **Rule:** a measurement with no automatic check gets a picture you can check by eye, and every
 change to it is compared on the lines already read. The shadda looked right and was not.
+
+### 56 · "A sound problem" that was missing sound
+
+**What happened:** a talking-head shoot on a phone with a Hollyland Lark A1, 28 takes. The user
+heard "تقطيع" in many of them and asked for the audio to be fixed in the edit instead of a reshoot.
+My first diagnosis, from the finished edit, was a Bluetooth band-limit at 4.4 kHz. **Wrong** — the
+raw audio had its full band.
+**The cause, measured:** the audio streams were 10–25% shorter in samples than in timestamps. Every
+missing stretch was a zero-byte AAC packet of 240–310 ms: the phone kept the clock running and the
+receiver delivered nothing. On the container's clock each one is a quarter second of silence inside
+a word; on a plain decode the holes vanish and the voice drifts ahead of the lips — up to 10 s by
+the end of a 52 s take.
+**Result:** 14 of 23 "problem" takes had lost 12–57% of their speech. **No filter brings back a
+syllable that was never recorded.** Four were light (≤3%) and were saved by cutting each hole from
+picture and sound together; the rest are reshoots. Even the "good" folder had holes — its edit
+worked because the editor had trimmed round them without knowing why.
+**Two traps in the repair:**
+- `afftdn` delays its output by **25 ms**. Lip sync was off by exactly that until cross-correlation
+  against the raw showed it; it is now taken back in the chain. Measure every filter's latency.
+- Cutting picture and sound separately drifts by a frame per hole. Both are cut on the same whole
+  frames.
+**Rule:** **before promising to fix sound, find out whether the sound exists.** Compare the decoded
+sample count to the stream duration; `holes.mjs` does it and gives a verdict per file. And test the
+wireless mic with it before a shoot (`routes/camera-project.md`) — five minutes against a lost day.
+**What made it trustworthy:** the user listened to a 20 s repaired clip without hearing the original
+first, as a stranger would, and judged it acceptable to rescue the video. The tools were checked
+against each other: the skill's versions reproduce the project's hole lists and cut lists exactly.
+
+### 57 · Whisper on Egyptian Arabic: invented words, rewritten dialect
+
+**What happened:** captions for an 80 s Egyptian talking head. Groq's `whisper-large-v3` turned
+24–52 s into invented text («lol», «شكرا لغبي», a Chinese character) and rewrote the rest as MSA.
+A dialect prompt and the turbo model were no better.
+**Result:** Gemini (`gemini-flash-latest`, free tier) transcribed it verbatim, in dialect, and
+caught a retake and a stumble the edit then removed. **But its sentence times were up to 1 s out**,
+and an aligner that snapped to the nearest pause picked the wrong one. Whisper's text was wrong
+and its **clock** was right.
+**Rule:** **text from one model, timing from another, and a check by ear.** Gemini for the words,
+Whisper's word times wherever its word spells the same (167 of 189 here), loudness for the rest.
+Then cut a short clip at each edit point and have it transcribed: the first stumble cut kept «ده
+أو», and only hearing the clip showed it. Also: Gemini's free tier refuses image and music
+generation (quota 0), so illustrations were drawn as SVG in the brand palette.
+
+### 58 · A fixed graphics panel over a presenter's chin
+
+**What happened:** the first talking-head template put every card in one navy box, 960×440, over
+the chest from 38.5% of the frame height. All 17 checks passed.
+**Result:** the user's words: the rectangle covers part of my face; put it below and the subtitles
+in its place; and rather than a fixed rectangle, the graphics should happen around the video, not
+in one place and **certainly not inside a fixed rectangular window**. A full render round.
+**Why the checks passed:** nothing in the manifest knew where the face was. The safe zone guards the
+platform's interface, not the person.
+**Rule:** **in a talking head the face is a keep-out area, measured on the footage at the widest
+punch-in** (here the head travelled 24–78% across and 9–38% down), declared in `__FMT.keepout`, and
+`verify.mjs` fails any element inside it ("keep-out areas"). Captions sit directly under the chin;
+graphics float loose over the desk and in the strips beside the head — text with a shadow, small
+amber tags, illustrations entering from their side — never a panel. A strip beside the head is
+narrow (190–210 px): a 200 px illustration there read as a sticker on the hand, so pictures go in
+the low band and the strips carry numbers.
+
+### 59 · A follow CTA on a video that posts to two accounts
+
+**What happened:** the end card said «تابعني…» with the presenter's name.
+**Result:** removed — the same video goes on the company's page and the presenter's own, and a
+follow card is wrong on one of them. The video now ends on the presenter's own closing line.
+**Rule:** ask **where the video is posted** before writing the CTA. A CTA that names one account
+belongs in that account's caption, not in the picture. `short-form.md`'s "the CTA is mandatory"
+stands for a single-account video; a cross-posted one may end on its last spoken line.
+
+### 60 · Written summaries over a captioned talk, and a badge that never leaves
+
+**What happened:** the second pilot's graphics floated freely and cleared the face, and still all
+of them were text: a kicker, a title, a sub-line, a checklist — the talk summarised in phrases,
+under captions that already carried every word. A name badge stayed on screen for 66 seconds.
+**Result:** the user's words: the elements are mostly writing, not a visual counterpart of what I'm
+saying; a word or two is fine, but the rule is visual elements that express what is being said,
+not a summary written on screen. And the badge has no reason to stay the whole video. A third round.
+**Rule:** **in a captioned talking head the graphics are pictures.** Each beat of the talk gets a
+small scene of what it says — a dial that falls, orders that arrive or fail, a van that goes and
+comes back — synced to the word, at a size that reads as a picture (an icon ≥ ~180 px tall), with
+two words of label at most. `verify.mjs` "pictures, not sentences" fails any graphic with more than
+`__FMT.overlayMaxWords` words. A name shows once, early, or not at all.
+**The trap underneath:** #09 said captions are not a story; the fix that followed was a story in
+phrases — still text. Text over speech is redundant twice: the ear has it and the captions have it.
+
+### 61 · The last frame caught the presenter looking away
+
+**What happened:** the edit ended 0.44 s after the last word. In that tail the presenter's eyes left
+the lens (at +0.34 s); the user noticed it at once.
+**Rule:** **a talking head ends on a look into the lens.** Pull the last second frame by frame on the
+eyes, find the first frame the gaze or the head moves, and end two frames before it (`spec.end`).
+The audio tail is not the guide — the eyes are.
+
+### 62 · The transcript had a sentence the audio did not
+
+**What happened:** a caption read "وكمان يبقى سهل في الاستخدام، فـ Claude Design بيساعدني..." over
+seconds where the presenter was saying something else. The raw transcript carried a 3.7 s sentence
+that the cut audio never contained; the aligner squeezed it in and pushed everything after it off.
+**Rule:** when a caption and Whisper disagree, **listen to the loudness, not either transcript.** A
+sentence with no room for it between two pauses is not there — drop it (`edit.json drop_text`).
+
+### 63 · Whisper returned its own prompt as the transcript
+
+**What happened:** the opening sentence, sent as a prompt to stop Whisper inventing a channel outro,
+came back as the transcript of the first piece — twelve words packed at 0.02 s each over the wrong
+seconds. Every word time after it was anchored to that clock, ~3 s early for 15 s.
+**Rule:** a run of five or more words shorter than 50 ms is an echo, not speech: ask again without
+the prompt (`groq_words.mjs` does). The prompt fixes one hallucination and can cause another.
+
+### 64 · A third caption line came down onto the face
+
+**What happened:** a closing line short on reading time merged with the line before it — ten words,
+62 letters — and wrapped to three lines, its last line inside the face keep-out.
+**Rule:** a caption is capped by letters as well as words (`CAP_MAX_CHARS`). Arabic words run long;
+ten of them do not fit two lines.
+
+### 65 · The cut ended on an empty chair
+
+**What happened:** on a long take holding several videos, the cut ran ~3 s past the last word, and
+those seconds were the presenter getting up — the chair empty from 0.05 s after "للجميع".
+**Rule:** the end is checked **on the cut**, frame by frame, not on the raw. A gaze checked on the
+raw take says nothing about what the cut put after the last word.
+
+### 66 · Review 1 of a ten-video batch — the rules it produced
+
+Ten re-edited talking heads went to the presenter at once. Every note was a rule nobody had
+written down; each is listed with how it is now enforced.
+
+1. **Never a look away from the lens** — at the start, at the end, *and between points*. A 1.9 s
+   glance to the side with a chair creak sat between point one and point two; the pause rule kept
+   it because the creak was louder than the silence threshold. → cut any non-speech stretch where
+   the eyes leave the lens, whatever its loudness; check the frames of every pause the pause rule
+   kept.
+2. **No silence at the head.** Several videos opened on a second of nothing. → `plan_cuts.mjs`
+   moves the start to the first sound minus 60 ms; `joint_check.mjs` fails a silent opening over
+   0.15 s.
+3. **A half-understood sentence is worse than a missing one.** Receiver holes left three sentences
+   that read as noise. → remove the damaged phrase (or sentence) when the meaning survives without
+   it; ask when it does not. Never leave a garbled sentence because it is "mostly there".
+4. **The hook must be fully intelligible.** When the take's own hook is damaged and has no clean
+   retake, open with the take's clean closing line as a cold open (`prepend.mjs`) — the presenter
+   chose this over keeping the damaged hook with big text.
+5. **When a sentence is said twice, keep the right/complete one** — and never leave half of the
+   slip ("ده... ده معناه"). The first version of a restated line is the one to cut.
+6. **Every joint lands on silence.** Fragments of cut words ("...الموقع") were audible at four joints
+   of one video. → `plan_cuts.mjs` snaps every hand-placed edge to the quietest 10 ms within
+   0.15 s; `joint_check.mjs` flags any joint whose 40 ms either side is speech-loud.
+7. **The end must sound like an end.** A video that stops on a question that opens a new point
+   reads as cut off. → end on a closing sentence; if the take has none, look for another take of
+   the same talk (a close was taken from the earlier take 131305 with `append.mjs`).
+8. **Name what is being enumerated.** In a talk listing six KPIs, each KPI's name stays on screen
+   for the whole stretch it is discussed (a ≤3-word label).
+9. **A labelled icon's siblings carry labels too** — a price tag reading «ملابس» beside a blank one
+   read as a mistake.
+10. **The look of the shoot is a setting, not a per-video fix**: blue wall light +30% saturation,
+    warm face glare −10% (`GRADE` in the template, measured on the frame).
+11. **Layout: pictures directly under the face, captions below them.**
+
+**Cost:** one full re-cut and re-render of ten videos.
 ---
 
 ## Recurring patterns — read these if you have no time for the whole log

@@ -365,6 +365,18 @@ function checkPalette(video, colors, manifest, rep, samples = 12, tol = 26.0) {
       }
     }
 
+    /* A talking head's footage fills every frame, so the mask covered everything and
+     * nothing was measured (#58). An element declared `swatch` paints every pixel of
+     * its box (a tag, a badge, a solid plate): it is the video's own chrome even over
+     * the footage, so it is measured — once it has settled: mid-entrance it is half
+     * transparent over the video, and that frame measured 2.7% (trap T9). */
+    for (const e of manifest.elements) {
+      if (!e.swatch || !((e.still_from ?? e.frames[0]) <= frameNo && frameNo < e.frames[1])) continue;
+      const [x0, y0, x1, y1] = e.bbox;
+      for (let yy = Math.max(0, Math.trunc(y0 / fh * h)); yy < Math.min(h, Math.trunc(y1 / fh * h)); yy++)
+        for (let xx = Math.max(0, Math.trunc(x0 / fw * w)); xx < Math.min(w, Math.trunc(x1 / fw * w)); xx++) masked[yy * w + xx] = 0;
+    }
+
     let total = 0, bad = 0;
     for (let p = 0; p < w * h; p++) {
       if (masked[p]) continue;
@@ -382,6 +394,14 @@ function checkPalette(video, colors, manifest, rep, samples = 12, tol = 26.0) {
    * unreadable codec and a broken ffmpeg all produce — the check reported a
    * clean pass on a file that did not exist. A result of zero is only
    * meaningful if something was actually looked at. */
+  /* Footage that fills every sampled frame leaves nothing of the video's own chrome to measure
+   * (a talking head with transparent graphics). The frames were read — that is not a broken
+   * file, which still fails below — so it is reported, as a warning, not as a pass or a fail. */
+  if (measured === 0 && skipped === samples) {
+    rep.add("palette", true,
+      `nothing to hold to the palette: footage fills all ${samples} sampled frames and no swatch was declared`, "#01", true);
+    return;
+  }
   if (measured === 0) {
     rep.add("palette", false,
       "no frame could be read — the palette was never checked "
@@ -416,6 +436,31 @@ function checkSafeZone(manifest, rep) {
     .map((e) => e.id);
   rep.add("safe zone", !bad.length,
           !bad.length ? "all inside" : `outside: ${bad.slice(0, 4).join(", ")}`, "#18");
+}
+
+function checkKeepout(manifest, rep) {
+  // #58 — a graphics panel covered the presenter's chin. The face is measured on the footage
+  // at the widest punch-in and declared; nothing that is drawn may enter it.
+  const ko = manifest.keepout;
+  if (!ko || !Object.keys(ko).length) { rep.add("keep-out areas", true, "none declared", "#58", true); return; }
+  const hits = [];
+  for (const e of manifest.elements.filter(critical))
+    for (const [name, box] of Object.entries(ko)) if (intersects(e.bbox, box)) hits.push(`${e.id}→${name}`);
+  rep.add("keep-out areas", !hits.length,
+          !hits.length ? `clear of ${Object.keys(ko).join(", ")}` : `inside: ${hits.slice(0, 4).join(", ")}`, "#58");
+}
+
+function checkPictures(manifest, rep) {
+  // #60 — two pilots summarised a captioned talk in written lines over the presenter. A graphic
+  // is a picture of what is said; it may carry a label, not a sentence. Captions are exempt.
+  const max = manifest.overlay_max_words;
+  if (!max) { rep.add("pictures, not sentences", true, "not declared", "#60", true); return; }
+  const wordy = manifest.elements
+    .filter((e) => e.zone !== "captions" && e.type !== "video")
+    .map((e) => ({ id: e.id, n: (e.text_nodes || []).join(" ").split(/\s+/).filter(Boolean).length }))
+    .filter((e) => e.n > max);
+  rep.add("pictures, not sentences", !wordy.length,
+          !wordy.length ? `every graphic carries ≤${max} words` : `wordy: ${wordy.slice(0, 4).map((e) => `${e.id}=${e.n}`).join(", ")}`, "#60");
 }
 
 function checkZones(manifest, rep) {
@@ -765,6 +810,8 @@ if (!has("skip-palette")) checkPalette(video, colors, manifest, rep);
 // layout
 checkChapters(manifest, rep);
 checkSafeZone(manifest, rep);
+checkKeepout(manifest, rep);
+checkPictures(manifest, rep);
 checkZones(manifest, rep);
 checkOverlap(manifest, rep);
 checkCoverage(manifest, rep, structure?.coverage_floor ?? 0.45);

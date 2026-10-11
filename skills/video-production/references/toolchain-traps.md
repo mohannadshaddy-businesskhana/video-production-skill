@@ -200,6 +200,16 @@ otherwise sorts the renderer's cached Chromium ahead of any system browser.
 | T17 | an element escapes its zone | fixed font size, narrower zone · for monospace, roughly `width ÷ 5` |
 | T18 | a logo crushed to 32px tall | an SVG in a flex column without `flex-shrink: 0` |
 | T19 | a black strip creeps in from the edge | a background exactly the frame's width + a drift tween — make it wider |
+| T20 | Arabic plates and an end card hug the **left** edge | `align-items: flex-end` inside a `direction: rtl` box is the left side. Arabic starts on the right: use `flex-start`. The snapshot looked "aligned", only the manifest's bbox (308→1020 after the fix, 60→772 before) showed which side |
+
+## 5.1 Footage edits — cutting picture and sound on one clock
+
+| # | Trap | Symptom | Fix |
+|---|---|---|---|
+| T21 | a filter with latency | voice 25 ms behind the lips after `afftdn`; constant, so every spot-check "looked fine" | cross-correlate the output against the source at three points; take the latency back (`atrim` + `apad`) |
+| T22 | a cut edge exactly on a frame boundary | 7 frames lost over 11 cuts — floor/ceil of `n/30` drifts by float error, and captions slide off the words | put each edge a quarter frame inside the run it belongs to |
+| T23 | a caption ends where the next one starts — computed in the same loop | each caption's end read the *next* caption's start before it was set, so all of them overlapped | assign every start first, then every end; `hyperframes check` reports it as `content_overlap` |
+| T24 | a VFR phone file cut with `select` | picture and sound cut a different amount | `fps=30:start_time=0` first, then cut both on the same frame numbers (`repair_holes.mjs`) |
 
 **The architecture that worked for three ratios:** the timeline is shared **verbatim** (it is what
 cost all the verification) · geometry in one definition file per ratio · a generator that merges

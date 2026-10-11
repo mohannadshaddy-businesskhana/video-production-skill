@@ -31,7 +31,18 @@ Thirteen roles are physical or human by definition: DoP, camera operator, 1st AC
 sound recordist, production designer, set, wardrobe, hair and makeup, script supervisor, talent, and
 location manager on the day. Plan around them; do not pretend to replace them.
 
+## Before the shoot — test the wireless mic
+
+Record two minutes on the real setup (same room, same distance, phone plugged in as on the day) and
+run `scripts/holes.mjs` on it. **0 holes = go.** Any hole: move the router, clear the line between
+transmitter and receiver, charge both, and test again. A shoot of 28 takes was lost to this
+(failure-log #56) and the test takes five minutes.
+
 ## After the shoot
+
+**First, triage the footage:** `node scripts/holes.mjs --dir raw/ --tsv triage.tsv`. Light files
+go through `scripts/repair_holes.mjs` and then `normalize.sh`; heavy files are reported as reshoots
+before anyone edits them. An edit built on a heavy file is time spent on a video that cannot ship.
 
 Footage editing, grading, mixing and captions all delegate to `/hyperframes` + `/media-use`. This
 layer resumes at Verify and Deliver.

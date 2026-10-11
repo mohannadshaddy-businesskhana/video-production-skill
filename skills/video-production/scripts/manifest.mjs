@@ -121,7 +121,17 @@ const report = await page.evaluate(({ FW, FH, FPS, ROLES }) => {
     // declared as "" once carried English through the language check (#39)
     const texts = [];
     const walk = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+    // only what is on screen at the measured frame: a scene's later labels sit in the DOM at
+    // opacity 0, and counting them read four numbers shown one at a time as four words (#60)
+    const shown = (t) => {
+      for (let el = t.parentElement; el && el !== node.parentElement; el = el.parentElement) {
+        const cs = getComputedStyle(el);
+        if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) === 0) return false;
+      }
+      return true;
+    };
     for (let t = walk.nextNode(); t; t = walk.nextNode()) {
+      if (!shown(t)) continue;
       const v = t.nodeValue.replace(/\s+/g, " ").trim();
       if (v) texts.push(v);
     }
@@ -143,6 +153,10 @@ const report = await page.evaluate(({ FW, FH, FPS, ROLES }) => {
 
   return {
     fps, duration_frames: dur, frame_size: [FW, FH],
+    // areas nothing may cover — a presenter's face (#58); declared as [x0, y0, x1, y1]
+    keepout: (window.__FMT && window.__FMT.keepout) || undefined,
+    // how many words a graphic may carry when the speech is already captioned (#60)
+    overlay_max_words: (window.__FMT && window.__FMT.overlayMaxWords) || undefined,
     safe_zone: window.__FMT && window.__FMT.safeTop !== undefined
       ? { y_min: window.__FMT.safeTop, y_max: window.__FMT.safeBottom }
       : undefined,
