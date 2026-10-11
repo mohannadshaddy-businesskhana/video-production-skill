@@ -74,6 +74,8 @@
 | 70 | Gemini TTS on the free tier: five facts that cost a day | Voice |
 | 71 | A batch split across models, and one voice per video | Voice |
 | 72 | One broken voice line blanked a whole film | Voice |
+| 73 | Breath and hiss between the sentences | Voice |
+| 74 | Real book covers instead of drawn placeholders | Brand |
 
 ---
 
@@ -1005,6 +1007,30 @@ not just the tween. Nothing downstream re-checks a time.
 - after a batch, pull one frame per video at ~1.5s into one contact sheet — a blank film shows at
   a glance, and it is the cheapest check there is.
 ---
+
+### 73 · Breath and hiss between the sentences
+
+**What happened:** the client heard a hiss («وش») between sentences in many videos — the TTS breath and
+room tone in the pauses, made louder by the loudness pass. `agate` took only 3–4 dB off; `silencedetect`
+did not see the breaths at all, because it reads peaks.
+**Rule:** measure the **RMS every 10 ms**; every stretch below −34 dB lasting ≥150 ms is turned down
+−18 dB in its core, keeping 30 ms at each edge so word tails are untouched — `scripts/quiet_pauses.mjs`
+on every voice line **before** assembly and loudness. Measured: breaths −38…−44 dB → −56…−60 dB, speech
+level unchanged.
+---
+
+### 74 · Real book covers instead of drawn placeholders
+
+**What happened:** a video about one book showed a drawn placeholder cover; the client asked for the real
+cover, same frame and size.
+**Rule:** research each cover (Goodreads image CDN, Neel wa Furat, Jarir), then `scripts/covers.mjs`:
+downloads, refuses < 250 px or non-portrait, **trims the white square** store photos put around a cover
+(cropdetect on the negated image needs a looped still — it skips the first frames), normalises to 2:3,
+and writes a contact sheet + provenance. **LOOK at the sheet** and match every title before trusting it;
+note editions (an English edition, a volume 2) for the client. curl.exe on Windows cannot write to a
+non-ASCII path — download to a temp folder.
+---
+
 ## Recurring patterns — read these if you have no time for the whole log
 
 1. **What is written as prose gets violated.** Four rules were written clearly and violated in the

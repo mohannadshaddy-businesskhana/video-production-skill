@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.3 — 2026-10-11
+- quiet_pauses.mjs (breath/hiss in pauses, #73) + covers.mjs (real book covers, #74)
+
 ## v1.2.2 — 2026-10-11
 - failure-log #72: one broken voice line blanked a whole film — tts_batch rejects implausible splits and regenerates the line alone
 
