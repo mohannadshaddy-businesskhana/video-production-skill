@@ -1029,6 +1029,11 @@ downloads, refuses < 250 px or non-portrait, **trims the white square** store ph
 and writes a contact sheet + provenance. **LOOK at the sheet** and match every title before trusting it;
 note editions (an English edition, a volume 2) for the client. curl.exe on Windows cannot write to a
 non-ASCII path — download to a temp folder.
+**Then the palette check failed 14 of 49 videos** (up to 12% off-palette): a cover is a photograph in the
+publisher's colours. Declare every real cover as `type: "image"` in the manifest (verify masks images) — and
+where a cover MOVES (lands big in the centre, then settles into a grid cell), one image entry **per resting
+position**, each measured after it settles; one entry measured mid-flight masked the wrong box. A drawn
+placeholder stays measured: it is our own chrome.
 
 ### 75 · Lost audio has a rescue ladder — and "keep it" is the last rung
 
