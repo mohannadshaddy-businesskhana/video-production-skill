@@ -1029,6 +1029,56 @@ downloads, refuses < 250 px or non-portrait, **trims the white square** store ph
 and writes a contact sheet + provenance. **LOOK at the sheet** and match every title before trusting it;
 note editions (an English edition, a volume 2) for the client. curl.exe on Windows cannot write to a
 non-ASCII path — download to a temp folder.
+
+### 75 · Lost audio has a rescue ladder — and "keep it" is the last rung
+
+**What happened:** receiver holes destroyed words inside sentences of six videos. The first delivery
+kept every damaged sentence "because most of it is there"; the presenter flagged every one of them
+as unintelligible — including a hook.
+**Rule:** for each damaged stretch, take the first rung that works: cut the damaged phrase → cut the
+sentence → drop the whole list item (a six-KPI video became five; renumber) → show a lost spoken name
+as an on-screen label → open with the take's clean closing line (`prepend.mjs`) → borrow the missing
+part from another take of the same talk (`append.mjs`) → only then keep it, and list it as a decision.
+Rungs 3–6 change content: propose them with the reason, the presenter decides.
+**Cost:** a full re-cut of six videos.
+
+### 76 · A misspoken name is fixed by cutting the word, not by covering the mouth
+
+**What happened:** the presenter said "جوة Claude Code عندنا حاجة اسمها Projects" — Projects live in
+the Claude app. He proposed captioning "Claude Chat" and writing "Chat" over his mouth.
+**Rule:** first check whether removing the wrong word leaves a true sentence: cutting "Code" (0.34 s,
+edge placed by ear, `exact`) gave "جوة Claude عندنا حاجة اسمها Projects" — true, and the captions
+match the voice. Text over the mouth fails three ways: the ear still hears the wrong word, it covers
+the face (#58), and the caption contradicts the voice.
+
+### 77 · One long take is several videos
+
+**What happened:** a 7-minute take held a fragment on seasonal buying, three attempts at a KPI video,
+the KPI video, and a website-tools video with a 10 s stall and a full first attempt.
+**Rule:** read the whole transcript before deciding anything; split by topic into separate work dirs
+(hard links to the same source save disk); in each, keep the last complete attempt and drop the
+rest; an unfinished fragment is listed, not edited. Two takes of the same talk recorded minutes apart
+are the same video twice — offer one, and keep the other as a source of spare parts (#75).
+
+### 78 · The deliverable folder and the notes file are part of the edit
+
+**What happened:** ten videos went to review as previews in chat; the presenter asked for one folder
+with everything to review at once.
+**Rule:** deliver numbered finals (`01 - <id> - <topic>.mp4`) in one folder with a notes file in the
+presenter's language: per video what changed, and **only** the decisions a person must make. Review
+notes come back as "video number + second + note". Approved videos go to the client's Drive through
+the mounted Drive folder (a connector cannot carry a 150 MB file); verify each upload's byte size
+before moving the local copy to the Recycle Bin — and say the space is free only after he empties it.
+
+### 79 · An unattended batch still needs ears
+
+**What happened:** three checks passed — joint loudness, caption-vs-Whisper match, verify — on joints
+that still left a split word ("المـ-" of "المرتبات"), a dropped "ده... ده معناه", and a sentence
+Gemini invented at a cut.
+**Rule:** every flagged joint is listened to (`clipcheck.mjs`), every damaged stretch the presenter
+named is listened to after the fix, and any sentence the transcript has that nobody remembers being
+said is checked against Whisper and the loudness. Machines narrow where to listen; they do not
+replace listening.
 ---
 
 ## Recurring patterns — read these if you have no time for the whole log
@@ -1048,3 +1098,6 @@ non-ASCII path — download to a temp folder.
    coverage — and has nothing to say about whether it *means* anything to a stranger. Two demos
    (#42, #43) passed all fifteen checks and failed with their first human viewer. Every gate in this
    skill sits downstream of a script nobody validated.
+7. **Machines narrow where to look; people decide.** On re-edited footage every automatic check
+   passed on joints that still split words (#79), and every damaged sentence kept "because most of it
+   is there" came back from review (#75). Measure to find the spot — then listen, and look at the eyes.

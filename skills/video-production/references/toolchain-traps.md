@@ -241,6 +241,25 @@ inherits the old ratio's numbers.
 | T29 | a Node script that exits while a fetch socket is closing (Windows) | `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)` — and the real error message is lost | never `process.exit()` after network calls; set `process.exitCode`, catch and print the error first |
 | T30 | a bash script edited while xargs is still running it | bash reads scripts incrementally: a running copy can read the new bytes mid-file | stop the batch (kill the process tree, not just the wrapper) before editing a script it runs |
 
+## 6.2 Re-editing raw takes (Oct 2026) — see `recut-talking-head.md`
+
+| # | Trap | Symptom | Fix |
+|---|---|---|---|
+| T31 | a background bash `until …; do sleep; done` waiter on Windows, hours into a session | `fork: Permission denied`, the waiter dies and the queued render never starts | wait in Node: `setInterval` reading the previous job's output file, `spawnSync` the next job |
+| T32 | rebuilding `public/` or re-running the manifest while that video renders or verifies | the verifier measures one build against a video made from another | one writer per work dir; queue builds behind the render, never beside it |
+| T33 | a time key the resolver does not know (`hook_punch_until`) | `tl.set(…, NaN)` in the built page — no error anywhere; the punch-out never happened, since the pilot | every time-valued key goes through the resolver (`*_at`, `*_until`); grep the built page for `NaN` |
+| T34 | a palette swatch measured while its scene fades out | 35.9% off-palette on one sampled frame | a swatch's measured range ends where the fade starts (`to − 0.25`) |
+| T35 | the last caption sized by its words, cut by an end chosen on the eyes | a 1.2 s caption fails reading time | merge decisions measure the last line against the film's end |
+| T36 | re-mapping the raw transcript onto a cut | words the audio kept are missing from captions (a raw time just outside the start, or inside a removed range) | after a re-cut that removed or added words, re-transcribe the cut audio; check each sentence's first and last word against the loudness |
+| T37 | the aligner on damaged audio | words stacked on one instant; a sentence starting 2.7 s before the previous one ends | `fill_collapsed.mjs`, then `groq_retime.mjs`; check monotonic order before building |
+| T38 | snapping a cut edge to the quietest point nearby | the quietest 10 ms was inside a word: "المرتبات" cut to "المـ" | listen to the joint; place the edge by ear with `"exact": true` |
+| T39 | `source_end` typed by hand | 3 s past the last word stayed in the cut — the presenter getting up, an empty chair | the tail is cut to the source's measured end, never a typed one |
+| T40 | a re-timed reference at time 0 | `"w:word>-0.01"` — the build's reference regex rejects it | clamp re-timed references at 0 |
+| T41 | AAC encode after a −2 dB limiter | +0.3 dBTP on one file, QC fails | on a true-peak QC failure, normalise once more at −4 dB and re-check |
+| T42 | a killed render leaves a temp file open | `EPERM … aroll.audio.f32` on the next cut | delete the leftover temp file, re-run |
+| T43 | a full disk mid-render | `No space left on device` at the very end of a 25-minute render | delete `output.mp4` / `output_enc.mp4` after each pass; hard links (review folders) keep an overwritten file's old bytes alive; the Recycle Bin frees nothing until emptied |
+| T44 | rendering without a pre-check | six of eight renders failed on reading time, 20 minutes each | `precheck.sh` (build + manifest + dwell + caption height) before every render |
+
 ## 7. Additions to the stop list in `unattended.md`
 
 | # | Situation | Why |

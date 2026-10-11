@@ -69,6 +69,7 @@ A rule without its scar gets rationalized away.
 | `references/video-types.md` | **Before any build.** What makes each type that type — carrier, camera, voice, rhythm |
 | `references/unattended.md` | **Before any batch the user will not watch** |
 | `references/whiteboard.md` | Hand-drawn / draw-on technique, inside any route |
+| `references/recut-talking-head.md` | **Before re-editing any raw talking-head take** — triage, edit decisions, joints, the rescue ladder for lost audio, the eyes, delivery |
 | `references/arabic-voice.md` | **Before any Arabic narration.** The spoken form (tashkeel, pause form, numbers in words), the tested provider chain and its quotas, the listening check |
 
 Every reference also exists as `<name>.ar.md` — the Arabic original the productions were run
@@ -114,6 +115,7 @@ to and what this layer adds on top.
 | Cutdowns, aspect variants, or platform versions of something that exists | `routes/versions.md` |
 | A localized or dubbed version | `routes/localization.md` |
 | A project that needs a camera, a crew, or a quote | `routes/camera-project.md` |
+| Raw talking-head takes to cut into finished videos (false starts, restarts, wireless-mic dropouts) | `references/recut-talking-head.md` — the whole playbook, then `/hyperframes` for the composition |
 | A video already rendered, to be reviewed or diagnosed | `routes/audit.md` |
 | Anything else | Delegate straight to `/hyperframes`, then apply § Verify below |
 

@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.3.0 — 2026-10-11
+- recut-talking-head playbook (raw talking-head takes → finished videos), failure-log #75–#79 (rescue ladder for lost audio, fix a misspoken word by cutting it, one long take = several videos, delivery folder + notes, ears on unattended batches), toolchain traps T31–T44, recurring pattern 7
+
 ## v1.2.3 — 2026-10-11
 - quiet_pauses.mjs (breath/hiss in pauses, #73) + covers.mjs (real book covers, #74)
 
