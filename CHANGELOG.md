@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.2 — 2026-10-11
+- failure-log #72: one broken voice line blanked a whole film — tts_batch rejects implausible splits and regenerates the line alone
+
 ## v1.2.1 — 2026-10-11
 - tts_batch.mjs: index per video — a line shared by two videos no longer mixes two models' voices (failure-log #71)
 

@@ -88,6 +88,12 @@ function split(takeOrDir, lines, model, work) {
   if (r.status !== 0) throw new Error("voice_timings failed: " + (r.stderr || r.stdout).slice(-500));
   for (const row of JSON.parse(readFileSync(join(work, "vt", "timings.json"), "utf8")).lines) {
     const k = row.id.slice(1);
+    // a split line must be plausible before it is cached (failure-log #72): words inside the line, a sane length
+    const letters = [...row.text.replace(/[^\p{L}]/gu, "")].length;
+    const words = row.words || [];
+    if (row.duration < Math.max(0.6, letters * 0.035) ||
+        words.some((w) => !Number.isFinite(w.start) || w.start < row.start - 0.05 || w.end > row.end + 0.3))
+      throw new Error("BROKEN_SPLIT " + k + " (" + row.duration + "s for " + letters + " letters)");
     copyFileSync(join(work, "vt", row.file), join(CACHE, k + ".wav"));
     writeFileSync(join(CACHE, k + ".json"), JSON.stringify((row.words || []).map((w) => [+(w.start - row.start).toFixed(3), +(w.end - w.start).toFixed(3), w.w])));
   }
@@ -155,7 +161,11 @@ async function group(jobs) {
     const lines = jobs.flatMap((j) => j.lines);
     try {
       if (lines.length <= 2) for (const t of lines) await oneLine(t, model, work);
-      else { const take = join(work, "take.wav"); writeFileSync(take, wav(await synth(model, lines.join("\n\n")))); split(take, lines, model, work); }
+      else {
+        const take = join(work, "take.wav"); writeFileSync(take, wav(await synth(model, lines.join("\n\n"))));
+        try { split(take, lines, model, work); }
+        catch (e) { if (!/BROKEN_SPLIT/.test(e.message)) throw e; console.log("  split broke (" + e.message + ") — every line of this group is voiced alone"); for (const t of lines) await oneLine(t, model, work); }
+      }
     } catch (e) { if (quota(e)) { console.log(`  ${model}: quota reached — next model`); retired.add(model); continue; } throw e; }
     const moveOn = [];
     for (const j of jobs) {

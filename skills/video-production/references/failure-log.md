@@ -73,6 +73,7 @@
 | 69 | A free voice endpoint that closed overnight | Voice |
 | 70 | Gemini TTS on the free tier: five facts that cost a day | Voice |
 | 71 | A batch split across models, and one voice per video | Voice |
+| 72 | One broken voice line blanked a whole film | Voice |
 
 ---
 
@@ -986,6 +987,24 @@ with the same voice name still sound slightly different — tell the client whic
 which model, and offer to unify them when the quotas allow.
 ---
 
+### 72 · One broken voice line blanked a whole film
+
+**What happened:** a take of five videos was split into lines, and one line came out **0.74s** long
+where its text needs about six; its word timings were garbage (a word "said" at −87.6s). The build
+used one of those words as a cue, a caption got an end time of −75.8s, and the render came out with
+**every animated element missing for the whole film** — only the captions, the watermark and the end
+card (timed by attributes, not by the timeline) appeared. The render, the loudness pass and the
+manifest all "succeeded".
+**Cause:** one non-finite or negative position inserted into a GSAP timeline breaks the timeline,
+not just the tween. Nothing downstream re-checks a time.
+**Rule:** **a time is checked where it is made.**
+- `tts_batch.mjs` rejects a split line whose words are not inside its own duration, or whose
+  duration is implausibly short for its letters, and regenerates it alone;
+- the build **refuses to render** when any scene start, cue, caption or voice clip is non-finite,
+  negative, or ends before it starts, and names the line to regenerate;
+- after a batch, pull one frame per video at ~1.5s into one contact sheet — a blank film shows at
+  a glance, and it is the cheapest check there is.
+---
 ## Recurring patterns — read these if you have no time for the whole log
 
 1. **What is written as prose gets violated.** Four rules were written clearly and violated in the
