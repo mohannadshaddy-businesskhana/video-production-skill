@@ -28,6 +28,18 @@ were wasted.
 Open on a **visual event** — a cut, a frame change, a move — under text that
 lands hard. Not a fade-in on a title card.
 
+### The hook names the subject — in the picture and in the line
+
+A 49-video batch passed every hook check (readable before 2s, still, high contrast) and was
+rejected: «الدخلات ضعيفة… محتاجة تكون جذابة أكتر ومتعلقة بالموضوع أو الكتاب» (failure-log #67).
+A generic question on an empty page could open any video.
+
+- **Visual hook:** the subject is on screen **from frame 0** — the book's cover, or the one number
+  the line is about. The line lands *after* the visual settles (a short punch, no bounce).
+- **Written/verbal hook:** a detail only this subject has — its inciting moment, its number with
+  its payoff, a belief it flips, a quiz on a name. Not «هل تعرف…؟» about nothing in particular.
+- **Truth gate:** a rewritten hook uses only facts already in the brief's fact sheet.
+
 ### Stack the hooks
 
 A short video carries three hooks at once, and using more than one multiplies the

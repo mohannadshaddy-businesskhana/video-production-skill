@@ -63,6 +63,16 @@
 | 59 | A follow CTA on a video that posts to two accounts | Conversion |
 | 60 | Written summaries over a captioned talk, and a badge that never leaves | Form |
 | 61 | The last frame caught the presenter looking away | Edit |
+| 62 | The transcript had a sentence the audio did not | Language |
+| 63 | Whisper returned its own prompt as the transcript | Language |
+| 64 | A third caption line came down onto the face | Layout |
+| 65 | The cut ended on an empty chair | Edit |
+| 66 | Review 1 of a ten-video batch — the rules it produced | Process |
+| 67 | A hook that was a sentence on an empty page | Hook |
+| 68 | An Arabic voice that "doesn't know Arabic": undiacritized text | Voice |
+| 69 | A free voice endpoint that closed overnight | Voice |
+| 70 | Gemini TTS on the free tier: five facts that cost a day | Voice |
+| 71 | A batch split across models, and one voice per video | Voice |
 
 ---
 
@@ -887,6 +897,93 @@ written down; each is listed with how it is now enforced.
 11. **Layout: pictures directly under the face, captions below them.**
 
 **Cost:** one full re-cut and re-render of ten videos.
+---
+
+### 67 · A hook that was a sentence on an empty page
+
+**What happened:** 49 short book videos opened on a question in large type on a cream page —
+«تقرأ الآية… ثم تمضي؟», «فاتك معرض الرياض؟». Every one passed every check (hook readable before
+2.0s, still, high contrast).
+**Result:** the client's words: «الدخلات ضعيفة إجمالاً… محتاجة تكون جذابة أكتر ومتعلقة بالموضوع أو
+الكتاب». A full re-voice and re-render of 46 videos.
+**Why the checks passed:** they measure whether a hook *can be read*, not whether it is *about
+anything*. A generic question could open any video, and the first frames showed no subject at all.
+**Rule:** the hook has two halves, and both must name the subject.
+- **Visual:** the subject is on screen from frame 0 — the book's cover, or the one number the
+  line is about («63», «1727», «25%»). Then the line lands as a short punch (scale 1.12 → 1,
+  0.35s, no bounce) *after* the visual has settled — one motion at a time (#28, #29).
+- **Copy:** a detail only this subject has, in the first line. «آيةٌ تقرؤها كل يوم… هل توقفت
+  عندها مرة؟» beats «تقرأ الآية… ثم تمضي؟» because it puts the reader's daily habit against the
+  book's promise. Levers that worked: the story's inciting moment («رجلٌ ابتُلي ببلية… فكان الجواب
+  كتاباً كاملاً»), a myth flipped («الفلسفة ليست صعبة… الكتاب الأول هو الصعب»), a number with its
+  payoff («30 يوماً… 4 كتب… وخطة جاهزة»), a quiz («ليس أبا حامد… إنه محمد الغزالي»).
+- **Truth gate:** a new hook may only use facts already verified in the brief's fact sheet. One
+  draft called a 2018 novel a «classic»; another said «قانون» where the source says «تأمل».
+  Check every hook against the fact sheet before voicing it.
+- Keep the old hook beside the new one (`was:`) so a single hook can be reverted.
+
+### 68 · An Arabic voice that "doesn't know Arabic": undiacritized text
+
+**What happened:** narration was sent to a neural Arabic voice as ordinary undiacritized text.
+**Result:** the client's words: «الصوت بيحصل فيه أخطاء أحيانا وكأن اللي بيقرأ مبيعرفش عربي أصل».
+**Cause:** written Arabic omits short vowels; the engine *guesses* them. «كتب» was read as
+*kataba* where the text meant *kutiba*; case endings were spoken before pauses (*kāmilan.*), which
+is exactly how a non-native reader sounds; numbers and «ﷺ» were read literally or skipped.
+**Rule:** the voice never reads the caption. Every line has a **spoken form** kept apart from the
+written one:
+- **full tashkeel inside the phrase**;
+- **pause form (waqf) at every comma and full stop** — no case ending before a pause («كامِلا»
+  not «كامِلاً», «يَوْم،» not «يَوْمٍ،»), because that is how a native reader stops; poetry keeps
+  its final vowels (the rhyme needs them);
+- **numbers in words** in the right case («عامَ أَلْفٍ وَتِسْعِمِئَةٍ وَسِتَّةٍ وَسِتّين»);
+- «ﷺ» → «صَلّى اللهُ عَلَيْهِ وَسَلَّم»; proper names vowelled (السَّنْعوسيّ، جوخَة الحارِثيّ).
+The caption keeps the written line; only the voice gets the diacritized one. A table keyed by
+the written line (`tashkeel.mjs`) makes a missing spoken form a build error, not a guess.
+**What the automatic check cannot do:** a listening model transcribes *words*, not vowels —
+«كَتَبَ» and «كُتِبَ» transcribe the same. The tashkeel layer prevents the error; only a human
+ear confirms it.
+
+### 69 · A free voice endpoint that closed overnight
+
+**What happened:** the first batch used Microsoft Edge's read-aloud endpoint through `edge-tts`
+(free, no key, word boundaries included). The next day every request returned **403**; updating
+the package and checking the clock changed nothing.
+**Result:** no voice at all until a new provider was chosen and wired in.
+**Rule:** **never ship on an unofficial endpoint.** It can close at any time, and it was never
+licensed for commercial use anyway. Use a provider with published terms and a key, and keep a
+**fallback chain** of tested providers or models so one closing never stops production
+(`references/arabic-voice.md`).
+
+### 70 · Gemini TTS on the free tier: five facts that cost a day
+
+Measured on one account on 11 Oct 2026, against the docs and a developer report that said
+otherwise:
+1. **~10 requests per day per model** on the free tier — measured on `gemini-2.5-flash-preview-tts`
+   and `gemini-3.8-flash-tts`; the "100/day" report did not hold. Each model has its **own**
+   quota, and so does each **listening** model used to check the lines.
+2. **`gemini-3.8-flash-tts` reads instructions aloud.** A style line placed in the text — «اقرأ
+   بالعربية الفصحى… لا تقرأ هذه التعليمات» — was spoken, including the last sentence. Send the
+   narration only (or the style through the API's style field). 2.5-flash did not read it.
+3. **Two-speaker mode did not switch voices**: both "speakers" came out as the first voice, so a
+   male/female sample comparison had no female in it. Compare voices with one request each.
+4. **New API keys start `AQ.` (53 chars), not `AIza`** — `tts_gemini.mjs` refused a working key
+   on its shape check. Fixed: both shapes are accepted.
+5. **One take for several lines splits wrongly at a comma** (#51 again): «من الفاتحة إلى الناس» was
+   cut into the next line. The listening check caught it; the line was regenerated alone.
+**Rule:** measure the quota on day one (it is the limit that shapes the whole plan), and budget
+requests: lines of **several videos in one request**, the listening check on every line, a
+failed line regenerated **alone** (one request per line, no split — nothing can move).
+
+### 71 · A batch split across models, and one voice per video
+
+**What happened:** with ~10 requests a day per model, 46 videos could not be voiced on one model
+in one day. Grouping five videos per request and moving to the next model on a 429 finished the
+batch — but a video whose redo hit the quota on model A could not be patched from model B.
+**Rule:** **a video is voiced by one model, start to finish.** When a redo on model A answers
+429, the whole video moves to model B; the rest of its group stays on A. The cache key includes
+the model, and the build takes each line from whichever model voiced its video. Different models
+with the same voice name still sound slightly different — tell the client which videos are on
+which model, and offer to unify them when the quotas allow.
 ---
 
 ## Recurring patterns — read these if you have no time for the whole log

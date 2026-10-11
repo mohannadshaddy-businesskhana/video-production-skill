@@ -69,6 +69,7 @@ A rule without its scar gets rationalized away.
 | `references/video-types.md` | **Before any build.** What makes each type that type — carrier, camera, voice, rhythm |
 | `references/unattended.md` | **Before any batch the user will not watch** |
 | `references/whiteboard.md` | Hand-drawn / draw-on technique, inside any route |
+| `references/arabic-voice.md` | **Before any Arabic narration.** The spoken form (tashkeel, pause form, numbers in words), the tested provider chain and its quotas, the listening check |
 
 Every reference also exists as `<name>.ar.md` — the Arabic original the productions were run
 in. The English file is the one to read; the Arabic is kept because it is the wording the
@@ -90,6 +91,7 @@ corrections were actually given in.
 | `cue_sheet.mjs` | cue sheet + licence audit from a media ledger |
 | `localize.mjs` | translatable strings, and what translation did to their length |
 | `tts_gemini.mjs` | narration from Gemini TTS, Egyptian Arabic included, on the free tier (about ten requests a day). `--whole` spends one request on the whole narration; `--check` listens to where every line starts; `--only` regenerates lines one at a time |
+| `tts_batch.mjs` | narration for a whole batch on a free tier: several videos per request, a fallback chain of TTS models on 429, one model per video, and a listening check that regenerates a misheard line alone. Reads `jobs.json` of SPOKEN forms; writes a cache + `index.json` the build reads |
 | `voice_timings.mjs` | a recorded or generated narration into per-line timings at one matched level. Takes either a take per line, or one take aligned to the script. Each line is cut to its words and its pauses capped; `--clean` also cleans a phone recording; `--words` adds when each word is said, for captions, and `--plot` draws the cuts on each line's spectrogram |
 | `holes.mjs` | **the gate on wireless-mic footage, before any edit.** Finds the holes a receiver left (packets the phone timestamped and never got), says which ones cut into speech, and gives a verdict per file: clean · light · medium · heavy (reshoot). `--dir` triages a whole shoot into one table |
 | `repair_holes.mjs` | closes the light holes: cuts each one from picture and sound on the same whole frames, so lip sync holds; 30fps CFR out, plus a cut list back to the raw. It cannot bring back a lost syllable |
@@ -252,6 +254,24 @@ Be honest about it.
   them under craft errors.
 - **A video that passes every check can still be a weak video.** Verification prevents failure. It
   does not create success.
+
+## Maintaining this skill — every change reaches GitHub
+
+The source of truth is the repository `video-production-skill` (GitHub), not this folder.
+`install.sh` **replaces** this folder with the repository's copy, so a change made only here is
+lost at the next install — eleven failure-log entries (#56–#66) were lost that way until v1.1.0
+recovered them.
+
+After **any** change to this skill — a failure-log entry, a check, a script:
+
+```bash
+bash <SKILL_DIR>/scripts/publish.sh "<one line: what changed>"            # patch bump
+bash <SKILL_DIR>/scripts/publish.sh --minor "<what changed>"              # new capability
+```
+
+It copies this folder into the repository clone, refuses if the clone has edits this folder does
+not, bumps `VERSION`, adds the line to `CHANGELOG.md`, commits, tags `vX.Y.Z`, and pushes.
+A change is not done until it is published.
 
 ## Hard stops
 

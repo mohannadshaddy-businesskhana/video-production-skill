@@ -230,6 +230,17 @@ inherits the old ratio's numbers.
 
 ---
 
+## 6.1 Windows and long batches (Oct 2026)
+
+| # | Trap | Symptom | Fix |
+|---|---|---|---|
+| T25 | patching a file from a bash heredoc on Windows | the anchor "is missing" though it is in the file, or a `\n` inside a JS string becomes a real line break — and the script around it still runs on the old code | write the patch as a .mjs **file**, read the target with `.replace(/\r\n/g, "\n")`, and let the patch throw on a missing anchor *before* anything runs |
+| T26 | `npx hyperframes …` in parallel or right after another npx | `npm error code ECOMPROMISED · Lock compromised` | run the cached binary directly: `node <npm-cache>/_npx/<hash>/node_modules/hyperframes/bin/hyperframes.mjs` |
+| T27 | render temp folders | each render leaves a ~120 MB `hf-render-*` folder in TEMP; 49 renders ≈ 6 GB on a nearly full disk | point TEMP at a disk with room, and delete `hf-render-*` older than 15 minutes between renders |
+| T28 | the renderer's own disk guard | `✗ Low disk space — 1.0 GB free`: the render refuses to start (another job on the machine filled the disk) | render raw output and TEMP on the roomier drive; only the small finals go to the delivery folder |
+| T29 | a Node script that exits while a fetch socket is closing (Windows) | `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)` — and the real error message is lost | never `process.exit()` after network calls; set `process.exitCode`, catch and print the error first |
+| T30 | a bash script edited while xargs is still running it | bash reads scripts incrementally: a running copy can read the new bytes mid-file | stop the batch (kill the process tree, not just the wrapper) before editing a script it runs |
+
 ## 7. Additions to the stop list in `unattended.md`
 
 | # | Situation | Why |

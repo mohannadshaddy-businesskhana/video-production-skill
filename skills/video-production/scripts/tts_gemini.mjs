@@ -47,7 +47,8 @@ function readKey() {
     } else if (lines.length === 1) key = lines[0];
   } else key = process.env[name] || process.env.GEMINI_API_KEY || null;
   if (!key) { console.error("no key: set GEMINI_API_KEY or pass --key-file <path> [--key-var NAME]"); process.exit(2); }
-  if (!/^AIza[0-9A-Za-z_-]{35}$/.test(key)) {
+  // Google issues two shapes: AIza… (39 chars) and, since 2026, AQ.… (53) — failure-log #70
+  if (!/^(AIza[0-9A-Za-z_-]{35}|AQ\.[0-9A-Za-z_.-]{40,})$/.test(key)) {
     console.error("that value does not have the shape of a Google API key — refusing to send it");
     process.exit(2);
   }
