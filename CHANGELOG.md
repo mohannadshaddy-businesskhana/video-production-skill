@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.3.6 — 2026-10-13
+- quiet_pauses.mjs: floor −46 dB (−34 caught quiet words and long sibilants) — #82 follow-up
+
 ## v1.3.5 — 2026-10-13
 - quiet_pauses.mjs: leave 200 ms of word decay and ramp the gain — the step clipped Arabic soft endings (#82)
 

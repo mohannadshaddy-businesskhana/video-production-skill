@@ -1183,3 +1183,6 @@ fix (#73) lowered everything under −34 dB 30 ms after the speech — and Arabi
 (the word's own decay) and 40 ms before the next onset, and **ramp** the gain (80 ms down, 40 ms up). Check it
 by measuring every word end (from the word timings) before vs after: 0 dB drop on any audible tail.
 ---
+**Follow-up (same day):** 200 ms of protection was not enough — a few words are spoken QUIETLY whole
+(«العادة» at −36…−45 dB) and a final «س» hisses for 400 ms at −41…−46. The floor moved from −34 to **−46 dB**:
+below that is room tone, never speech. Measured on 1,992 word ends: 0 dropped by more than 3 dB.

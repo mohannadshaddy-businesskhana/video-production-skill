@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* quiet_pauses.mjs — take the breath and hiss out of the pauses in a TTS line, leave the speech alone.
  *
- *   node quiet_pauses.mjs <in.wav> <out.wav> [--floor -34] [--min 0.15] [--cut 0.125]
+ *   node quiet_pauses.mjs <in.wav> <out.wav> [--floor -46] [--min 0.15] [--cut 0.125]
  *
  * Measures the RMS level every 10 ms; every stretch below --floor dB that lasts at least --min seconds
  * is turned down by --cut (0.125 = −18 dB) in its core: 200 ms after the speech are left alone (a word's own
@@ -11,7 +11,7 @@
  */
 import { spawnSync } from "node:child_process";
 
-export function quietPauses(src, dst, { floor = -34, min = 0.15, cut = 0.125 } = {}) {
+export function quietPauses(src, dst, { floor = -46, min = 0.15, cut = 0.125 } = {}) {
   const r = spawnSync("ffmpeg", ["-hide_banner", "-i", src, "-af",
     "aresample=48000,asetnsamples=480,astats=metadata=1:reset=1,ametadata=print:key=lavfi.astats.Overall.RMS_level",
     "-f", "null", "-"], { encoding: "utf8" });
@@ -32,8 +32,8 @@ export function quietPauses(src, dst, { floor = -34, min = 0.15, cut = 0.125 } =
 
 if (/quiet_pauses\.mjs$/.test(process.argv[1] || "")) {
   const [src, dst, ...rest] = process.argv.slice(2);
-  if (!src || !dst) { console.error("usage: quiet_pauses.mjs <in.wav> <out.wav> [--floor -34] [--min 0.15] [--cut 0.125]"); process.exit(2); }
+  if (!src || !dst) { console.error("usage: quiet_pauses.mjs <in.wav> <out.wav> [--floor -46] [--min 0.15] [--cut 0.125]"); process.exit(2); }
   const opt = (n, d) => { const i = rest.indexOf(n); return i >= 0 ? +rest[i + 1] : d; };
-  const n = quietPauses(src, dst, { floor: opt("--floor", -34), min: opt("--min", 0.15), cut: opt("--cut", 0.125) });
+  const n = quietPauses(src, dst, { floor: opt("--floor", -46), min: opt("--min", 0.15), cut: opt("--cut", 0.125) });
   console.log(`${n} pauses quietened → ${dst}`);
 }
