@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.3.4 — 2026-10-12
+- strip_burst.mjs: cut the noise burst Gemini TTS leaves at the end of each take; tts_batch calls it (#81)
+
 ## v1.3.3 — 2026-10-12
 - renumber listening-check entry to #80 (75–79 were taken by a parallel session)
 

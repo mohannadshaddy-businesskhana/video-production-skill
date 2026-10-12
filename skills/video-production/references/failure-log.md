@@ -77,6 +77,7 @@
 | 73 | Breath and hiss between the sentences | Voice |
 | 74 | Real book covers instead of drawn placeholders | Brand |
 | 80 | A listening check that redid good lines | Voice |
+| 81 | The hiss was a burst at the END of each take, not breath | Voice |
 
 ---
 
@@ -1121,3 +1122,16 @@ and the run still printed "unchecked: none".
 7. **Machines narrow where to look; people decide.** On re-edited footage every automatic check
    passed on joints that still split words (#79), and every damaged sentence kept "because most of it
    is there" came back from review (#75). Measure to find the spot — then listen, and look at the eyes.
+
+### 81 · The hiss was a burst at the END of each take, not breath
+
+**What happened:** after the breath fix (#73) the client still heard «تشويش». Measured on the final mix: the
+pauses were at −70…−85 dB — clean. The noise was **~100 ms of flat broadband noise at −9 dB, louder than
+the speech**, at the very end of every Gemini TTS take (3.8, 3.1 and lite), after ~300 ms of silence. The
+trim-to-speech step kept it (it is loud), the breath fix left it (it only touches quiet stretches), and
+the aligner stretched the last word's timing over it. 34 of 279 lines (each take's last line) had it.
+**Rule:** `scripts/strip_burst.mjs` — a loud (≥ −14 dB), flat (core range ≤ 8 dB), short (≤ 350 ms) run
+at the very end, after ≥ 80 ms of silence, is cut at the silence and the last word's timing clamped.
+`tts_batch.mjs` now calls `stripLine` on every cached line. When a client hears noise, **measure where it
+is** (pause / speech / clip edge) before reusing a fix: two different noises, two different cures.
+---

@@ -23,6 +23,7 @@ import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { stripLine } from "./strip_burst.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const VT = join(HERE, "voice_timings.mjs");
@@ -96,6 +97,7 @@ function split(takeOrDir, lines, model, work) {
       throw new Error("BROKEN_SPLIT " + k + " (" + row.duration + "s for " + letters + " letters)");
     copyFileSync(join(work, "vt", row.file), join(CACHE, k + ".wav"));
     writeFileSync(join(CACHE, k + ".json"), JSON.stringify((row.words || []).map((w) => [+(w.start - row.start).toFixed(3), +(w.end - w.start).toFixed(3), w.w])));
+    stripLine(join(CACHE, k + ".wav"));   // the noise burst Gemini leaves at the end of a take (#81)
   }
 }
 
