@@ -175,6 +175,10 @@ const report = await page.evaluate(({ FW, FH, FPS, ROLES }) => {
 await writeFile(outPath, JSON.stringify(report, null, 2), "utf8");
 const missing = report.elements.filter((e) => e.missing).map((e) => e.id);
 console.log(`manifest → ${outPath}  (${report.elements.length} elements, ${report.chapters.length} chapters, via ${page.driver})`);
+// A route with a narrative skeleton reads chapter roles; a composition that never
+// declared them used to fail later as "got [None, None, …]" with no hint why (#82).
+if (report.chapters.length && report.chapters.every((c) => c.role === undefined))
+  console.warn("  ⚠ no chapter declares a role — add data-role to each chapter <section> or pass --roles a,b,c");
 if (missing.length) console.error("MISSING ELEMENTS:", missing.join(", "));
 
 await page.close();

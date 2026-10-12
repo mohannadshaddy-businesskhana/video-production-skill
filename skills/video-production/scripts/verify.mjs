@@ -664,8 +664,14 @@ function checkStructure(manifest, structure, rep) {
   const expected = structure.roles || ROLE_ORDER;
   if (structure.roles) {
     const ok = JSON.stringify(roles) === JSON.stringify(expected);
+    // No chapter carrying a role at all is a missing declaration, not a wrong
+    // structure: the composition never said which chapter is which. The old
+    // message ("got [None, None, …]") read like the story was broken (#82).
+    const undeclared = roles.length && roles.every((r) => r === undefined);
     rep.add("chapter roles", ok,
-            ok ? "situation→old→transition→solution→sweep→cta" : `got ${pyRepr(roles)}`,
+            ok ? "situation→old→transition→solution→sweep→cta"
+              : undeclared ? "no chapter declares a role — add data-role to each chapter <section>, or pass --roles to manifest.mjs"
+              : `got ${pyRepr(roles)}`,
             "#07");
   }
 
@@ -763,17 +769,20 @@ function checkLanguage(manifest, structure, rep) {
           !offenders.length ? `all ${lang}` : offenders.slice(0, 3).join("; "), "#39");
 }
 
-function checkCtaStillness(manifest, structure, rep) {
-  // #34 — the CTA once held for one second.
+function checkCtaHolds(manifest, structure, rep) {
+  /* #34 — the CTA once held for one second. #82 — and "hold" never meant a
+   * frozen frame: the card must be complete, with nothing new entering, for
+   * this long — while "no dead air" still holds over it. Emphasis on the
+   * action itself (a pulse on the button) is how both are true at once. */
   const need = (structure || {}).cta_min_still_frames;
   if (!need) return;
   const cta = (manifest.chapters || []).find((c) => c.role === "cta");
-  if (!cta) { rep.add("cta stillness", false, "no chapter with role 'cta'", "#34"); return; }
+  if (!cta) { rep.add("cta holds", false, "no chapter with role 'cta'", "#34"); return; }
   const inCta = manifest.elements.filter((e) => e.chapter === cta.id);
   const lastEntry = inCta.length
     ? Math.max(...inCta.map((e) => e.still_from ?? e.frames[0])) : cta.start;
   const still = cta.end - lastEntry;
-  rep.add("cta stillness", still >= need, `${still} frames still (min ${need})`, "#34");
+  rep.add("cta holds", still >= need, `complete for ${still} frames, nothing new enters (min ${need})`, "#34");
 }
 
 // ── main ────────────────────────────────────────────────────────────────────
@@ -824,7 +833,7 @@ checkHeroIntro(manifest, structure, rep);
 checkSweep(manifest, structure, rep);
 checkRelationShapes(manifest, rep);
 checkLanguage(manifest, structure, rep);
-checkCtaStillness(manifest, structure, rep);
+checkCtaHolds(manifest, structure, rep);
 
 const code = rep.render();
 

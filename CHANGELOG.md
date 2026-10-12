@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.3.5 — 2026-10-13
+- quiet_pauses.mjs: leave 200 ms of word decay and ramp the gain — the step clipped Arabic soft endings (#82)
+
 ## v1.3.4 — 2026-10-12
 - strip_burst.mjs: cut the noise burst Gemini TTS leaves at the end of each take; tts_batch calls it (#81)
 

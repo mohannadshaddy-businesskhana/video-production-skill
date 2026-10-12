@@ -46,8 +46,9 @@ Both are real constraints found the hard way:
   five videos then failed ten in a row. Place anything the frame depends on **before the earliest
   class midpoint**.
 - **Chapter 6 has 180 frames for: a number that must be readable (≥45 frames of stillness) and a
-  CTA that must hold (≥105 frames).** 45 + 105 + entrances = 180 exactly. There is no slack, so the
-  CTA lockup enters as **one block with no stagger** — any stagger eats the stillness.
+  CTA that must hold complete (≥105 frames).** 45 + 105 + entrances = 180 exactly. There is no slack, so
+  the CTA lockup enters as **one block with no stagger**. Complete is not frozen: the button pulses on
+  the beat through the hold, or the frame fails "no dead air" (#82).
 
 ## Per-video data
 
@@ -92,7 +93,7 @@ Also hide at capture time: time-tracker widgets, onboarding tooltips, toasts, ha
 ## Ship-blocking checks specific to this route
 
 Beyond the standard verifier: `chapter roles`, `class skeleton`, `sweep item count`,
-`sweep accumulates`, `sweep stays shallow`, `hero named early`, `cta stillness`.
+`sweep accumulates`, `sweep stays shallow`, `hero named early`, `cta holds`.
 
 A `chapter roles` or `chapter continuity` failure is a **stop**, not a fix — the script's structure
 is wrong, and that is the user's decision.

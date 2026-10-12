@@ -78,6 +78,9 @@
 | 74 | Real book covers instead of drawn placeholders | Brand |
 | 80 | A listening check that redid good lines | Voice |
 | 81 | The hiss was a burst at the END of each take, not breath | Voice |
+| 82 | The breath fix clipped the ends of words | Voice |
+| 82 | A CTA rule that demanded the dead air another rule forbids | Conversion |
+| 83 | A name swap that the app's own re-render undid | Legal |
 
 ---
 
@@ -451,8 +454,10 @@ dozens of elements change in under 10 frames will read as a glitch.
 **What happened:** the video ended with a logo and a pale grey domain for about 1 second.
 **Result:** 20 seconds of work wasted. The domain is the only element that converts, and it had the
 least contrast in frame.
-**Rule:** **CTA ≥ 3.5 seconds of complete stillness.** The link is the highest contrast after the
-action button. The music does not start its fade until the card has settled.
+**Rule:** **the CTA is complete for ≥ 3.5 seconds — nothing new enters it.** The link is the highest
+contrast after the action button. The music does not start its fade until the card has settled.
+**Not a frozen frame (#82):** the hold is for the card's content; the picture keeps living through
+emphasis on the action itself.
 
 ### 35 · A truncated render file handed over for review
 
@@ -1134,4 +1139,47 @@ the aligner stretched the last word's timing over it. 34 of 279 lines (each take
 at the very end, after ≥ 80 ms of silence, is cut at the silence and the last word's timing clamped.
 `tts_batch.mjs` now calls `stripLine` on every cached line. When a client hears noise, **measure where it
 is** (pause / speech / clip edge) before reusing a fix: two different noises, two different cures.
+---
+
+### 82 · A CTA rule that demanded the dead air another rule forbids
+
+**What happened:** an 18-video series made before the dead-air gate (#49) existed was re-verified
+with it. Every video failed at the same three places, the CTA among them: rule #34 said "≥ 3.5
+seconds of complete stillness", and #49 fails any still stretch over 0.6 s under music. The two
+rules could not both pass, and the old check name ("cta stillness") said the wrong one was right.
+**The user's ruling:** a long, fully still stretch is rejected absolutely, and that comes first. The
+CTA still needs time to be taken in — so give it emphasis, not a freeze.
+**Rule:** the CTA card enters complete and **nothing new enters it for ≥ 3.5 s** (`cta holds`). Over
+that hold the action itself moves: a pulse on the button on the beat (scale 1 → 1.06, two beats a
+cycle), or a narrated line pointing at it. Motion on the action pulls the eye *to* it, so #29 is not
+broken. Also checked the same way: the end of the situation chapter (the client starts typing again
+once the hero's name has been read) and the solution's product shot (a slow push onto the part of
+the screen the line is about, starting only after the line has had 1.5 s of stillness).
+**Also:** a manifest whose chapters carry no role failed as `got [None, None, …]` — read as a broken
+story. It now says the roles were never declared, and `manifest.mjs` warns at measure time.
+
+### 83 · A name swap that the app's own re-render undid
+
+**What happened:** demo data built on a film's characters was swapped to original names on the DOM
+at capture time (#17). Re-shooting the series showed what the first shoot had shipped: four of ten
+staff were in the list and two of those four were misspelled, so they never matched; the agency's own
+name, the avatar initials, an email address and the film's city were never in it; and React re-rendered
+lists after the one-off pass and put «MI», «23-19» and «CDA» back between the pass and the pixel — in
+shots the pass had reported clean.
+**Rule:** build the swap list **from the seed file**, not from what one shot showed. Install it before
+the app loads and re-apply it on every DOM mutation (a MutationObserver), swap short names as whole
+words only, swap the initials that avatars compute from the original name, and judge each shot by
+reading the screen **after** it was taken — with a risky-token list wider than the swap list, so an
+unlisted variant fails loudly.
+**Also:** a demo sign-in endpoint was rate-limited (10 an hour per IP); the capture now keeps its
+session in the temp directory instead of signing in for every run.
+
+### 82 · The breath fix clipped the ends of words
+
+**What happened:** after #81 the client heard words "cut off in the last letter". Measured on S-03: the breath
+fix (#73) lowered everything under −34 dB 30 ms after the speech — and Arabic soft endings (ـا in «كاملا»,
+ـة in «ببليّة», a final hamza) fade out right through −36…−50 dB. 16 word ends lost 18 dB mid-decay.
+**Rule:** a pause treatment never starts at the speech threshold: leave **200 ms after the last loud frame**
+(the word's own decay) and 40 ms before the next onset, and **ramp** the gain (80 ms down, 40 ms up). Check it
+by measuring every word end (from the word timings) before vs after: 0 dB drop on any audible tail.
 ---

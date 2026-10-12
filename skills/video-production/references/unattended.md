@@ -116,7 +116,7 @@ run verify → read reports/NN.json
 | `sweep stays shallow` | remove the zoom or interaction from the sweep chapter | ✅ |
 | `relation shapes drawn` | draw the lines · a mesh of n nodes needs n(n−1)/2 edges | ✅ |
 | `single language` | translate · the exception is brand names in `brand_names` | ✅ |
-| `cta stillness` | add CTA stillness · borrow from the sweep chapter | ✅ |
+| `cta holds` | lengthen the complete CTA · borrow from the sweep chapter — never by freezing it (#82) | ✅ |
 | `hero named early` | bring the identity block forward | ✅ |
 | `class skeleton` | return the chapter boundaries to the class skeleton | ✅ |
 | `beat continuity` | the track runs continuously · gain automation only · a 12 kHz low-passed hit | ⚠️ two attempts |

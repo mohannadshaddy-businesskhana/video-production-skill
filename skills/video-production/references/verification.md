@@ -51,7 +51,7 @@ Run `node scripts/doctor.mjs` to see what the machine has.
 
 Narrative routes add: `chapter roles` · `class skeleton` · `hero named early` · `sweep item count` ·
 `sweep accumulates` · `sweep stays shallow` · `relation shapes drawn` · `single language` ·
-`cta stillness`.
+`cta holds`.
 
 ---
 

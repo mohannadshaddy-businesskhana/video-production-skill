@@ -107,7 +107,7 @@ node scripts/verify.mjs \
 | `sweep stays shallow` | شيل الزوم/التفاعل من فصل الاستعراض | ✅ |
 | `relation shapes drawn` | ارسم الخطوط · شبكة بـ n عقدة = n(n−1)/2 خط | ✅ |
 | `single language` | ترجم · الاستثناء أسماء العلامات في `brand_names` | ✅ |
-| `cta stillness` | زوّد سكون الـCTA · استلف من فصل الاستعراض | ✅ |
+| `cta holds` | طوّل الـCTA المكتمل · استلف من فصل الاستعراض — من غير ما تجمّده (#82) | ✅ |
 | `hero named early` | قدّم كتلة التعريف | ✅ |
 | `class skeleton` | أرجع حدود الفصول لهيكل الفئة | ✅ |
 | `beat continuity` | التراك يشتغل متصل · أتوميشن gain بس · ضربة low-pass 12kHz | ⚠️ محاولتان |
