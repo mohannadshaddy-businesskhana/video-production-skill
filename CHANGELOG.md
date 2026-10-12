@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.3.3 — 2026-10-12
+- renumber listening-check entry to #80 (75–79 were taken by a parallel session)
+
 ## v1.3.2 — 2026-10-12
 - failure-log #75: listening check shifted by one and redid good lines — stop on mass failure, one transcript per video
 

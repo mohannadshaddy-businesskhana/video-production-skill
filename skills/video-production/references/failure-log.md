@@ -76,7 +76,7 @@
 | 72 | One broken voice line blanked a whole film | Voice |
 | 73 | Breath and hiss between the sentences | Voice |
 | 74 | Real book covers instead of drawn placeholders | Brand |
-| 75 | A listening check that redid good lines | Voice |
+| 80 | A listening check that redid good lines | Voice |
 
 ---
 
@@ -1087,7 +1087,7 @@ said is checked against Whisper and the loudness. Machines narrow where to liste
 replace listening.
 ---
 
-### 75 · A listening check that redid good lines
+### 80 · A listening check that redid good lines
 
 **What happened:** 30 clips per listening request, answers numbered `{i, text}`. The listener's answers came
 back **shifted by one**: every one of 412 lines "differed" while each transcription was right for its
