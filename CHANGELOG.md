@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.3.2 — 2026-10-12
+- failure-log #75: listening check shifted by one and redid good lines — stop on mass failure, one transcript per video
+
 ## v1.3.1 — 2026-10-11
 - failure-log #74: real covers must be registered as image elements, one entry per resting position
 

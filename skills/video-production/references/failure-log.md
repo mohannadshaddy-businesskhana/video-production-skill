@@ -76,6 +76,7 @@
 | 72 | One broken voice line blanked a whole film | Voice |
 | 73 | Breath and hiss between the sentences | Voice |
 | 74 | Real book covers instead of drawn placeholders | Brand |
+| 75 | A listening check that redid good lines | Voice |
 
 ---
 
@@ -1086,7 +1087,21 @@ said is checked against Whisper and the loudness. Machines narrow where to liste
 replace listening.
 ---
 
-## Recurring patterns — read these if you have no time for the whole log
+### 75 · A listening check that redid good lines
+
+**What happened:** 30 clips per listening request, answers numbered `{i, text}`. The listener's answers came
+back **shifted by one**: every one of 412 lines "differed" while each transcription was right for its
+neighbour — and the fix step regenerated good lines in 10 videos until the TTS quota ran out. Once the
+strong listeners hit 429, the weaker ones returned fragments («بدر», «عام الفيل») against unrelated lines,
+and the run still printed "unchecked: none".
+**Rule:**
+- never act on a check that fails almost everything — **a 100% failure rate is a broken check**, stop and
+  report; regenerate only when a small minority differs;
+- do not ask a listener to keep many clips apart: send **one recording per video** (lines joined with short
+  gaps), get one transcript, align it to the script **word by word**; no numbering to slip;
+- an answer from a model below the strong tier is "unchecked", not a verdict.
+---
+ — read these if you have no time for the whole log
 
 1. **What is written as prose gets violated.** Four rules were written clearly and violated in the
    very next render. If a rule is measurable, **write it as code.**
