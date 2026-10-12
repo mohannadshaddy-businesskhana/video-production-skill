@@ -4,11 +4,15 @@
 #   ./build.sh 11-versions/square        a version in its own folder
 # Stops at the first failure, because a render nobody gated is a render nobody trusts.
 set -uo pipefail
-export PATH="$PATH"
-export TEMP=".render-tmp"; export TMP="$TEMP"
-HF="$HF"
-SK="$HOME/.claude/skills/video-production/scripts"
-B="<repo>/demos"
+# Machine-specific paths come from the environment, never from this file:
+#   HF        hyperframes' dist/cli.js            (required)
+#   SK        the installed skill's scripts folder (default: ~/.claude/skills/video-production/scripts)
+#   NODE_ROOT a folder whose node_modules resolve the measuring scripts (default: this folder)
+B="$(cd "$(dirname "$0")" && pwd)"
+HF="${HF:?set HF to hyperframes/dist/cli.js}"
+SK="${SK:-$HOME/.claude/skills/video-production/scripts}"
+NODE_ROOT="${NODE_ROOT:-$B}"
+export TEMP="${TEMP:-$B/.render-tmp}"; export TMP="$TEMP"; mkdir -p "$TEMP"
 N="${1%/}"; D="$B/$N"
 NAME="${N//\//-}"                        # 11-versions/square → 11-versions-square
 
