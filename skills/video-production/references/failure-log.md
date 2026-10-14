@@ -81,6 +81,7 @@
 | 82 | The breath fix clipped the ends of words | Voice |
 | 82 | A CTA rule that demanded the dead air another rule forbids | Conversion |
 | 83 | A name swap that the app's own re-render undid | Legal |
+| 84 | A line cut off by its own box, measured as inside it | Layout |
 
 ---
 
@@ -1186,3 +1187,15 @@ by measuring every word end (from the word timings) before vs after: 0 dB drop o
 **Follow-up (same day):** 200 ms of protection was not enough — a few words are spoken QUIETLY whole
 («العادة» at −36…−45 dB) and a final «س» hisses for 400 ms at −41…−46. The floor moved from −34 to **−46 dB**:
 below that is room tone, never speech. Measured on 1,992 word ends: 0 dropped by more than 3 dB.
+
+### 84 · A line cut off by its own box, measured as inside it
+
+**What happened:** an 18-video series shipped with the hero's line reading «مديرة حسابا» (the last
+letters clipped) and the sweep chapter's line losing 31% of itself under its box — in all 54 files,
+every one of which passed "zone containment" and "safe zone".
+**Why the checks passed:** `manifest.mjs` clips each bbox to every overflow:hidden ancestor (so a
+cropped screenshot is measured as what shows). A line wider than its own zone was therefore measured
+as exactly the zone — the hidden part simply did not exist to the verifier.
+**Rule:** `manifest.mjs` records `cut`, the share of a text element's own box that clipping hides, and
+`verify.mjs` fails "text not cut off" above 1%. Control: the same composition measured 7.8% and 31%
+before the fix and nothing after it.

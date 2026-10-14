@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.4.0 — 2026-10-14
+- verify: 'text not cut off' (#84), CTA holds without freezing (#82), actionable missing-roles message; failure-log #82–#84 (CTA vs dead air, DOM name-swap gaps, clipped text); scrub machine paths and names
+
 ## v1.3.6 — 2026-10-13
 - quiet_pauses.mjs: floor −46 dB (−34 caught quiet words and long sibilants) — #82 follow-up
 

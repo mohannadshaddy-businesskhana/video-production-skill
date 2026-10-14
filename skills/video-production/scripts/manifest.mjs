@@ -136,6 +136,14 @@ const report = await page.evaluate(({ FW, FH, FPS, ROLES }) => {
       if (v) texts.push(v);
     }
     const e = { ...d, bbox: boxOf(node), text_nodes: texts };
+    // bbox is clipped to every overflow:hidden ancestor, so a line wider than its
+    // box measured as "inside the zone" while the viewer read «مديرة حسابا» (#84).
+    // Record how much of the element's own box the clipping hides.
+    if (d.type === "text" && !d.texture) {
+      const r = node.getBoundingClientRect(), [l, t, rr, b] = e.bbox;
+      const full = r.width * r.height, seen = Math.max(0, rr - l) * Math.max(0, b - t);
+      if (full > 0 && seen / full < 0.99) e.cut = +(1 - seen / full).toFixed(3);
+    }
     if (d.zoneEl) {
       const zn = document.querySelector(d.zoneEl);
       if (zn) { const k = "z-" + d.id; extraZones[k] = boxOf(zn); e.zone = k; }

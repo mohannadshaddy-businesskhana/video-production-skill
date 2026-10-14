@@ -769,6 +769,16 @@ function checkLanguage(manifest, structure, rep) {
           !offenders.length ? `all ${lang}` : offenders.slice(0, 3).join("; "), "#39");
 }
 
+function checkTextCut(manifest, rep) {
+  // #84 — a line wider than its box is clipped by the box, and every zone check
+  // passes because the clipped part is not measured at all.
+  const cut = manifest.elements.filter((e) => e.type === "text" && !e.texture && (e.cut || 0) > 0.01);
+  rep.add("text not cut off", !cut.length,
+          !cut.length ? "every line fully inside its box"
+            : cut.slice(0, 4).map((e) => `${e.id} ${Math.round(e.cut * 100)}% hidden «${String(e.text || "").slice(0, 24)}»`).join("; "),
+          "#84");
+}
+
 function checkCtaHolds(manifest, structure, rep) {
   /* #34 — the CTA once held for one second. #82 — and "hold" never meant a
    * frozen frame: the card must be complete, with nothing new entering, for
@@ -834,6 +844,7 @@ checkSweep(manifest, structure, rep);
 checkRelationShapes(manifest, rep);
 checkLanguage(manifest, structure, rep);
 checkCtaHolds(manifest, structure, rep);
+checkTextCut(manifest, rep);
 
 const code = rep.render();
 
