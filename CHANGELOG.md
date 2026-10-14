@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.4.1 — 2026-10-15
+- failure-log #85–#87: one hook for a whole series, the writer's problem instead of the owner's, a number alone on black
+
 ## v1.4.0 — 2026-10-14
 - verify: 'text not cut off' (#84), CTA holds without freezing (#82), actionable missing-roles message; failure-log #82–#84 (CTA vs dead air, DOM name-swap gaps, clipped text); scrub machine paths and names
 

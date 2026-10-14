@@ -82,6 +82,9 @@
 | 82 | A CTA rule that demanded the dead air another rule forbids | Conversion |
 | 83 | A name swap that the app's own re-render undid | Legal |
 | 84 | A line cut off by its own box, measured as inside it | Layout |
+| 85 | Eighteen videos, one hook | Hook |
+| 86 | The writer's problem instead of the owner's | Message |
+| 87 | A number alone on a black frame | Form |
 
 ---
 
@@ -1199,3 +1202,40 @@ as exactly the zone — the hidden part simply did not exist to the verifier.
 **Rule:** `manifest.mjs` records `cut`, the share of a text element's own box that clipping hides, and
 `verify.mjs` fails "text not cut off" above 1%. Control: the same composition measured 7.8% and 31%
 before the fix and nothing after it.
+
+### 85 · Eighteen videos, one hook
+
+**What happened:** a section series built from one template opened every video the same way: a
+client's WhatsApp message asking or answering something. 36 files passed every check.
+**Result:** the owner's words — the opening is very bad and repeated, for the third time in three
+videos; not every video can open on a client's WhatsApp message. He stopped the review at video 4.
+**Rule:** **in a series, the hook is per video, not per template.** Choose each video's hook type from
+`short-form.md` for that video's problem, and no two neighbouring videos share a hook type. A
+template fixes the timeline and the brand — never the opening situation.
+
+### 86 · The writer's problem instead of the owner's
+
+**What happened:** each video's problem was written by whoever drafted the script. Finance: "the
+worst thing is billing a client for something he paid". Sales: "the account manager re-types the
+deal into another system for 45 minutes". The owner's real problems: the agency owner does not know
+which client money was collected, what instalments remain and when; without a CRM nobody follows up
+the opportunities, the deal's details get lost, and what was agreed with the client never reaches the
+team. A finance line ("profitable on paper is one thing, cash in the safe is another") read as a
+lesson, not a reason to buy.
+**Result:** "the video is very bad", and a full rebuild of the series.
+**Rule:** **the problem each video sells is asked of the product owner, in his words, before any
+script.** It is the `alternative` and `claim` fields of `script.json` — the five fields that are
+questions for the user (#42, `short-form.md`). A script drafted from a feature list is a draft for
+him to correct, never a script. No line teaches the viewer a concept; every line is their pain or
+its end.
+
+### 87 · A number alone on a black frame
+
+**What happened:** each video's chapter 6 showed the section's number («15», «13») counting up alone
+on black for two seconds before the CTA.
+**Result:** "not understood and empty — remove it from every video."
+**Rule:** a number never stands alone: it is said inside the sentence that gives it its meaning, on
+the screen it counts, or it is cut. The six-chapter spine's "number" chapter is optional, not a slot
+to fill.
+**Also from the same review:** the sweep of the client portal ran over screenshots of the platform's
+own sections, not the portal's — the background of a sweep shows the thing being swept.
