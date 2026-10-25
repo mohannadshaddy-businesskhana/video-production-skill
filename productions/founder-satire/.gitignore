@@ -1,0 +1,4 @@
+node_modules/
+renders/
+.render-tmp/
+assets/music/

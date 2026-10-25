@@ -1,0 +1,549 @@
+<!doctype html>
+<!--
+  «رائد أعمال المظاهر» — wordless satire, 1080×1920, stick figures in black line.
+
+  One founder, five scenes, hard cuts on the music:
+    s1 pitch deck     rocket, unicorn, hockey stick, the globe
+    s2 competition    first place, trophy, confetti
+    s3 conference     a lanyard, business cards to everyone, a group selfie
+    s4 media          live on TV, a bubble of rocket/unicorn/bulb
+    s5 the punchline  an investor points at the sales chart — flat on zero.
+                      The founder turns the chart 90°: the flat line is now
+                      "growth". The investor leaves. The founder takes a selfie.
+
+  Two counters stay on screen the whole time: followers climb from 120 to
+  53,400; sales stay 0. That contrast is the whole joke, so it never leaves.
+
+  All scene times live in T (seconds). Re-timing to the track's beats is a
+  change to T only — every move inside a scene is relative to its scene start.
+-->
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>رائد أعمال المظاهر</title>
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face { font-family:"Hand"; src:url("assets/fonts/caveat.ttf") format("truetype");
+        font-weight:400 700; font-style:normal; font-display:block; }
+      :root { --ink:#141414; --paper:#F6F2E8; --red:#D0342C; --card:#FFFFFF; --shade:#E7E0CF; }
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:1080px; height:1920px; overflow:hidden; background:#F6F2E8; }
+      #root { position:relative; width:100%; height:100%; overflow:hidden; background:var(--paper); }
+      #stage { position:absolute; left:0; top:0; width:1080px; height:1920px; }
+      #stage .ink { fill:none; stroke:var(--ink); stroke-width:9; stroke-linecap:round; stroke-linejoin:round; }
+      #stage .thin { stroke-width:6; }
+      #stage .red { stroke:var(--red); }
+      #stage .fill { fill:var(--ink); }
+      #stage .paper { fill:var(--paper); }
+      #stage .white { fill:var(--card); }
+      #stage .shade { fill:var(--shade); stroke:none; }
+      #stage text { font-family:"Hand",cursive; font-weight:700; fill:var(--ink); }
+      /* the two counters: the joke is in their contrast, so they never leave */
+      #hud { position:absolute; left:90px; right:90px; top:250px; height:150px;
+             display:flex; justify-content:space-between; z-index:5; }
+      .card { width:420px; height:150px; background:var(--card); border:7px solid var(--ink);
+              border-radius:34px; display:flex; align-items:center; gap:22px; padding:0 34px; }
+      .card svg { width:84px; height:84px; flex-shrink:0; }
+      .card svg * { fill:none; stroke:var(--ink); stroke-width:7; stroke-linecap:round; stroke-linejoin:round; }
+      .num { font-family:"Hand",cursive; font-weight:700; font-size:104px; line-height:1;
+             color:var(--ink); direction:ltr; }
+      #cs .num { color:var(--red); }
+      #cs svg * { stroke:var(--red); }
+      #flash { position:absolute; inset:0; background:#FFFFFF; opacity:0; z-index:8; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="38"
+         data-fps="30" data-width="1080" data-height="1920">
+      <section id="film" class="scene clip" data-start="0" data-duration="38" data-track-index="0">
+        <svg id="stage" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div id="hud">
+          <div class="card" id="cf">
+            <svg viewBox="0 0 84 84"><circle cx="34" cy="26" r="14"/><path d="M8 74 C10 52 58 52 60 74"/>
+              <path d="M70 30 V54 M58 42 H82"/></svg>
+            <span class="num" id="nf">120</span>
+          </div>
+          <div class="card" id="cs">
+            <svg viewBox="0 0 84 84"><path d="M4 12 H16 L26 54 H68 L78 24 H20"/>
+              <circle cx="32" cy="70" r="6"/><circle cx="62" cy="70" r="6"/></svg>
+            <span class="num" id="ns">0</span>
+          </div>
+        </div>
+        <div id="flash"></div>
+      </section>
+      <audio id="bgm" src="assets/music/track.mp3" data-start="0" data-duration="38"
+             data-track-index="1" data-volume="1"></audio>
+    </div>
+
+    <script>
+const NS = "http://www.w3.org/2000/svg";
+const stage = document.getElementById("stage");
+const tl = gsap.timeline({ paused: true });
+window.__MF = window.__MF || [];
+window.__MOTION = window.__MOTION || [];
+
+/* ── scene clock (seconds) — the only thing a re-time touches ───────── */
+const T = { s1: 0, s2: 6.5, s3: 13, s4: 19.5, s5: 26, end: 38 };
+const FLOOR = 1450;
+
+/* ── drawing helpers ─────────────────────────────────────────────────── */
+function el(tag, attrs, parent) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  (parent || stage).appendChild(n);
+  return n;
+}
+const g = (parent, attrs = {}) => el("g", attrs, parent);
+const P = (parent, d, cls = "ink", extra = {}) => el("path", { d, class: cls, ...extra }, parent);
+const L = (parent, x1, y1, x2, y2, cls = "ink") => P(parent, `M${x1} ${y1} L${x2} ${y2}`, cls);
+const C = (parent, cx, cy, r, cls = "ink") => el("circle", { cx, cy, r, class: cls }, parent);
+const R = (parent, x, y, w, h, rx = 18, cls = "ink white") =>
+  el("rect", { x, y, width: w, height: h, rx, class: cls }, parent);
+
+/* a joint is a <g> whose rotation is tweened as an attribute in its own
+   local frame — no transform-origin guessing on nested SVG groups */
+function joint(parent, ox, oy, v = 0) {
+  const n = g(parent, { transform: `rotate(${v} ${ox} ${oy})` });
+  n._o = [ox, oy]; n._v = v;
+  return n;
+}
+function turn(j, v, at, d = 0.35, ease = "power2.inOut") {
+  const [ox, oy] = j._o;
+  tl.fromTo(j, { attr: { transform: `rotate(${j._v} ${ox} ${oy})` } },
+               { attr: { transform: `rotate(${v} ${ox} ${oy})` }, duration: d, ease,
+                 immediateRender: false }, at);
+  j._v = v;
+}
+function jset(j, v) { j._v = v; j.setAttribute("transform", `rotate(${v} ${j._o[0]} ${j._o[1]})`); }
+
+/* ── the stick figure ────────────────────────────────────────────────── *
+ * Hip at (0,0). Torso 150 up, head r46 above the neck. Arms hang from the
+ * shoulder (0,-135): upper 80, forearm 80. Legs: thigh 85, shin 85, so the
+ * feet stand on y=170. A rotation of 0 hangs straight down; positive turns
+ * clockwise on screen, so the screen-left arm (A) lifts with +, B with −.  */
+function figure(id, parent, x, y, s, opt = {}) {
+  const root = g(parent, { id, transform: `translate(${x} ${y}) scale(${s})` });
+  const pos = g(root, { transform: "translate(0 0)" });
+  pos._x = 0; pos._y = 0;
+  const tilt = joint(pos, 0, 0);
+  const F = { id, root, pos, tilt, s };
+  const leg = (k, foot) => {
+    const a = joint(tilt, 0, 0, k === "A" ? 6 : -6);
+    L(a, 0, 0, 0, 85);
+    const b = joint(a, 0, 85);
+    L(b, 0, 85, 0, 170); L(b, 0, 170, foot, 170);
+    F["l" + k + "1"] = a; F["l" + k + "2"] = b;
+  };
+  leg("A", -24); leg("B", 24);
+  L(tilt, 0, 0, 0, -150);
+  if (opt.tie) P(tilt, "M0 -146 L-12 -112 L0 -84 L12 -112 Z", "ink thin fill");
+  if (opt.lanyard) { P(tilt, "M-26 -150 L0 -96 L26 -150", "ink thin");
+                     R(tilt, -22, -98, 44, 54, 8, "ink thin white"); }
+  const hd = joint(tilt, 0, -150);
+  C(hd, 0, -198, 46, "ink paper");
+  if (opt.hat) { P(hd, "M-64 -224 H64", "ink"); P(hd, "M-40 -226 C-40 -290 40 -290 40 -226", "ink fill"); }
+  F.hd = hd;
+  const arm = (k) => {
+    const a = joint(tilt, 0, -135, k === "A" ? 14 : -14);
+    L(a, 0, -135, 0, -55);
+    const b = joint(a, 0, -55);
+    L(b, 0, -55, 0, 25); C(b, 0, 27, 10, "ink thin fill");
+    const hand = g(b, {});                  // props ride here, drawn about (0,27)
+    F["a" + k + "1"] = a; F["a" + k + "2"] = b; F["h" + k] = hand;
+  };
+  arm("A"); arm("B");
+  return F;
+}
+/* pose: any subset of joints, all moving together */
+const POSES = {
+  rest:   { aA1: 14, aA2: 0, aB1: -14, aB2: 0, lA1: 6, lA2: 0, lB1: -6, lB2: 0, hd: 0, tilt: 0 },
+  hips:   { aA1: 45, aA2: -90, aB1: -45, aB2: 90 },
+  armsUp: { aA1: 155, aA2: 5, aB1: -155, aB2: -5 },
+  shrug:  { aA1: 60, aA2: 90, aB1: -60, aB2: -90 },
+  palmA:  { aA1: 120, aA2: 117 },          // hand A on the face
+  stand:  { lA1: 6, lA2: 0, lB1: -6, lB2: 0 },
+  sit:    { lA1: -82, lA2: 84, lB1: -96, lB2: 96 },
+  crouch: { lA1: 40, lA2: -70, lB1: -40, lB2: 70 },
+};
+function pose(F, p, at, d = 0.35, ease = "power2.inOut") {
+  if (typeof p === "string") p = POSES[p];
+  for (const k in p) turn(F[k], p[k], at, d, ease);
+}
+function place(F, p) { if (typeof p === "string") p = POSES[p]; for (const k in p) jset(F[k], p[k]); }
+function move(F, x, y, at, d = 0.4, ease = "power2.inOut") {
+  tl.fromTo(F.pos, { attr: { transform: `translate(${F.pos._x} ${F.pos._y})` } },
+            { attr: { transform: `translate(${x} ${y})` }, duration: d, ease, immediateRender: false }, at);
+  F.pos._x = x; F.pos._y = y;
+}
+function walk(F, x, at, d) {
+  const steps = Math.max(2, Math.round(d / 0.22)), step = d / steps, y = F.pos._y;
+  move(F, x, y, at, d, "none");
+  for (let i = 0; i < steps; i++) {
+    const s = i % 2 ? 1 : -1;
+    pose(F, { lA1: 24 * s, lA2: 8, lB1: -24 * s, lB2: 8, aA1: 14 - 16 * s, aB1: -14 - 16 * s }, at + i * step, step, "sine.inOut");
+  }
+  pose(F, { ...POSES.stand, aA1: 14, aB1: -14 }, at + d, 0.15);
+}
+function hop(F, at, h = 70, d = 0.5) {
+  const x = F.pos._x, y = F.pos._y;
+  move(F, x, y - h, at, d / 2, "power2.out");
+  move(F, x, y, at + d / 2, d / 2, "power2.in");
+}
+/* the scene windows: a hard cut in, a hard cut out */
+function scene(id, from, to) {
+  // display, not visibility: a child set visible would show through a hidden parent
+  const n = g(stage, { id, display: from === 0 ? "inline" : "none" });
+  if (from > 0) tl.set(n, { attr: { display: "inline" } }, from);
+  if (to < T.end) tl.set(n, { attr: { display: "none" } }, to);
+  return n;
+}
+function show(n, at) { n.setAttribute("display", "none"); tl.set(n, { attr: { display: "inline" } }, at); }
+/* the attribute must exist before the set: GSAP reverts to what it recorded, and
+   a missing attribute reverts to nothing — the element stays hidden on a seek back */
+function hide(n, at) { if (!n.hasAttribute("display")) n.setAttribute("display", "inline");
+                       tl.set(n, { attr: { display: "none" } }, at); }
+/* a stroke drawn on: pathLength=1 means no measuring at render time */
+function draw(path, at, d = 0.5) {
+  path.setAttribute("pathLength", 1);
+  gsap.set(path, { strokeDasharray: 1, strokeDashoffset: 1 });
+  tl.fromTo(path, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d, ease: "none", immediateRender: false }, at);
+}
+/* pops a fresh wrapper, so the drawing's own transform attribute is never touched */
+function pop(n, at, d = 0.3, cx = 0, cy = 0) {
+  if (n.hasAttribute("transform")) { const w = g(n.parentNode); w.appendChild(n); n = w; }
+  gsap.set(n, { scale: 0, svgOrigin: `${cx} ${cy}` });
+  tl.fromTo(n, { scale: 0 }, { scale: 1, duration: d, ease: "back.out(2.2)", svgOrigin: `${cx} ${cy}`,
+                               immediateRender: false }, at);
+}
+function flash(at) {
+  tl.fromTo("#flash", { opacity: 0 }, { opacity: 0.85, duration: 0.05, ease: "none", immediateRender: false }, at);
+  tl.to("#flash", { opacity: 0, duration: 0.3, ease: "power1.out" }, at + 0.05);
+}
+
+/* ── props ───────────────────────────────────────────────────────────── */
+function rocket(p, x, y, s = 1) {
+  const r = g(p, { transform: `translate(${x} ${y}) scale(${s})` });
+  P(r, "M0 -110 C40 -70 42 0 30 50 H-30 C-42 0 -40 -70 0 -110 Z", "ink white");
+  C(r, 0, -30, 18);
+  P(r, "M-30 20 L-60 70 L-30 50 M30 20 L60 70 L30 50");
+  P(r, "M-14 64 L0 110 L14 64", "ink red");
+  return r;
+}
+function unicorn(p, x, y, s = 1) {
+  const u = g(p, { transform: `translate(${x} ${y}) scale(${s})` });
+  P(u, "M-70 90 C-80 20 -50 -40 0 -60 C30 -70 70 -40 90 0 C100 20 80 40 60 30 C40 22 20 30 10 60 C0 80 -20 95 -70 90 Z", "ink white");
+  P(u, "M-10 -58 L10 -150 L24 -66", "ink white");
+  P(u, "M0 -90 L18 -96 M4 -116 L20 -120");
+  C(u, 40, -10, 7, "ink thin fill");
+  P(u, "M-30 -55 C-60 -40 -70 0 -66 40 M-12 -60 C-40 -60 -48 -20 -46 20");
+  return u;
+}
+function hockey(p, x, y, s = 1) {
+  const c = g(p, { transform: `translate(${x} ${y}) scale(${s})` });
+  P(c, "M-120 -110 V100 H130");
+  const line = P(c, "M-100 70 L-30 55 L30 30 L70 -30 L100 -110", "ink red");
+  P(c, "M76 -104 L102 -116 L110 -88", "ink red");
+  return { g: c, line };
+}
+function globe(p, x, y, s = 1) {
+  const o = g(p, { transform: `translate(${x} ${y}) scale(${s})` });
+  C(o, 0, 0, 100, "ink white");
+  P(o, "M0 -100 C-55 -60 -55 60 0 100 C55 60 55 -60 0 -100 M-100 0 H100 M-86 -50 H86 M-86 50 H86", "ink thin");
+  [[0, -1], [0.87, -0.5], [0.87, 0.5], [0, 1], [-0.87, 0.5], [-0.87, -0.5]].forEach(([a, b]) =>
+    P(o, `M${a * 125} ${b * 125} L${a * 165} ${b * 165}`, "ink red"));
+  return o;
+}
+function bulb(p, x, y, s = 1) {
+  const b = g(p, { transform: `translate(${x} ${y}) scale(${s})` });
+  P(b, "M-30 40 C-70 0 -50 -70 0 -72 C50 -70 70 0 30 40 Z", "ink white");
+  P(b, "M-26 52 H26 M-20 66 H20 M-10 40 L-10 10 L10 10 L10 40");
+  return b;
+}
+function trophy(p, x, y, s = 1) {
+  const t = g(p, { transform: `translate(${x} ${y}) scale(${s})` });
+  P(t, "M-50 -90 H50 C50 -30 30 0 0 0 C-30 0 -50 -30 -50 -90 Z", "ink white");
+  P(t, "M-50 -76 C-84 -76 -84 -30 -40 -30 M50 -76 C84 -76 84 -30 40 -30");
+  P(t, "M0 0 V30 M-34 44 H34 V30 H-34 Z", "ink white");
+  P(t, "M-6 -66 L0 -78 L6 -66 L18 -64 L8 -56 L12 -44 L0 -50 L-12 -44 L-8 -56 L-18 -64 Z", "ink thin fill");
+  return t;
+}
+function phone(p, x, y, s = 1, rot = 0) {
+  const ph = g(p, { transform: `translate(${x} ${y}) rotate(${rot}) scale(${s})` });
+  R(ph, -22, -40, 44, 76, 8, "ink thin white");
+  return ph;
+}
+function sparkle(p, x, y, s = 1) {
+  const k = g(p, { transform: `translate(${x} ${y}) scale(${s})` });
+  P(k, "M0 -30 V30 M-30 0 H30 M-18 -18 L18 18 M18 -18 L-18 18", "ink thin");
+  return k;
+}
+function cardBiz(p) { return R(p, -26, -16, 52, 32, 4, "ink thin white"); }
+
+/* ═══ S1 · the pitch deck ═════════════════════════════════════════════ */
+{
+  const S = scene("s1", T.s1, T.s2), t0 = T.s1;
+  L(S, 40, FLOOR + 170 - 120, 1040, FLOOR + 170 - 120);
+  // the projector screen on its stand
+  R(S, 380, 560, 640, 480, 10);
+  L(S, 700, 1040, 700, 1500); L(S, 620, 1500, 780, 1500);
+  const clip = el("clipPath", { id: "s1clip" }, el("defs", {}, S));
+  el("rect", { x: 384, y: 564, width: 632, height: 472 }, clip);
+  const scr = g(S, { "clip-path": "url(#s1clip)" });
+  const slides = [g(scr), g(scr), g(scr), g(scr)];
+  // 1 · a rocket leaving the slide
+  const rk = rocket(slides[0], 0, 0, 1.25);
+  tl.fromTo(rk, { attr: { transform: "translate(700 1000) scale(1.25)" } },
+            { attr: { transform: "translate(700 760) scale(1.25)" }, duration: 0.5, ease: "power2.out", immediateRender: false }, t0);
+  tl.to(rk, { attr: { transform: "translate(700 360) scale(1.25)" }, duration: 0.5, ease: "power2.in" }, t0 + 1.0);
+  rk.setAttribute("transform", "translate(700 1000) scale(1.25)");
+  [[480, 680], [930, 650], [520, 960], [950, 940]].forEach(([x, y]) => sparkle(slides[0], x, y, 0.8));
+  // 2 · the unicorn
+  unicorn(slides[1], 700, 840, 1.6);
+  // 3 · the hockey stick
+  const hk = hockey(slides[2], 700, 810, 1.6); draw(hk.line, t0 + 3.05, 0.55);
+  // 4 · the world
+  globe(slides[3], 700, 800, 1.35);
+  const SL = [0, 1.5, 3.0, 4.5];
+  slides.forEach((s, i) => { if (i) show(s, t0 + SL[i]); if (i < 3) hide(s, t0 + SL[i + 1]); });
+  pop(slides[1], t0 + 1.5, 0.3, 700, 840); pop(slides[3], t0 + 4.5, 0.3, 700, 800);
+
+  const F = figure("f1", S, 210, FLOOR - 120, 1.5, { tie: true });
+  place(F, { aB1: -100, aB2: -10, aA1: 30, aA2: -20 });
+  const clicker = g(F.hB); R(clicker, -10, 22, 20, 38, 5, "ink thin fill");
+  // a click on every slide, a bigger pose each time
+  SL.slice(1).forEach((at) => { pose(F, { aB2: -40 }, t0 + at - 0.12, 0.08); pose(F, { aB2: -10 }, t0 + at, 0.12); });
+  pose(F, { aA1: 120, aA2: 20, hd: -10 }, t0 + 1.6, 0.3);            // unicorn: «look!»
+  pose(F, { aA1: 30, aA2: -20, hd: 0 }, t0 + 2.8, 0.25);
+  pose(F, { aB1: -150, aB2: 10, tilt: -6 }, t0 + 3.1, 0.4);         // follows the stick up
+  pose(F, { ...POSES.armsUp, tilt: 0 }, t0 + 4.6, 0.3);             // the world
+  hop(F, t0 + 4.65, 60, 0.45);
+  pose(F, POSES.hips, t0 + 5.6, 0.3);
+  window.__MOTION.push({ id: "s1-rocket", frames: [0, 45], magnitude: "large" });
+}
+
+/* ═══ S2 · first place ════════════════════════════════════════════════ */
+{
+  const S = scene("s2", T.s2, T.s3), t0 = T.s2;
+  // the spotlight
+  P(S, "M540 470 L330 1160 H750 Z", "shade");
+  // podium: 2 · 1 · 3
+  R(S, 140, 1250, 260, 200, 6); R(S, 400, 1160, 280, 290, 6); R(S, 680, 1300, 260, 150, 6);
+  el("text", { x: 540, y: 1360, "font-size": 170, "text-anchor": "middle" }, S).textContent = "1";
+  el("text", { x: 270, y: 1410, "font-size": 130, "text-anchor": "middle" }, S).textContent = "2";
+  el("text", { x: 810, y: 1425, "font-size": 120, "text-anchor": "middle" }, S).textContent = "3";
+  L(S, 40, 1450, 1040, 1450);
+  const runA = figure("f2a", S, 270, 1250 - 170 * 1.0, 1.0); place(runA, "rest");
+  const runB = figure("f2b", S, 810, 1300 - 170 * 1.0, 1.0); place(runB, "rest");
+  const F = figure("f2", S, 540, 1160 - 170 * 1.15, 1.15, { tie: true }); place(F, "rest");
+  const tr = trophy(F.hB, 0, 0, 1);
+  tr.setAttribute("transform", "translate(0 40) rotate(180) scale(0.8)");      // upright with the arm raised
+  show(tr, t0 + 0.6);
+  pose(F, { aB1: -170, aB2: 0 }, t0 + 0.6, 0.35, "back.out(1.6)");
+  pose(F, { aA1: 150, aA2: 0 }, t0 + 1.4, 0.3);
+  hop(F, t0 + 1.5, 70, 0.45); hop(F, t0 + 2.3, 70, 0.45);
+  pose(F, { aA1: 40, aA2: -110, hd: 18 }, t0 + 3.3, 0.35);              // a kiss for the trophy
+  pose(F, { aA1: 150, aA2: 0, hd: 0 }, t0 + 4.4, 0.3); hop(F, t0 + 4.5, 70, 0.45);
+  // the others clap politely
+  [runA, runB].forEach((R2, k) => {
+    for (let i = 0; i < 7; i++) {
+      const at = t0 + 0.8 + i * 0.75 + k * 0.2;
+      pose(R2, { aA1: 40, aA2: -100, aB1: -40, aB2: 100 }, at, 0.18);
+      pose(R2, { aA1: 30, aA2: -70, aB1: -30, aB2: 70 }, at + 0.25, 0.18);
+    }
+  });
+  // the crowd: heads and waving arms along the bottom
+  for (let i = 0; i < 7; i++) {
+    const x = 100 + i * 147, y = 1640 + (i % 2) * 40;
+    C(S, x, y, 46, "ink paper"); P(S, `M${x - 70} ${y + 140} C${x - 60} ${y + 60} ${x + 60} ${y + 60} ${x + 70} ${y + 140}`);
+    const arm = joint(S, x + 40, y + 70, -20); L(arm, x + 40, y + 70, x + 40, y - 40);
+    for (let j = 0; j < 8; j++) turn(arm, j % 2 ? -20 : 20, t0 + 0.4 + j * 0.7 + i * 0.07, 0.35, "sine.inOut");
+  }
+  // confetti, slow, so it never reads as a glitch (#33)
+  const conf = g(S);
+  for (let i = 0; i < 28; i++) {
+    const x = 60 + ((i * 137) % 960), d = 3.6 + (i % 5) * 0.5;
+    const c = P(conf, "M-12 0 H12", i % 3 ? "ink thin" : "ink thin red");
+    c.setAttribute("transform", `translate(${x} 440) rotate(0)`);
+    tl.fromTo(c, { attr: { transform: `translate(${x} ${440 - (i % 7) * 40}) rotate(0)` } },
+              { attr: { transform: `translate(${x + ((i % 4) - 1.5) * 50} 1460) rotate(${(i % 2 ? 1 : -1) * 540})` },
+                duration: d, ease: "none", immediateRender: false }, t0 + 0.7 + (i % 9) * 0.12);
+  }
+  show(conf, t0 + 0.7);
+  [[150, 700], [930, 600], [880, 980]].forEach(([x, y], i) => {
+    const sp = sparkle(S, x, y, 1.2); pop(sp, t0 + 1 + i * 1.3, 0.25, x, y);
+  });
+  flash(t0 + 0.65);
+  window.__MOTION.push({ id: "s2-trophy", frames: [Math.round(t0 * 30) + 18, Math.round(t0 * 30) + 30], magnitude: "large" });
+}
+
+/* ═══ S3 · the conference ═════════════════════════════════════════════ */
+{
+  const S = scene("s3", T.s3, T.s4), t0 = T.s3;
+  // bunting across the hall
+  P(S, "M40 520 C300 600 780 600 1040 520", "ink thin");
+  for (let i = 0; i < 9; i++) {
+    const x = 90 + i * 112, y = 548 + Math.sin((i / 8) * Math.PI) * 52;
+    P(S, `M${x - 32} ${y} L${x} ${y + 60} L${x + 32} ${y}`, i % 2 ? "ink thin white" : "ink thin red");
+  }
+  L(S, 40, 1450, 1040, 1450);
+  const F = figure("f3", S, 230, FLOOR - 120, 1.35, { tie: true, lanyard: true }); place(F, "rest");
+  const people = [600, 780, 960].map((x, i) => {
+    const Q = figure("f3p" + i, S, x, FLOOR - 120 + (i % 2) * 14, 1.15, { lanyard: true });
+    place(Q, "rest"); return Q;
+  });
+  // cards fly to each of them, in turn
+  const deck = g(F.hB); R(deck, -26, 20, 52, 34, 4, "ink thin white"); show(deck, t0 + 0.2);
+  pose(F, { aB1: -70, aB2: -20 }, t0 + 0.2, 0.3);
+  people.forEach((Q, i) => {
+    const at = t0 + 0.7 + i * 1.0;
+    const c = g(S); cardBiz(c);
+    const x0 = 230 + 1.35 * 110, y0 = FLOOR - 120 - 1.35 * 120, x1 = Q.root.transform.baseVal[0].matrix.e - 1.15 * 40;
+    tl.fromTo(c, { attr: { transform: `translate(${x0} ${y0}) rotate(0)` } },
+              { attr: { transform: `translate(${x1} ${FLOOR - 120 - 1.15 * 40}) rotate(${360 + 20 * i})` },
+                duration: 0.45, ease: "power1.out", immediateRender: false }, at);
+    c.setAttribute("transform", `translate(${x0} ${y0})`); show(c, at);
+    pose(F, { aB1: -110, aB2: 10 }, at - 0.1, 0.12); pose(F, { aB1: -70, aB2: -20 }, at + 0.1, 0.25);
+    pose(Q, { aA1: 40, aA2: -60, hd: -10 }, at + 0.35, 0.25);         // takes it, looks at it
+    pose(Q, { aA1: 14, aA2: 0, hd: 0 }, at + 1.3, 0.3);
+    hide(c, at + 1.3);
+  });
+  // everyone squeezes in for the selfie
+  const ph = g(F.hB);
+  phone(ph, 0, 40, 1.2, 180); show(ph, t0 + 3.6); hide(deck, t0 + 3.6);
+  walk(F, 160, t0 + 3.4, 0.6);
+  pose(F, { aB1: -150, aB2: 20, hd: -12 }, t0 + 4.0, 0.35);
+  people.forEach((Q, i) => {
+    walk(Q, -60 - i * 60, t0 + 3.5 + i * 0.1, 0.6);
+    pose(Q, { aB1: -160, aB2: 0, hd: -14 }, t0 + 4.3 + i * 0.1, 0.3);   // peace signs, all of them
+  });
+  flash(t0 + 4.9); flash(t0 + 5.6);
+  window.__MOTION.push({ id: "s3-cards", frames: [Math.round(t0 * 30) + 20, Math.round(t0 * 30) + 110], magnitude: "small" });
+}
+
+/* ═══ S4 · live on TV ═════════════════════════════════════════════════ */
+{
+  const S = scene("s4", T.s4, T.s5), t0 = T.s4;
+  // the screen we watch him on
+  R(S, 60, 470, 960, 1150, 40, "ink paper");
+  L(S, 540, 1620, 540, 1700); L(S, 400, 1700, 680, 1700);
+  const rec = C(S, 130, 540, 20, "red"); rec.setAttribute("style", "fill:#D0342C;stroke:none");
+  for (let i = 0; i < 12; i++) tl.set(rec, { attr: { display: i % 2 ? "inline" : "none" } }, t0 + 0.5 + i * 0.5);
+  // the studio: a desk, two chairs, the host
+  L(S, 100, 1500, 980, 1500);
+  P(S, "M90 1500 H990");
+  const chair = (x, dir) => P(S, `M${x} 1330 H${x + 120 * dir} M${x} 1330 V1500 M${x + 120 * dir} 1330 V1500 M${x} 1330 V1170`);
+  chair(260, 1); chair(830, -1);
+  const F = figure("f4", S, 300, 1330 - 2, 1.2, { tie: true }); place(F, { ...POSES.rest, ...POSES.sit });
+  const H = figure("f4h", S, 790, 1330 - 2, 1.1); place(H, { ...POSES.rest, lA1: 82, lA2: -84, lB1: 96, lB2: -96 });
+  // a mic on a stand
+  P(S, "M450 1500 V1150 M420 1500 H480"); R(S, 432, 1080, 36, 70, 18, "ink fill");
+  // the bubble, and what he says: rockets, unicorns, light bulbs
+  P(S, "M210 640 H880 C930 640 940 670 940 700 V900 C940 940 920 960 880 960 H420 L330 1060 L350 960 H210 C170 960 150 940 150 900 V700 C150 670 170 640 210 640 Z", "ink white");
+  const said = [rocket(S, 310, 800, 0.8), unicorn(S, 545, 820, 0.85), bulb(S, 790, 800, 1.2)];
+  said.forEach((n, i) => pop(n, t0 + 0.6 + i * 1.3, 0.3,
+    ...n.getAttribute("transform").match(/translate\(([-\d.]+) ([-\d.]+)/).slice(1).map(Number)));
+  // he never stops talking with his hands
+  const G = [[-100, -40, 60, -20], [-60, -90, 110, 30], [-140, 10, 40, -60], [-80, -60, 90, 10]];
+  for (let i = 0; i < 12; i++) {
+    const [b1, b2, a1, a2] = G[i % 4];
+    pose(F, { aB1: b1, aB2: b2, aA1: a1, aA2: a2, hd: i % 2 ? 6 : -6 }, t0 + 0.3 + i * 0.5, 0.3);
+  }
+  // the host nods along
+  for (let i = 0; i < 8; i++) turn(H.hd, i % 2 ? 0 : 12, t0 + 0.5 + i * 0.7, 0.3);
+  pose(F, { ...POSES.armsUp }, t0 + 6.1, 0.25);
+  window.__MOTION.push({ id: "s4-hands", frames: [Math.round(t0 * 30) + 9, Math.round(t0 * 30) + 190], magnitude: "small" });
+}
+
+/* ═══ S5 · the punchline ══════════════════════════════════════════════ */
+{
+  const S = scene("s5", T.s5, T.end), t0 = T.s5;
+  L(S, 40, 1500, 1040, 1500);
+  // a door on the right, for the investor to leave by
+  R(S, 930, 980, 150, 520, 6, "ink paper"); C(S, 950, 1250, 8, "ink thin fill");
+  // the easel and its chart
+  P(S, "M460 1080 L380 1500 M580 1080 L660 1500 M520 1080 V1500");
+  const board = g(S, { transform: "rotate(0 520 900)" });
+  R(board, 320, 720, 400, 360, 10);
+  P(board, "M360 750 V1040 H690");
+  P(board, "M370 1030 H660", "ink red");
+  P(board, "M640 1012 L668 1030 L640 1048", "ink red");
+  el("text", { x: 368, y: 1000, "font-size": 60 }, board).textContent = "0";
+
+  const F = figure("f5", S, 130, 1500 - 170 * 1.3, 1.3, { tie: true }); place(F, "rest");
+  const ph = g(F.hB); phone(ph, 0, 40, 1.15, 180);
+  // he checks the followers, and loses it
+  place(F, { aB1: -150, aB2: -30, hd: -8 });
+  pose(F, { ...POSES.armsUp, hd: 0 }, t0 + 0.9, 0.25);
+  hop(F, t0 + 0.95, 80, 0.45); hop(F, t0 + 1.5, 80, 0.45);
+  pose(F, POSES.hips, t0 + 2.1, 0.3);
+  // the investor walks in
+  const V = figure("f5v", S, 1180, 1500 - 170 * 1.25, 1.25, { hat: true }); place(V, "rest");
+  const bag = g(V.hB); R(bag, -34, 30, 68, 50, 6, "ink fill");
+  walk(V, -280, t0 + 1.6, 1.4);                                     // stops at x≈830, beside the chart
+  pose(V, { aA1: 95, aA2: 10, hd: 10 }, t0 + 3.2, 0.3);             // points at the chart
+  pose(V, { aA1: 14, aA2: 0, hd: 0 }, t0 + 4.0, 0.3);
+  pose(V, { ...POSES.shrug }, t0 + 4.1, 0.3);                       // «so where are the sales?»
+  pose(F, { aA1: 14, aA2: 0, aB1: -14, aB2: 0, hd: 14 }, t0 + 3.3, 0.3);
+  // he turns the chart: flat becomes "growth"
+  walk(F, 50, t0 + 4.6, 0.5);
+  pose(F, { aB1: -120, aB2: -40, aA1: 14 }, t0 + 5.2, 0.25);
+  tl.fromTo(board, { attr: { transform: "rotate(0 520 900)" } },
+            { attr: { transform: "rotate(-90 520 900)" }, duration: 0.6, ease: "back.out(1.4)", immediateRender: false }, t0 + 5.35);
+  window.__MOTION.push({ id: "s5-turn", frames: [Math.round((t0 + 5.35) * 30), Math.round((t0 + 5.95) * 30)], magnitude: "large" });
+  pose(F, { aB1: -160, aB2: 0, aA1: 45, aA2: -90 }, t0 + 6.1, 0.3); // ta-da
+  const sp = sparkle(S, 720, 640, 1.3); pop(sp, t0 + 6.0, 0.25, 720, 640);
+  pose(V, { aA1: 14, aA2: 0, aB1: -14, aB2: 0 }, t0 + 6.4, 0.3);
+  pose(V, { ...POSES.palmA, hd: 10 }, t0 + 6.9, 0.35);             // facepalm
+  pose(V, { aA1: 14, aA2: 0, hd: 0 }, t0 + 8.0, 0.25);
+  walk(V, -60, t0 + 8.2, 0.9);                                      // out the door
+  hide(V.root, t0 + 9.1);
+  // and the selfie with the "growth" — followers +1,100, sales still 0
+  pose(F, { aB1: -150, aB2: 20, aA1: 45, aA2: -90, hd: -12 }, t0 + 9.0, 0.35);
+  flash(t0 + 9.6);
+  pose(F, { ...POSES.armsUp, hd: 0 }, t0 + 10.2, 0.3);
+  hop(F, t0 + 10.25, 60, 0.45);
+}
+
+/* ── the counters: followers climb, sales never move ─────────────────── */
+{
+  const nf = document.getElementById("nf");
+  const fmt = (v) => Math.round(v).toLocaleString("en-US");
+  const climb = [[T.s1 + 1.5, 860, 3.0], [T.s2 + 0.6, 6400, 4.5], [T.s3 + 4.9, 18900, 1.2],
+                 [T.s4 + 0.5, 52300, 5.6], [T.s5 + 9.6, 53400, 0.8]];
+  // one tween over the whole film computes the value from the clock, so a frame
+  // rendered out of order never shows a number left over from a later frame
+  const ease = gsap.parseEase("power1.inOut");
+  const at = (t) => { let v = 120;
+    for (const [a, to, d] of climb) { if (t >= a + d) v = to; else if (t > a) return v + (to - v) * ease((t - a) / d); else return v; }
+    return v; };
+  const clock = { p: 0 };
+  tl.fromTo(clock, { p: 0 }, { p: 1, duration: T.end, ease: "none", immediateRender: false,
+            onUpdate: () => { nf.textContent = fmt(at(clock.p * T.end)); } }, 0);
+  // the zero gets a little shake whenever someone looks at it
+  [T.s2 + 2.0, T.s4 + 3.0, T.s5 + 3.4].forEach((at) =>
+    tl.fromTo("#cs", { x: 0 }, { keyframes: { x: [0, -10, 10, -8, 8, 0] }, duration: 0.4, ease: "none",
+                                 immediateRender: false }, at));
+}
+
+/* ── the music: one track, gain only, never stopped (#26 #27) ─────────── */
+tl.fromTo("#bgm", { volume: 1 }, { volume: 0, duration: 1.0, ease: "none", immediateRender: false }, T.end - 1.0);
+
+/* ── the manifest (references/verification.md) ───────────────────────── */
+const fr = (s) => Math.round(s * 30);
+window.__MF.push({ id: "hud-followers", type: "text", chapter: "film", zone: "hud",
+  frames: [0, fr(T.end)], still_from: 0, text: "53,400", critical: false, el: "#cf" });
+window.__MF.push({ id: "hud-sales", type: "text", chapter: "film", zone: "hud",
+  frames: [0, fr(T.end)], still_from: 0, text: "0", critical: true, el: "#cs" });
+["s1", "s2", "s3", "s4", "s5"].forEach((id, i, a) => {
+  const from = T[id], to = i < a.length - 1 ? T[a[i + 1]] : T.end;
+  window.__MF.push({ id: id + "-scene", type: "shape", chapter: "film", zone: "stage",
+    frames: [fr(from), fr(to)], still_from: fr(from), critical: false, el: "#" + id });
+});
+
+window.__timelines = window.__timelines || {};
+window.__timelines["main"] = tl;
+tl.seek(0, false);
+    </script>
+  </body>
+</html>
