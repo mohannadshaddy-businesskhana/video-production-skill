@@ -1239,3 +1239,40 @@ the screen it counts, or it is cut. The six-chapter spine's "number" chapter is 
 to fill.
 **Also from the same review:** the sweep of the client portal ran over screenshots of the platform's
 own sections, not the portal's — the background of a sweep shows the thing being swept.
+
+### 88 · Tashkeel is not dialect: «الأسود» read as Fusha
+
+**What happened:** an Egyptian-colloquial series (EGT Chess, Oct 2026) got full-tashkeel spoken forms
+from a text model. «والأسود يدافع» came out «وِالْأَسْوَد» — correct Arabic, wrong dialect.
+**Result:** the client heard it at once: "the colloquial says الإسود, not الأسود".
+**Rule:** for a dialect, the spoken form needs a **dialect lexicon that overrides the model's
+diacritization word by word** (matched on the bare word, with و/ب/ل/ف prefixes), kept in the project
+(`config/egyptian-lexicon.json`). Every word the client flags goes in it once and is fixed in every
+video. The model's prompt gets the same examples, but the lexicon is the guarantee.
+
+### 89 · An English gloss in brackets was read aloud twice
+
+**What happened:** the script wrote «كمبيوتر اسمه ديب بلو (Deep Blue)». The spoken form kept both,
+so the voice said the name twice; on some voices the second reading was mangled.
+**Result:** "the word Deep Blue repeats in the read text, and is sometimes mispronounced".
+**Rule:** English in brackets right after its Arabic counterpart is a **caption-only gloss**: it is
+removed from the spoken form, never voiced. The caption keeps it.
+
+### 90 · The listening check cried wolf, and every false alarm cost a request
+
+**What happened:** the word-for-word check flagged lines whose audio was right, because the listener
+wrote «كش مات» as «كشمات», «اتنين وسبعين» as «72», and «g» as a one-letter token that the
+comparison dropped. Each flag regenerated the line alone — one TTS request each, on a free tier of
+~10 per day per project. Meanwhile the same check's loose `includes` match passed a real error:
+«ديب بلو» heard as «دي بروو» («دي» is inside «ديب»).
+**Rule:** before comparing, read the listener's digits back as words in the dialect, accept a word
+found inside the joined transcript, keep one-letter Latin tokens — and compare words by letter
+ratio (≥0.75), never by substring of a short word. Re-score already-generated lines from their
+stored transcript before regenerating anything.
+
+### 91 · Three API keys, two quotas
+
+**What happened:** three Gemini keys were counted as three daily quotas. Two belonged to the same
+Google project, which has one quota; one key was simply invalid.
+**Rule:** on day one, test every key (`/models` for validity) and count **projects**, not keys, when
+budgeting requests. And never probe the TTS models to "check the quota" — each probe is a request.

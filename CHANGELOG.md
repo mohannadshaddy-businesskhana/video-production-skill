@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.4.2 — 2026-10-30
+- failure-log #88–#91: dialect lexicon, caption-only English gloss, listener false alarms, keys vs projects (EGT Chess)
+
 ## v1.4.1 — 2026-10-15
 - failure-log #85–#87: one hook for a whole series, the writer's problem instead of the owner's, a number alone on black
 
