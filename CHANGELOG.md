@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.4.3 — 2026-11-11
+- failure-log #88: swap the seed's film quotes, not only its names; whole-word rules use \p{L}
+
 ## v1.4.2 — 2026-10-30
 - failure-log #88–#91: dialect lexicon, caption-only English gloss, listener false alarms, keys vs projects (EGT Chess)
 

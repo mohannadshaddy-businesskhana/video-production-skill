@@ -85,6 +85,7 @@
 | 85 | Eighteen videos, one hook | Hook |
 | 86 | The writer's problem instead of the owner's | Message |
 | 87 | A number alone on a black frame | Form |
+| 88 | The names were swapped and the film's lines were not | Legal |
 
 ---
 
@@ -1276,3 +1277,15 @@ stored transcript before regenerating anything.
 Google project, which has one quota; one key was simply invalid.
 **Rule:** on day one, test every key (`/models` for validity) and count **projects**, not keys, when
 budgeting requests. And never probe the TTS models to "check the quota" — each probe is a request.
+
+### 88 · The names were swapped and the film's lines were not
+
+**What happened:** a demo seeded from a film had every character name swapped at capture time
+(#17, #83), and a launch video went out with the team chat still quoting the film in small text on
+the phone — "the one eye is awake… I'm not a ball", "your paperwork is missing… I'm watching you",
+"the paper door", "the door agency". A whole-word rule also missed a name followed by an Arabic
+comma, because «،» sits in the same Unicode block as the letters.
+**Rule:** swap whole seeded messages, not only names: read every free-text string in the seed (chat,
+notes, descriptions) and replace each one that quotes the source, and add its signature phrases to
+the risky list. Whole-word rules use letter classes (`p{L}`), never a script's Unicode block.
+**Cost:** a re-shoot and a re-render of a video already handed over for publishing.
