@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.5.0 — 2026-11-23
+- recut: pack_takes.mjs (several takes in one text, restarts ↺ / other-take ≈), joint_sheet.mjs (one PNG per joint: frames, waveform, words), joint_check --json, 20 ms fade on edit joints (repair_holes --fade-ms) — after browser-use/video-use
+
 ## v1.4.3 — 2026-11-11
 - failure-log #88: swap the seed's film quotes, not only its names; whole-word rules use \p{L}
 

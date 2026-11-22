@@ -45,6 +45,19 @@ bash scripts/recut/prep.sh raw/<take>.mp4 <name>
 
 ## 2. The edit decision — `edit.json`
 
+**Several takes of one talk?** Pack them into one text first, and decide from that:
+
+```bash
+node scripts/recut/pack_takes.mjs work/takes.md work/<takeA> work/<takeB>
+```
+
+Each line is a phrase broken on a ≥0.5 s pause, with its raw-take time. `↺` marks a restart inside
+the take (it shares most words and the first two with an earlier phrase); `≈` the same sentence in
+another take. On a real take it marked exactly the three restarts the hand-written `edit.json` had
+removed. Keep the last complete version; a sentence from another take comes in with `prepend.mjs` /
+`append.mjs`. A spoken list ("لو عايز تزود …" five times) opens the same way every item — the
+overlap rule, not the opening, keeps those from being marked.
+
 Read the transcript and decide, per take, by meaning:
 
 | Keep | Cut |
@@ -65,9 +78,19 @@ Read the transcript and decide, per take, by meaning:
 
 ```bash
 bash scripts/recut/cut.sh <name>
-node scripts/recut/joint_check.mjs work/<name>/aroll16k.mp3 work/<name>/joints.json
+node scripts/recut/joint_check.mjs work/<name>/aroll16k.mp3 work/<name>/joints.json --json work/<name>/flagged.json
+node scripts/recut/joint_sheet.mjs work/<name> --joints work/<name>/flagged.json     # one PNG per flagged joint
 node scripts/recut/clipcheck.mjs work/<name>/aroll16k.mp3 <a>:<b> --key-file $KEYS   # each flagged joint
 ```
+
+- `joint_sheet` draws each joint as one picture: eight frames (−600 ms … +600 ms, the after-cut ones
+  labelled in yellow), the waveform with the joint in red, and the words placed on their times. Look
+  at it before listening: a word starting right on the red line, a posture jump, or a glance shows
+  at once. `--at 12.3,40.1` draws times a reviewer named; `--video` when `aroll_norm.mp4` is gone
+  (a rendered preview works — on the same clock within a frame, which is why the last "before" frame is −67 ms, not −33). Needs an ffmpeg built with libharfbuzz for
+  the Arabic words (the gyan.dev full build has it).
+- Edit joints get a **20 ms fade** (`cut.sh` passes `--fade-ms 20` to `repair_holes.mjs`); holes keep
+  5 ms, because a hole's edge is mid-word and a longer fade eats the word.
 
 - `joint_check` flags a joint whose 40 ms either side is speech-loud. It flags tight-but-fine joints
   too — **listen** to each flagged one (Gemini marks partial syllables with "-"; Groq is the fallback

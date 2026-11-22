@@ -1,9 +1,11 @@
 // Closes the receiver holes in a phone recording: each hole is cut from picture and sound
 // together, on whole frames, so lip sync holds however many holes there are.
-// Usage: node repair_holes.mjs <video> <out.mov> [--holes holes.json] [--keep-tmp]
+// Usage: node repair_holes.mjs <video> <out.mov> [--holes holes.json] [--no-clean] [--fade-ms N] [--keep-tmp]
 //   Without --holes it measures them itself (holes.mjs). Output: 30fps CFR h264 + PCM, ready
 //   for normalize.sh. Writes <out>.cuts.json: every removed range in source time, so an edit
 //   made on the repaired file can be traced back to the raw one. See failure-log #56.
+//   --fade-ms: the fade at every edge. A hole needs 5 ms (its edge is mid-word, a longer fade eats
+//   the word); an edit cut sits in a dip and can take a longer one (cut.sh passes 20).
 //   --no-clean: cut only. The same frame-exact cutter then serves an edit (a retake, a stumble,
 //   a long pause) on a file that is already clean — a second denoise pass would thin the voice.
 import { spawnSync } from "node:child_process";
@@ -14,7 +16,7 @@ import { analyze } from "./holes.mjs";
 const FPS = 30;
 const SR = 48000;
 const CH = 2;
-const FADE_S = 0.005;               // a hole's edges are abrupt; 5ms kills the click, not the word
+const HOLE_FADE_MS = 5;             // a hole's edges are abrupt; 5ms kills the click, not the word
 // Rumble + a light hiss cut, nothing that thins a voice. afftdn delays its output by 25ms
 // (measured by cross-correlation); the atrim/apad pair takes that back so lips and voice meet.
 const AFFTDN_LATENCY_S = 0.025;
@@ -59,8 +61,8 @@ function timedPcm(file) {
   return new Float32Array(buf.buffer, buf.byteOffset, buf.length / 4);
 }
 
-function spliceAudio(pcm, kept) {
-  const perFrame = SR / FPS, fade = Math.round(FADE_S * SR);
+function spliceAudio(pcm, kept, fadeMs) {
+  const perFrame = SR / FPS, fade = Math.max(1, Math.round(fadeMs / 1000 * SR));
   const total = kept.reduce((n, [a, b]) => n + (b - a) * perFrame, 0);
   const out = new Float32Array(total * CH);
   let o = 0;
@@ -92,21 +94,24 @@ function encode(src, audioRaw, removed, out, clean) {
 function parseArgs(args) {
   const [src, out] = args;
   if (!src || !out || src.startsWith("--")) {
-    console.error("usage: repair_holes.mjs <video> <out.mov> [--holes holes.json] [--no-clean] [--keep-tmp]");
+    console.error("usage: repair_holes.mjs <video> <out.mov> [--holes holes.json] [--no-clean] [--fade-ms N] [--keep-tmp]");
     process.exit(2);
   }
   const hi = args.indexOf("--holes");
   const holes = hi > 0 ? JSON.parse(readFileSync(args[hi + 1], "utf8")).list : analyze(src).list;
-  return { src, out, holes, keepTmp: args.includes("--keep-tmp"), clean: !args.includes("--no-clean") };
+  const fi = args.indexOf("--fade-ms");
+  const fadeMs = fi > 0 ? Number(args[fi + 1]) : HOLE_FADE_MS;
+  if (!(fadeMs > 0)) { console.error("--fade-ms needs a positive number"); process.exit(2); }
+  return { src, out, holes, fadeMs, keepTmp: args.includes("--keep-tmp"), clean: !args.includes("--no-clean") };
 }
 
 function main() {
-  const { src, out, holes, keepTmp, clean } = parseArgs(process.argv.slice(2));
+  const { src, out, holes, fadeMs, keepTmp, clean } = parseArgs(process.argv.slice(2));
   const totalFrames = Math.floor(durationS(src) * FPS);
   const removed = removedFrameRuns(holes);
   const kept = keptFrameRuns(removed, totalFrames);
   const tmp = out.replace(/\.\w+$/, ".audio.f32");
-  writeFileSync(tmp, Buffer.from(spliceAudio(timedPcm(src), kept).buffer));
+  writeFileSync(tmp, Buffer.from(spliceAudio(timedPcm(src), kept, fadeMs).buffer));
   encode(src, tmp, removed, out, clean);
   if (!keepTmp) rmSync(tmp);
   const cuts = removed.map(([a, b]) => ({ from_s: +(a / FPS).toFixed(3), to_s: +(b / FPS).toFixed(3) }));

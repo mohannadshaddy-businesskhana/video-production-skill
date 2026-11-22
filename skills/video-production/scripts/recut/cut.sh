@@ -9,7 +9,11 @@ KEYS="${KEYS:?set KEYS to a .env file holding GROQ_API_KEY and GEMINI_API_KEY}"
 T="$(cd "$(dirname "$0")" && pwd)"
 SK="$(dirname "$T")"
 node "$T/plan_cuts.mjs" "$W/edit.json" "$W/words.json" "$W" >/dev/null
-node "$SK/repair_holes.mjs" "$W/repaired_norm.mp4" "$W/aroll.mov" --holes "$W/cuts.json" --no-clean >/dev/null
+# an edit edge sits in a dip (plan_cuts snaps it there), so it can take a longer fade than a hole's
+# 5 ms and the room tone on each side meets without a step. 20 ms, after browser-use/video-use's 30 ms,
+# kept short because an "exact" edge is placed by ear next to a word.
+CUT_FADE_MS=20
+node "$SK/repair_holes.mjs" "$W/repaired_norm.mp4" "$W/aroll.mov" --holes "$W/cuts.json" --no-clean --fade-ms "$CUT_FADE_MS" >/dev/null
 bash "$SK/normalize.sh" "$W/aroll.mov" "$W/aroll_norm.mp4" >/dev/null
 rm -f "$W/aroll.mov" "$W/public/aroll.mp4"
 ffmpeg -v error -y -i "$W/aroll_norm.mp4" -vn -ac 1 -ar 16000 -c:a libmp3lame -b:a 48k "$W/aroll16k.mp3"
